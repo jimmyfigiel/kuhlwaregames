@@ -10,9 +10,12 @@
     "deploy": "npm run build && firebase deploy"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^latest",
     "vite": "^8.0.12"
   },
   "dependencies": {
-    "firebase": "^12.13.0"
+    "firebase": "^12.13.0",
+    "react": "^latest",
+    "react-dom": "^latest"
   }
 }
