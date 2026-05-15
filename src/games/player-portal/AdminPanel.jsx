@@ -6,6 +6,7 @@ import {
   getDocs,
   orderBy,
   query,
+  serverTimestamp,
   setDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase.js";
@@ -19,11 +20,18 @@ function arrayToText(value) {
   return value.join(", ");
 }
 
-function textToArray(value) {
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter((item) => item.length > 0);
+function hasGamePermission(permissionArray, gameId) {
+  return Array.isArray(permissionArray) && permissionArray.includes(gameId);
+}
+
+function toggleGamePermission(permissionArray, gameId, checked) {
+  const currentArray = Array.isArray(permissionArray) ? permissionArray : [];
+
+  if (checked) {
+    return Array.from(new Set([...currentArray, gameId])).sort();
+  }
+
+  return currentArray.filter((id) => id !== gameId);
 }
 
 const blankPlayerForm = {
@@ -32,8 +40,8 @@ const blankPlayerForm = {
   pin: "",
   active: true,
   isSuperuser: false,
-  authorizedToPlayText: "player-portal",
-  authorizedToCreateText: "",
+  authorizedToPlay: ["player-portal"],
+  authorizedToCreate: [],
 };
 
 const blankGameForm = {
@@ -106,12 +114,27 @@ export default function AdminPanel({ onClose }) {
       pin: player.pin || "",
       active: player.active !== false,
       isSuperuser: player.isSuperuser === true,
-      authorizedToPlayText: arrayToText(player.authorizedToPlay),
-      authorizedToCreateText: arrayToText(player.authorizedToCreate),
+      authorizedToPlay: Array.isArray(player.authorizedToPlay)
+        ? player.authorizedToPlay
+        : [],
+      authorizedToCreate: Array.isArray(player.authorizedToCreate)
+        ? player.authorizedToCreate
+        : [],
     });
 
     setActiveAdminTab("players");
     setMessage("");
+  }
+
+  function updatePlayerPermission(permissionName, gameId, checked) {
+    setPlayerForm({
+      ...playerForm,
+      [permissionName]: toggleGamePermission(
+        playerForm[permissionName],
+        gameId,
+        checked
+      ),
+    });
   }
 
   async function savePlayer(event) {
@@ -142,9 +165,9 @@ export default function AdminPanel({ onClose }) {
           pin: playerForm.pin.trim(),
           active: playerForm.active,
           isSuperuser: playerForm.isSuperuser,
-          authorizedToPlay: textToArray(playerForm.authorizedToPlayText),
-          authorizedToCreate: textToArray(playerForm.authorizedToCreateText),
-          updatedAt: new Date().toISOString(),
+          authorizedToPlay: playerForm.authorizedToPlay,
+          authorizedToCreate: playerForm.authorizedToCreate,
+          updatedAt: serverTimestamp(),
         },
         { merge: true }
       );
@@ -220,7 +243,7 @@ export default function AdminPanel({ onClose }) {
           enabled: gameForm.enabled,
           minPlayers: Number(gameForm.minPlayers),
           maxPlayers: Number(gameForm.maxPlayers),
-          updatedAt: new Date().toISOString(),
+          updatedAt: serverTimestamp(),
         },
         { merge: true }
       );
@@ -288,7 +311,11 @@ export default function AdminPanel({ onClose }) {
             Manage Games
           </button>
 
-          <button type="button" className="secondary-button" onClick={loadAdminData}>
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={loadAdminData}
+          >
             Refresh
           </button>
 
@@ -403,38 +430,6 @@ export default function AdminPanel({ onClose }) {
                   }
                 />
 
-                <label htmlFor="authorizedToPlay">
-                  Authorized to Play, comma separated
-                </label>
-                <input
-                  id="authorizedToPlay"
-                  type="text"
-                  placeholder="player-portal, baseball, lorcana"
-                  value={playerForm.authorizedToPlayText}
-                  onChange={(event) =>
-                    setPlayerForm({
-                      ...playerForm,
-                      authorizedToPlayText: event.target.value,
-                    })
-                  }
-                />
-
-                <label htmlFor="authorizedToCreate">
-                  Authorized to Create, comma separated
-                </label>
-                <input
-                  id="authorizedToCreate"
-                  type="text"
-                  placeholder="player-portal, baseball"
-                  value={playerForm.authorizedToCreateText}
-                  onChange={(event) =>
-                    setPlayerForm({
-                      ...playerForm,
-                      authorizedToCreateText: event.target.value,
-                    })
-                  }
-                />
-
                 <div className="checkbox-row">
                   <label>
                     <input
@@ -464,6 +459,65 @@ export default function AdminPanel({ onClose }) {
                     Superuser
                   </label>
                 </div>
+
+                <h3>Game Permissions</h3>
+
+                {games.length === 0 ? (
+                  <p className="muted">
+                    No games found. Add games in Manage Games first.
+                  </p>
+                ) : (
+                  <div className="permission-grid">
+                    <div className="permission-grid-header">Game</div>
+                    <div className="permission-grid-header">Can Play</div>
+                    <div className="permission-grid-header">Can Create</div>
+
+                    {games.map((game) => (
+                      <div className="permission-row" key={game.id}>
+                        <div className="permission-game-name">
+                          <strong>{game.title || game.id}</strong>
+                          <span>{game.id}</span>
+                        </div>
+
+                        <label className="permission-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={hasGamePermission(
+                              playerForm.authorizedToPlay,
+                              game.id
+                            )}
+                            onChange={(event) =>
+                              updatePlayerPermission(
+                                "authorizedToPlay",
+                                game.id,
+                                event.target.checked
+                              )
+                            }
+                          />
+                          Play
+                        </label>
+
+                        <label className="permission-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={hasGamePermission(
+                              playerForm.authorizedToCreate,
+                              game.id
+                            )}
+                            onChange={(event) =>
+                              updatePlayerPermission(
+                                "authorizedToCreate",
+                                game.id,
+                                event.target.checked
+                              )
+                            }
+                          />
+                          Create
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <button type="submit">Save Player</button>
               </form>

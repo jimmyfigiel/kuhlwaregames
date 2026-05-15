@@ -1,15 +1,27 @@
 import { useState } from "react";
 import AdminPanel from "./AdminPanel.jsx";
+import ChangePin from "./ChangePin.jsx";
 import "./PlayerPortal.css";
 
-export default function Dashboard({ player, onLogout }) {
+export default function Dashboard({ player, onLogout, onPlayerUpdated }) {
   const [showAdmin, setShowAdmin] = useState(false);
+  const [showChangePin, setShowChangePin] = useState(false);
 
   const authorizedToPlay = player.authorizedToPlay || [];
   const authorizedToCreate = player.authorizedToCreate || [];
 
   if (showAdmin) {
     return <AdminPanel onClose={() => setShowAdmin(false)} />;
+  }
+
+  if (showChangePin) {
+    return (
+      <ChangePin
+        player={player}
+        onCancel={() => setShowChangePin(false)}
+        onPlayerUpdated={onPlayerUpdated}
+      />
+    );
   }
 
   return (
@@ -28,6 +40,14 @@ export default function Dashboard({ player, onLogout }) {
           ) : (
             <span className="badge muted-badge">Player</span>
           )}
+
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={() => setShowChangePin(true)}
+          >
+            Change PIN
+          </button>
 
           <button type="button" className="secondary-button" onClick={onLogout}>
             Log out

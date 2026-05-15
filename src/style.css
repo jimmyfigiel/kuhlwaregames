@@ -23,3 +23,78 @@ button,
 input {
   font: inherit;
 }
+
+.player-portal .single-card-layout {
+  width: min(100%, 700px);
+  margin: 0 auto;
+}
+
+.player-portal .single-card-layout .card {
+  width: 100%;
+}
+
+.player-portal .permission-grid {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 140px 140px;
+  gap: 0;
+  margin-top: 12px;
+  border: 1px solid #444c5f;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.player-portal .permission-grid-header {
+  padding: 10px;
+  background: #242936;
+  color: #d9deea;
+  font-weight: 700;
+  border-bottom: 1px solid #444c5f;
+}
+
+.player-portal .permission-row {
+  display: contents;
+}
+
+.player-portal .permission-game-name,
+.player-portal .permission-checkbox {
+  padding: 10px;
+  border-bottom: 1px solid #444c5f;
+}
+
+.player-portal .permission-game-name span {
+  display: block;
+  color: #b9c0cf;
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.player-portal .permission-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.player-portal .permission-checkbox input {
+  width: auto;
+}
+
+@media (max-width: 700px) {
+  .player-portal .permission-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .player-portal .permission-grid-header {
+    display: none;
+  }
+
+  .player-portal .permission-row {
+    display: block;
+    border-bottom: 1px solid #444c5f;
+  }
+
+  .player-portal .permission-game-name,
+  .player-portal .permission-checkbox {
+    border-bottom: 0;
+  }
+}
