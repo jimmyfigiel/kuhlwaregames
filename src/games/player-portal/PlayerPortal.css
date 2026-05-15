@@ -1,0 +1,264 @@
+.player-portal.app-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.player-portal.portal-shell {
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.player-portal .card {
+  width: min(100%, 560px);
+  background: #2d3340;
+  border: 1px solid #444c5f;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.player-portal .portal-header {
+  width: 100%;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.player-portal .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.player-portal .portal-grid {
+  width: min(100%, 1100px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.player-portal h1,
+.player-portal h2 {
+  margin-top: 0;
+}
+
+.player-portal .muted {
+  color: #b9c0cf;
+}
+
+.player-portal label {
+  display: block;
+  margin: 18px 0 6px;
+  color: #d9deea;
+}
+
+.player-portal input {
+  width: 100%;
+  border: 1px solid #566174;
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: #181b22;
+  color: #ffffff;
+}
+
+.player-portal button {
+  margin-top: 16px;
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  background: #6ea8fe;
+  color: #10141b;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.player-portal button:hover {
+  filter: brightness(1.08);
+}
+
+.player-portal .secondary-button {
+  background: #566174;
+  color: #ffffff;
+}
+
+.player-portal .message {
+  min-height: 1.5em;
+  color: #ffd479;
+}
+
+.player-portal pre {
+  overflow: auto;
+  background: #181b22;
+  border-radius: 12px;
+  padding: 16px;
+  color: #d9deea;
+}
+
+.player-portal .badge {
+  display: inline-block;
+  margin: 4px 0 16px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #ffd479;
+  color: #1e1e1e;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.player-portal .muted-badge {
+  background: #566174;
+  color: #ffffff;
+}
+
+.player-portal .simple-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.player-portal .simple-list li {
+  margin: 8px 0;
+}
+
+.player-portal .button-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.player-portal .admin-layout {
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 20px;
+}
+
+.player-portal .admin-sidebar {
+  align-self: start;
+}
+
+.player-portal .admin-sidebar button {
+  width: 100%;
+  text-align: left;
+}
+
+.player-portal .admin-main {
+  display: grid;
+  gap: 20px;
+}
+
+.player-portal .selected-button {
+  background: #ffd479;
+  color: #1e1e1e;
+}
+
+.player-portal .danger-button {
+  background: #ff7777;
+  color: #1e1e1e;
+}
+
+.player-portal .section-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.player-portal .table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.player-portal .data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.player-portal .data-table th,
+.player-portal .data-table td {
+  border-bottom: 1px solid #444c5f;
+  padding: 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.player-portal .data-table th {
+  color: #d9deea;
+  background: #242936;
+}
+
+.player-portal .row-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.player-portal .row-actions button {
+  margin-top: 0;
+}
+
+.player-portal .checkbox-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.player-portal .checkbox-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.player-portal .checkbox-row input {
+  width: auto;
+}
+
+@media (max-width: 760px) {
+  .player-portal .portal-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .player-portal .portal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .player-portal .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 900px) {
+  .player-portal .admin-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .player-portal .section-heading-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+.player-portal .admin-layout .card {
+  width: 100%;
+}
+
+.player-portal .admin-main {
+  width: 100%;
+  min-width: 0;
+}
+
+.player-portal .table-wrap {
+  width: 100%;
+  max-width: 100%;
+}
