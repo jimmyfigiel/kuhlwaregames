@@ -8,6 +8,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase.js";
 import "./PlayerPortal.css";
@@ -200,6 +201,29 @@ export default function AdminPanel({ onClose }) {
     }
   }
 
+  async function clearPlayerDevices(player) {
+    const confirmed = window.confirm(
+      `Clear remembered devices for "${player.displayName || player.id}"?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await updateDoc(doc(db, "players", player.id), {
+        authUids: [],
+        updatedAt: serverTimestamp(),
+      });
+
+      setMessage(`Cleared remembered devices for ${player.id}.`);
+      await loadAdminData();
+    } catch (error) {
+      console.error(error);
+      setMessage(`Could not clear devices: ${error.message}`);
+    }
+  }
+
   function startNewGame() {
     setGameForm(blankGameForm);
     setActiveAdminTab("games");
@@ -346,6 +370,7 @@ export default function AdminPanel({ onClose }) {
                         <th>Name</th>
                         <th>Status</th>
                         <th>Role</th>
+                        <th>Devices</th>
                         <th>Can Play</th>
                         <th>Can Create</th>
                         <th>Actions</th>
@@ -359,12 +384,25 @@ export default function AdminPanel({ onClose }) {
                           <td>{player.displayName}</td>
                           <td>{player.active === false ? "Inactive" : "Active"}</td>
                           <td>{player.isSuperuser ? "Superuser" : "Player"}</td>
+                          <td>
+                            {Array.isArray(player.authUids)
+                              ? player.authUids.length
+                              : 0}
+                          </td>
                           <td>{arrayToText(player.authorizedToPlay)}</td>
                           <td>{arrayToText(player.authorizedToCreate)}</td>
                           <td>
                             <div className="row-actions">
                               <button type="button" onClick={() => editPlayer(player)}>
                                 Edit
+                              </button>
+
+                              <button
+                                type="button"
+                                className="secondary-button"
+                                onClick={() => clearPlayerDevices(player)}
+                              >
+                                Clear Devices
                               </button>
 
                               <button

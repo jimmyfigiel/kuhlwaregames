@@ -1,14 +1,31 @@
 import { useState } from "react";
 import AdminPanel from "./AdminPanel.jsx";
 import ChangePin from "./ChangePin.jsx";
+import CreateRoom from "./CreateRoom.jsx";
+import DeviceManager from "./DeviceManager.jsx";
+import JoinRoom from "./JoinRoom.jsx";
+import RoomList from "./RoomList.jsx";
 import "./PlayerPortal.css";
 
-export default function Dashboard({ player, onLogout, onPlayerUpdated }) {
+export default function Dashboard({
+  player,
+  authUser,
+  pendingJoinCode,
+  onJoinCodeHandled,
+  onOpenRoom,
+  onLogout,
+  onPlayerUpdated,
+}) {
   const [showAdmin, setShowAdmin] = useState(false);
   const [showChangePin, setShowChangePin] = useState(false);
+  const [showDevices, setShowDevices] = useState(false);
+  const [roomRefreshKey, setRoomRefreshKey] = useState(0);
 
   const authorizedToPlay = player.authorizedToPlay || [];
-  const authorizedToCreate = player.authorizedToCreate || [];
+
+  function refreshRooms() {
+    setRoomRefreshKey((currentValue) => currentValue + 1);
+  }
 
   if (showAdmin) {
     return <AdminPanel onClose={() => setShowAdmin(false)} />;
@@ -24,6 +41,18 @@ export default function Dashboard({ player, onLogout, onPlayerUpdated }) {
     );
   }
 
+  if (showDevices) {
+    return (
+      <DeviceManager
+        player={player}
+        authUser={authUser}
+        onBack={() => setShowDevices(false)}
+        onLogout={onLogout}
+        onPlayerUpdated={onPlayerUpdated}
+      />
+    );
+  }
+
   return (
     <main className="player-portal portal-shell">
       <header className="portal-header">
@@ -31,6 +60,9 @@ export default function Dashboard({ player, onLogout, onPlayerUpdated }) {
           <h1>Kuhlware Games</h1>
           <p className="muted">
             Logged in as <strong>{player.displayName}</strong>
+          </p>
+          <p className="small-muted">
+            Device session: {authUser?.uid || "not available"}
           </p>
         </div>
 
@@ -49,11 +81,30 @@ export default function Dashboard({ player, onLogout, onPlayerUpdated }) {
             Change PIN
           </button>
 
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={() => setShowDevices(true)}
+          >
+            Devices
+          </button>
+
           <button type="button" className="secondary-button" onClick={onLogout}>
             Log out
           </button>
         </div>
       </header>
+
+      {pendingJoinCode && (
+        <section className="portal-wide-row">
+          <JoinRoom
+            player={player}
+            joinCode={pendingJoinCode}
+            onJoined={onOpenRoom}
+            onCancel={onJoinCodeHandled}
+          />
+        </section>
+      )}
 
       <section className="portal-grid">
         <article className="card">
@@ -70,38 +121,19 @@ export default function Dashboard({ player, onLogout, onPlayerUpdated }) {
           )}
         </article>
 
-        <article className="card">
-          <h2>Create New Room</h2>
+        <CreateRoom
+          player={player}
+          onRoomCreated={(room) => {
+            refreshRooms();
+            onOpenRoom(room);
+          }}
+        />
 
-          {authorizedToCreate.length === 0 ? (
-            <p className="muted">You are not authorized to create rooms yet.</p>
-          ) : (
-            <>
-              <p className="muted">Choose a game to create a new room.</p>
-
-              <div className="button-list">
-                {authorizedToCreate.map((gameId) => (
-                  <button
-                    key={gameId}
-                    type="button"
-                    onClick={() =>
-                      alert(`Create room for ${gameId} will be added next.`)
-                    }
-                  >
-                    Create {gameId}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-        </article>
-
-        <article className="card">
-          <h2>Active Rooms</h2>
-          <p className="muted">
-            Room list will appear here once we add the rooms collection query.
-          </p>
-        </article>
+        <RoomList
+          player={player}
+          refreshKey={roomRefreshKey}
+          onOpenRoom={onOpenRoom}
+        />
 
         {player.isSuperuser && (
           <article className="card">

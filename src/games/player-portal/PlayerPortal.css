@@ -262,3 +262,109 @@
   width: 100%;
   max-width: 100%;
 }
+
+.player-portal select {
+  width: 100%;
+  border: 1px solid #566174;
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: #181b22;
+  color: #ffffff;
+  font: inherit;
+}
+
+.player-portal button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.player-portal .room-list {
+  display: grid;
+  gap: 12px;
+}
+
+.player-portal .room-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border: 1px solid #444c5f;
+  border-radius: 12px;
+  padding: 14px;
+  background: #242936;
+}
+
+.player-portal .room-card h3 {
+  margin: 0 0 6px;
+}
+
+.player-portal .room-card p {
+  margin: 4px 0;
+}
+
+.player-portal .room-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.player-portal .room-actions button {
+  margin-top: 0;
+}
+
+@media (max-width: 700px) {
+  .player-portal .room-card {
+    flex-direction: column;
+  }
+}
+
+.player-portal .small-muted {
+  color: #8f98aa;
+  font-size: 0.8rem;
+  word-break: break-all;
+}
+
+.player-portal .portal-wide-row {
+  width: min(100%, 1100px);
+  margin: 0 auto 20px;
+}
+
+.player-portal .wide-card {
+  width: 100%;
+}
+
+.player-portal hr {
+  border: 0;
+  border-top: 1px solid #444c5f;
+  margin: 24px 0;
+}
+
+.player-portal .game-loader-layout {
+  width: min(100%, 1100px);
+  margin: 20px auto 0;
+}
+
+.player-portal .room-details-layout {
+  width: min(100%, 1100px);
+}
+
+.player-portal .game-test-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 18px 0;
+}
+
+.player-portal code {
+  background: #181b22;
+  border: 1px solid #444c5f;
+  border-radius: 6px;
+  padding: 2px 6px;
+  color: #d9deea;
+}
+
+@media (max-width: 760px) {
+  .player-portal .game-test-grid {
+    grid-template-columns: 1fr;
+  }
+}

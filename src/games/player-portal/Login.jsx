@@ -1,18 +1,34 @@
 import { useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  arrayUnion,
+  doc,
+  getDoc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../../firebase.js";
 import "./PlayerPortal.css";
 
-export default function Login({ onLoginSuccess }) {
+export default function Login({
+  authUser,
+  onLoginSuccess,
+  sessionMessage = "",
+}) {
   const [playerCode, setPlayerCode] = useState("");
   const [pin, setPin] = useState("");
-  const [message, setMessage] = useState("");
+  const [rememberDevice, setRememberDevice] = useState(true);
+  const [message, setMessage] = useState(sessionMessage);
 
   async function handleLogin(event) {
     event.preventDefault();
 
     const cleanPlayerCode = playerCode.trim().toLowerCase();
     const cleanPin = pin.trim();
+
+    if (!authUser?.uid) {
+      setMessage("Device authentication is not ready yet. Try again.");
+      return;
+    }
 
     if (!cleanPlayerCode) {
       setMessage("Enter your player code.");
@@ -47,9 +63,19 @@ export default function Login({ onLoginSuccess }) {
         return;
       }
 
+      if (rememberDevice) {
+        await updateDoc(playerRef, {
+          authUids: arrayUnion(authUser.uid),
+          updatedAt: serverTimestamp(),
+        });
+      }
+
       onLoginSuccess({
         id: playerSnap.id,
         ...playerData,
+        authUids: rememberDevice
+          ? Array.from(new Set([...(playerData.authUids || []), authUser.uid]))
+          : playerData.authUids || [],
       });
     } catch (error) {
       console.error(error);
@@ -86,10 +112,23 @@ export default function Login({ onLoginSuccess }) {
             onChange={(event) => setPin(event.target.value)}
           />
 
+          <label className="remember-device-row">
+            <input
+              type="checkbox"
+              checked={rememberDevice}
+              onChange={(event) => setRememberDevice(event.target.checked)}
+            />
+            Remember this device
+          </label>
+
           <button type="submit">Log in</button>
         </form>
 
-        <p className="message">{message}</p>
+        {message && <p className="message">{message}</p>}
+
+        <p className="small-muted">
+          Device ID: {authUser?.uid ? authUser.uid : "not ready"}
+        </p>
       </section>
     </main>
   );
