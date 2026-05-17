@@ -1,9 +1,37 @@
-import { arrayUnion, collection, doc, getDoc, getDocs, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
+// /src/games/player-portal/JoinRoom.jsx
+
+import {
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
+
 import { db } from "../../firebase.js";
+import { ensurePlayerCanUseGame } from "../../playerService.js";
 import "./PlayerPortal.css";
 
-export default function JoinRoom({ player, joinCode, onJoined, onCancel }) {
+function getPlayerDisplayName(player) {
+  return player.displayName || player.name || player.id || "Unknown Player";
+}
+
+function isSuperuser(player) {
+  return player.isSuperuser || player.isSuperUser || false;
+}
+
+export default function JoinRoom({
+  player,
+  authUser,
+  joinCode,
+  onJoined,
+  onCancel,
+}) {
   const [room, setRoom] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -11,6 +39,7 @@ export default function JoinRoom({ player, joinCode, onJoined, onCancel }) {
 
   useEffect(() => {
     findRoom();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [joinCode]);
 
   async function findRoom() {
@@ -18,10 +47,13 @@ export default function JoinRoom({ player, joinCode, onJoined, onCancel }) {
     setMessage("");
 
     try {
-      const cleanJoinCode = joinCode.trim().toLowerCase();
+      const cleanJoinCode = String(joinCode || "").trim().toLowerCase();
 
       const roomSnapshot = await getDocs(
-        query(collection(db, "rooms"), where("joinCodeLower", "==", cleanJoinCode))
+        query(
+          collection(db, "rooms"),
+          where("joinCodeLower", "==", cleanJoinCode)
+        )
       );
 
       if (roomSnapshot.empty) {
@@ -49,10 +81,8 @@ export default function JoinRoom({ player, joinCode, onJoined, onCancel }) {
       return;
     }
 
-    const authorizedToPlay = player.authorizedToPlay || [];
-
-    if (!authorizedToPlay.includes(room.gameId) && !player.isSuperuser) {
-      setMessage("You are not authorized to play this game.");
+    if (!player?.id) {
+      setMessage("No player is logged in.");
       return;
     }
 
@@ -60,37 +90,52 @@ export default function JoinRoom({ player, joinCode, onJoined, onCancel }) {
     setMessage("Joining room...");
 
     try {
-      const gameSnap = await getDoc(doc(db, "games", room.gameId));
+      const playerIds = Array.isArray(room.playerIds) ? room.playerIds : [];
+      const alreadyInRoom = playerIds.includes(player.id);
 
-      if (gameSnap.exists()) {
-        const game = gameSnap.data();
-        const maxPlayers = Number(game.maxPlayers || 0);
-        const playerIds = Array.isArray(room.playerIds) ? room.playerIds : [];
-
-        if (
-          maxPlayers > 0 &&
-          playerIds.length >= maxPlayers &&
-          !playerIds.includes(player.id)
-        ) {
-          setMessage("This room is full.");
-          setJoining(false);
-          return;
-        }
+      if (playerIds.length >= 2 && !alreadyInRoom) {
+        setMessage("This room already has two players.");
+        setJoining(false);
+        return;
       }
+
+      const playerName = getPlayerDisplayName(player);
+
+      const updatedPlayer = isSuperuser(player)
+        ? player
+        : await ensurePlayerCanUseGame(
+            player.id,
+            playerName,
+            room.gameId,
+            authUser?.uid || null
+          );
 
       const roomRef = doc(db, "rooms", room.id);
 
       await updateDoc(roomRef, {
         playerIds: arrayUnion(player.id),
+        players: arrayUnion({
+          playerId: player.id,
+          name: playerName,
+          slotId: null,
+          joinedAt: Date.now(),
+        }),
         updatedAt: serverTimestamp(),
       });
 
       const updatedRoomSnap = await getDoc(roomRef);
 
-      onJoined({
+      const updatedRoom = {
         id: updatedRoomSnap.id,
         ...updatedRoomSnap.data(),
-      });
+      };
+
+      if (onJoined) {
+        onJoined({
+          room: updatedRoom,
+          player: updatedPlayer,
+        });
+      }
     } catch (error) {
       console.error(error);
       setMessage(`Could not join room: ${error.message}`);
@@ -110,6 +155,7 @@ export default function JoinRoom({ player, joinCode, onJoined, onCancel }) {
           <p>
             Join <strong>{room.title || "Untitled Room"}</strong>?
           </p>
+
           <p className="muted">
             {room.gameTitle || room.gameId} · Created by{" "}
             {room.createdByName || room.createdBy}
@@ -120,7 +166,11 @@ export default function JoinRoom({ player, joinCode, onJoined, onCancel }) {
               {joining ? "Joining..." : "Join Room"}
             </button>
 
-            <button type="button" className="secondary-button" onClick={onCancel}>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={onCancel}
+            >
               Cancel
             </button>
           </div>

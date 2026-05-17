@@ -1,13 +1,15 @@
+// /src/games/player-portal/CreateRoom.jsx
+
 import { useEffect, useState } from "react";
 import {
   addDoc,
   collection,
-  doc,
-  getDoc,
   getDocs,
   serverTimestamp,
 } from "firebase/firestore";
+
 import { db } from "../../firebase.js";
+import { loadGameDefinition } from "../../gameRegistry.js";
 import "./PlayerPortal.css";
 
 function makeJoinCode() {
@@ -21,6 +23,10 @@ function makeJoinCode() {
   return code;
 }
 
+function getPlayerDisplayName(player) {
+  return player.displayName || player.name || player.id || "Unknown Player";
+}
+
 export default function CreateRoom({ player, onRoomCreated }) {
   const [games, setGames] = useState([]);
   const [selectedGameId, setSelectedGameId] = useState("");
@@ -29,10 +35,15 @@ export default function CreateRoom({ player, onRoomCreated }) {
   const [loadingGames, setLoadingGames] = useState(true);
   const [creating, setCreating] = useState(false);
 
-  const authorizedToCreate = player.authorizedToCreate || [];
+  const authorizedToCreate =
+    player.authorizedGames ||
+    player.authorizedToCreate ||
+    player.authorizedToPlay ||
+    [];
 
   useEffect(() => {
     loadGames();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function loadGames() {
@@ -40,23 +51,33 @@ export default function CreateRoom({ player, onRoomCreated }) {
     setMessage("");
 
     try {
-      if (authorizedToCreate.length === 0) {
+      if (
+        authorizedToCreate.length === 0 &&
+        !player.isSuperuser &&
+        !player.isSuperUser
+      ) {
         setGames([]);
         return;
       }
 
       const gamesSnapshot = await getDocs(collection(db, "games"));
 
-      const loadedGames = gamesSnapshot.docs
+      let loadedGames = gamesSnapshot.docs
         .map((gameDoc) => ({
           id: gameDoc.id,
           ...gameDoc.data(),
         }))
-        .filter((game) => game.enabled !== false)
-        .filter((game) => authorizedToCreate.includes(game.id))
-        .sort((a, b) =>
-          String(a.title || a.id).localeCompare(String(b.title || b.id))
+        .filter((game) => game.enabled !== false);
+
+      if (!player.isSuperuser && !player.isSuperUser) {
+        loadedGames = loadedGames.filter((game) =>
+          authorizedToCreate.includes(game.id)
         );
+      }
+
+      loadedGames.sort((a, b) =>
+        String(a.title || a.id).localeCompare(String(b.title || b.id))
+      );
 
       setGames(loadedGames);
 
@@ -93,27 +114,88 @@ export default function CreateRoom({ player, onRoomCreated }) {
     setMessage("Creating room...");
 
     try {
+      const gameDefinition = await loadGameDefinition(selectedGame.id);
+
+      const initialGameState =
+        gameDefinition?.rules?.createInitialState
+          ? gameDefinition.rules.createInitialState({ options: {} })
+          : gameDefinition?.createInitialState
+            ? gameDefinition.createInitialState({ options: {} })
+            : null;
+
+      if (!initialGameState) {
+        throw new Error(
+          `Game "${selectedGame.id}" does not provide createInitialState().`
+        );
+      }
+
       const joinCode = makeJoinCode();
+      const playerName = getPlayerDisplayName(player);
+
+      const gameSetup = {
+        started: false,
+
+        visitorsPlayerId: null,
+        homePlayerId: null,
+
+        visitorsTeamName: "Visitors",
+        homeTeamName: "Home",
+
+        visitorsTeamColor: "#991b1b",
+        homeTeamColor: "#1d4ed8",
+      };
 
       const roomDoc = await addDoc(collection(db, "rooms"), {
         title: cleanTitle,
+
         gameId: selectedGame.id,
         gameTitle: selectedGame.title || selectedGame.id,
+
         joinCode,
         joinCodeLower: joinCode.toLowerCase(),
+
         createdBy: player.id,
-        createdByName: player.displayName,
+        createdByName: playerName,
+
         playerIds: [player.id],
-        status: "active",
+
+        players: [
+          {
+            playerId: player.id,
+            name: playerName,
+            slotId: null,
+            joinedAt: Date.now(),
+          },
+        ],
+
+        gameSetup,
+        gameState: initialGameState,
+
+        status: "setup",
+
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
 
-      const roomSnap = await getDoc(doc(db, "rooms", roomDoc.id));
-
       const createdRoom = {
-        id: roomSnap.id,
-        ...roomSnap.data(),
+        id: roomDoc.id,
+        title: cleanTitle,
+        gameId: selectedGame.id,
+        gameTitle: selectedGame.title || selectedGame.id,
+        joinCode,
+        createdBy: player.id,
+        createdByName: playerName,
+        playerIds: [player.id],
+        players: [
+          {
+            playerId: player.id,
+            name: playerName,
+            slotId: null,
+          },
+        ],
+        gameSetup,
+        gameState: initialGameState,
+        status: "setup",
       };
 
       setRoomTitle("");
@@ -130,7 +212,11 @@ export default function CreateRoom({ player, onRoomCreated }) {
     }
   }
 
-  if (authorizedToCreate.length === 0) {
+  if (
+    authorizedToCreate.length === 0 &&
+    !player.isSuperuser &&
+    !player.isSuperUser
+  ) {
     return (
       <article className="card">
         <h2>Create New Room</h2>
@@ -152,6 +238,7 @@ export default function CreateRoom({ player, onRoomCreated }) {
       ) : (
         <form onSubmit={handleCreateRoom}>
           <label htmlFor="gameSelect">Game</label>
+
           <select
             id="gameSelect"
             value={selectedGameId}
@@ -165,6 +252,7 @@ export default function CreateRoom({ player, onRoomCreated }) {
           </select>
 
           <label htmlFor="roomTitle">Room Title</label>
+
           <input
             id="roomTitle"
             type="text"

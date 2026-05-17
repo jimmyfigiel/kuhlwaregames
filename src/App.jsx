@@ -1,8 +1,11 @@
+// /src/App.jsx
+
 import { useEffect, useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
 import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
 
-import { auth, db } from "./firebase.js";
+import { auth } from "./firebase.js";
+import { getPlayerByAuthUid } from "./playerService.js";
+
 import Login from "./games/player-portal/Login.jsx";
 import Dashboard from "./games/player-portal/Dashboard.jsx";
 import RoomScreen from "./games/player-portal/RoomScreen.jsx";
@@ -38,7 +41,9 @@ export default function App() {
         }
 
         setAuthUser(firebaseUser);
-        await restorePlayerFromAuthUid(firebaseUser.uid);
+
+        const restoredPlayer = await getPlayerByAuthUid(firebaseUser.uid);
+        setCurrentPlayer(restoredPlayer);
       } catch (error) {
         console.error(error);
         setSessionMessage(`Auth failed: ${error.message}`);
@@ -51,32 +56,6 @@ export default function App() {
 
     return () => unsubscribe();
   }, []);
-
-  async function restorePlayerFromAuthUid(uid) {
-    try {
-      const playersSnapshot = await getDocs(
-        query(collection(db, "players"), where("authUids", "array-contains", uid))
-      );
-
-      if (playersSnapshot.empty) {
-        setCurrentPlayer(null);
-        return;
-      }
-
-      const activePlayer = playersSnapshot.docs
-        .map((playerSnap) => ({
-          id: playerSnap.id,
-          ...playerSnap.data(),
-        }))
-        .find((player) => player.active !== false);
-
-      setCurrentPlayer(activePlayer || null);
-    } catch (error) {
-      console.error(error);
-      setSessionMessage(`Could not restore player session: ${error.message}`);
-      setCurrentPlayer(null);
-    }
-  }
 
   function handleLoginSuccess(player) {
     setCurrentPlayer(player);

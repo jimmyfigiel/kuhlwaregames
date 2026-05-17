@@ -1,4 +1,7 @@
+// /src/games/player-portal/Dashboard.jsx
+
 import { useState } from "react";
+
 import AdminPanel from "./AdminPanel.jsx";
 import ChangePin from "./ChangePin.jsx";
 import CreateRoom from "./CreateRoom.jsx";
@@ -21,7 +24,13 @@ export default function Dashboard({
   const [showDevices, setShowDevices] = useState(false);
   const [roomRefreshKey, setRoomRefreshKey] = useState(0);
 
-  const authorizedToPlay = player.authorizedToPlay || [];
+  const isSuperuser = player.isSuperuser || player.isSuperUser || false;
+
+  const authorizedGames =
+    player.authorizedGames ||
+    player.authorizedToCreate ||
+    player.authorizedToPlay ||
+    [];
 
   function refreshRooms() {
     setRoomRefreshKey((currentValue) => currentValue + 1);
@@ -58,16 +67,19 @@ export default function Dashboard({
       <header className="portal-header">
         <div>
           <h1>Kuhlware Games</h1>
+
           <p className="muted">
-            Logged in as <strong>{player.displayName}</strong>
+            Logged in as{" "}
+            <strong>{player.displayName || player.name || player.id}</strong>
           </p>
+
           <p className="small-muted">
             Device session: {authUser?.uid || "not available"}
           </p>
         </div>
 
         <div className="header-actions">
-          {player.isSuperuser ? (
+          {isSuperuser ? (
             <span className="badge">Superuser</span>
           ) : (
             <span className="badge muted-badge">Player</span>
@@ -99,45 +111,53 @@ export default function Dashboard({
         <section className="portal-wide-row">
           <JoinRoom
             player={player}
+            authUser={authUser}
             joinCode={pendingJoinCode}
-            onJoined={onOpenRoom}
+            onJoined={(result) => {
+              if (result?.player && onPlayerUpdated) {
+                onPlayerUpdated(result.player);
+              }
+
+              if (result?.room) {
+                refreshRooms();
+                onOpenRoom(result.room);
+                return;
+              }
+
+              refreshRooms();
+              onOpenRoom(result);
+            }}
             onCancel={onJoinCodeHandled}
           />
         </section>
       )}
 
       <section className="portal-grid">
-        <article className="card">
-          <h2>Authorized Games</h2>
-
-          {authorizedToPlay.length === 0 ? (
-            <p className="muted">You are not authorized for any games yet.</p>
-          ) : (
-            <ul className="simple-list">
-              {authorizedToPlay.map((gameId) => (
-                <li key={gameId}>{gameId}</li>
-              ))}
-            </ul>
-          )}
-        </article>
-
-        <CreateRoom
-          player={player}
-          onRoomCreated={(room) => {
-            refreshRooms();
-            onOpenRoom(room);
-          }}
-        />
-
         <RoomList
           player={player}
           refreshKey={roomRefreshKey}
           onOpenRoom={onOpenRoom}
         />
 
-        {player.isSuperuser && (
+        <CreateRoom
+          player={{
+            ...player,
+            isSuperuser,
+            isSuperUser: isSuperuser,
+            authorizedGames,
+            authorizedToCreate: authorizedGames,
+            authorizedToPlay: authorizedGames,
+          }}
+          onRoomCreated={(room) => {
+            refreshRooms();
+            onOpenRoom(room);
+          }}
+        />
+
+        {isSuperuser && (
           <article className="card">
             <h2>Admin</h2>
+
             <p className="muted">
               Manage players, games, permissions, and setup data.
             </p>

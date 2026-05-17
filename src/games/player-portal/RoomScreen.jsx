@@ -1,12 +1,16 @@
+// /src/games/player-portal/RoomScreen.jsx
+
 import {
   arrayRemove,
   deleteDoc,
   doc,
   getDoc,
+  onSnapshot,
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 import GameLoader from "../../GameLoader.jsx";
 import { db } from "../../firebase.js";
 import "./PlayerPortal.css";
@@ -28,9 +32,42 @@ export default function RoomScreen({
 }) {
   const [currentRoom, setCurrentRoom] = useState(room);
   const [message, setMessage] = useState("");
+  const [syncMessage, setSyncMessage] = useState("Connecting to room...");
 
   const isCreator = currentRoom.createdBy === player.id;
-  const canManage = isCreator || player.isSuperuser;
+  const canManage =
+    isCreator || player.isSuperuser || player.isSuperUser || false;
+
+  useEffect(() => {
+    if (!room?.id) {
+      return undefined;
+    }
+
+    const roomRef = doc(db, "rooms", room.id);
+
+    const unsubscribe = onSnapshot(
+      roomRef,
+      (roomSnap) => {
+        if (!roomSnap.exists()) {
+          setSyncMessage("This room no longer exists.");
+          return;
+        }
+
+        setCurrentRoom({
+          id: roomSnap.id,
+          ...roomSnap.data(),
+        });
+
+        setSyncMessage("Live sync active.");
+      },
+      (error) => {
+        console.error(error);
+        setSyncMessage(`Live sync error: ${error.message}`);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [room?.id]);
 
   async function refreshRoom() {
     try {
@@ -70,7 +107,9 @@ export default function RoomScreen({
 
   async function leaveRoom() {
     if (isCreator) {
-      setMessage("Room creators cannot leave their own room. Delete it instead.");
+      setMessage(
+        "Room creators cannot leave their own room. Delete it instead."
+      );
       return;
     }
 
@@ -100,7 +139,9 @@ export default function RoomScreen({
     }
 
     const confirmed = window.confirm(
-      `Delete room "${currentRoom.title || currentRoom.id}"? This cannot be undone.`
+      `Delete room "${
+        currentRoom.title || currentRoom.id
+      }"? This cannot be undone.`
     );
 
     if (!confirmed) {
@@ -118,23 +159,99 @@ export default function RoomScreen({
 
   return (
     <main className="player-portal portal-shell">
-      <header className="portal-header">
-        <div>
-          <h1>{currentRoom.title || "Untitled Room"}</h1>
+      <header
+        className="portal-header"
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "8px",
+          padding: "4px 6px",
+          marginBottom: "6px",
+          minHeight: "32px",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            minWidth: 0,
+            flex: 1,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+          }}
+        >
+          <strong
+            style={{
+              fontSize: "14px",
+              lineHeight: 1,
+              color: "#fff",
+              flexShrink: 0,
+            }}
+          >
+            Kuhlware Games
+          </strong>
+
+          <span
+            style={{
+              fontSize: "12px",
+              lineHeight: 1,
+              color: "#ddd",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            Playing as {player.displayName || player.name || player.id}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={onBack}
+          style={{
+            fontSize: "12px",
+            padding: "4px 8px",
+            lineHeight: 1.1,
+            flexShrink: 0,
+          }}
+        >
+          Back
+        </button>
+      </header>
+
+      <section
+        className="game-loader-layout"
+        style={{
+          marginTop: 0,
+          paddingTop: 0,
+        }}
+      >
+        <GameLoader
+          room={currentRoom}
+          player={player}
+          authUser={authUser}
+          onRoomChanged={refreshRoom}
+        />
+      </section>
+
+      <section className="single-card-layout room-details-layout">
+        <article className="card">
+          <h2>{currentRoom.title || "Untitled Room"}</h2>
+
           <p className="muted">
             {currentRoom.gameTitle || currentRoom.gameId} · Room screen
           </p>
+
           {currentRoom.joinCode && (
             <p className="small-muted">Join Code: {currentRoom.joinCode}</p>
           )}
-        </div>
 
-        <div className="header-actions">
-          <button type="button" className="secondary-button" onClick={onBack}>
-            Back to Portal
-          </button>
-        </div>
-      </header>
+          <p className="small-muted">{syncMessage}</p>
+        </article>
+      </section>
 
       <section className="single-card-layout room-details-layout">
         <article className="card">
@@ -153,6 +270,14 @@ export default function RoomScreen({
             <strong>Players:</strong>{" "}
             {(currentRoom.playerIds || []).join(", ") || "None"}
           </p>
+
+          {currentRoom.joinCode && (
+            <p>
+              <strong>Invite Link:</strong>
+              <br />
+              {getJoinUrl(currentRoom.joinCode)}
+            </p>
+          )}
 
           <div className="button-list">
             <button type="button" onClick={refreshRoom}>
@@ -192,15 +317,6 @@ export default function RoomScreen({
 
           {message && <p className="message">{message}</p>}
         </article>
-      </section>
-
-      <section className="game-loader-layout">
-        <GameLoader
-          room={currentRoom}
-          player={player}
-          authUser={authUser}
-          onRoomChanged={refreshRoom}
-        />
       </section>
     </main>
   );

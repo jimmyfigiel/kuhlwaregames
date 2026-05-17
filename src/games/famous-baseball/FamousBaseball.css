@@ -1,0 +1,437 @@
+/* /src/games/famous-baseball/FamousBaseball.css */
+
+.fbb-game {
+  width: 100%;
+}
+
+.fbb-card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 14px;
+  background: #ffffff;
+  margin-bottom: 14px;
+  color: #111111;
+}
+
+.fbb-card h2,
+.fbb-card h3,
+.fbb-card p,
+.fbb-card div,
+.fbb-card label {
+  color: #111111;
+}
+
+.fbb-muted {
+  color: #333333;
+  opacity: 0.8;
+}
+
+.fbb-button-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.fbb-choice-button {
+  border: 2px solid #111111;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 800;
+  background: #ffffff;
+  color: #111111;
+  cursor: pointer;
+}
+
+.fbb-choice-button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.fbb-input {
+  width: 100%;
+  margin-top: 4px;
+  margin-bottom: 10px;
+  padding: 8px;
+  color: #111111;
+  background: #ffffff;
+  border: 1px solid #999999;
+  border-radius: 6px;
+}
+
+.fbb-label {
+  display: block;
+  color: #111111;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.fbb-setup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.fbb-setup-team-card {
+  border: 4px solid #333333;
+  border-radius: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  color: #111111;
+}
+
+.fbb-color-input {
+  display: block;
+  width: 100%;
+  height: 42px;
+  margin-top: 4px;
+  margin-bottom: 10px;
+  background: #ffffff;
+  border: 1px solid #999999;
+  border-radius: 6px;
+}
+
+.fbb-invite-box {
+  border: 2px solid #111111;
+  border-radius: 10px;
+  padding: 12px;
+  background: #f3f4f6;
+  margin-bottom: 14px;
+  color: #111111;
+}
+
+.fbb-scoreboard {
+  background: #111111;
+  border: 3px solid #333333;
+  border-radius: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.fbb-scoreboard-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 64px 104px;
+  min-height: 108px;
+  min-width: 428px;
+  width: 100%;
+}
+
+.fbb-team-row {
+  display: grid;
+  grid-template-columns: 58px 1fr 48px;
+  align-items: center;
+  height: 54px;
+  border-bottom: 2px solid #111111;
+}
+
+.fbb-team-row.inactive {
+  opacity: 0.78;
+}
+
+.fbb-team-side {
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 900;
+  text-align: center;
+  line-height: 1;
+}
+
+.fbb-team-name {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.fbb-team-score {
+  color: #ffffff;
+  font-size: 34px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.fbb-inning-panel {
+  background: #050505;
+  color: #ffffff;
+  border-left: 2px solid #333333;
+  border-right: 2px solid #333333;
+  display: grid;
+  grid-template-rows: 1fr 1.5fr 1fr;
+  align-items: center;
+  justify-items: center;
+  min-width: 64px;
+  height: 108px;
+}
+
+.fbb-inning-arrow {
+  color: #555555;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.fbb-inning-arrow.active {
+  color: #ffffff;
+}
+
+.fbb-inning-number {
+  color: #ffffff;
+  font-size: 42px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.fbb-bases-panel {
+  background: #050505;
+  color: #ffffff;
+  min-width: 104px;
+  height: 108px;
+  border-right: 2px solid #333333;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.fbb-diamond {
+  position: relative;
+  width: 88px;
+  height: 70px;
+  margin: 0 auto;
+}
+
+.fbb-base {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: #374151;
+  border: 2px solid #111111;
+  transform: rotate(45deg);
+}
+
+.fbb-base.occupied {
+  background: #facc15;
+}
+
+.fbb-base.second {
+  left: 32px;
+  top: 0;
+}
+
+.fbb-base.third {
+  left: 8px;
+  top: 25px;
+}
+
+.fbb-base.first {
+  right: 8px;
+  top: 25px;
+}
+
+.fbb-outs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.fbb-out-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #374151;
+  display: inline-block;
+}
+
+.fbb-out-dot.occupied {
+  background: #facc15;
+}
+
+.fbb-status-strip {
+  display: grid;
+  grid-template-columns: 90px 1fr 1fr;
+  min-width: 428px;
+  background: #050505;
+  border-top: 2px solid #333333;
+}
+
+.fbb-status-strip-phase {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 2px solid #333333;
+  padding: 6px;
+}
+
+.fbb-status-strip-line {
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+  padding: 8px 6px;
+  border-right: 2px solid #333333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fbb-status-strip-line.done {
+  color: #facc15;
+}
+
+.fbb-scoreboard-footer {
+  background: #050505;
+  color: #ffffff;
+  border-top: 2px solid #333333;
+  padding: 8px 10px;
+  font-size: 14px;
+  text-align: center;
+  min-width: 428px;
+}
+
+.fbb-scoreboard-footer strong {
+  color: #ffffff;
+}
+
+.fbb-result-title {
+  font-weight: 800;
+  font-size: 18px;
+  color: #111111;
+}
+
+.fbb-result-detail {
+  margin-top: 4px;
+  color: #111111;
+}
+
+.fbb-section-title {
+  font-weight: 800;
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #111111;
+}
+
+.fbb-small-chart {
+  font-size: 13px;
+  opacity: 0.8;
+  border-top: 1px solid #dddddd;
+  padding-top: 10px;
+  margin-top: 12px;
+  color: #111111;
+}
+
+.fbb-log-title {
+  font-weight: 800;
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #111111;
+}
+
+.fbb-log-entry {
+  padding-top: 8px;
+  margin-top: 8px;
+  color: #111111;
+}
+
+.fbb-log-entry + .fbb-log-entry {
+  border-top: 1px solid #dddddd;
+}
+
+.fbb-log-entry-title {
+  font-weight: 800;
+}
+
+.fbb-log-entry-detail {
+  font-size: 14px;
+}
+
+/* Keep the scoreboard as one row on mobile.
+   It scrolls horizontally instead of stacking. */
+@media (max-width: 760px) {
+  .fbb-scoreboard-grid {
+    grid-template-columns: 220px 52px 86px;
+    min-width: 358px;
+  }
+
+  .fbb-status-strip {
+    grid-template-columns: 70px 1fr 1fr;
+    min-width: 358px;
+  }
+
+  .fbb-scoreboard-footer {
+    min-width: 358px;
+    font-size: 12px;
+  }
+
+  .fbb-team-row {
+    grid-template-columns: 44px 1fr 40px;
+  }
+
+  .fbb-team-side {
+    font-size: 22px;
+  }
+
+  .fbb-team-name {
+    font-size: 18px;
+  }
+
+  .fbb-team-score {
+    font-size: 30px;
+  }
+
+  .fbb-inning-panel {
+    min-width: 52px;
+  }
+
+  .fbb-inning-number {
+    font-size: 34px;
+  }
+
+  .fbb-bases-panel {
+    min-width: 86px;
+  }
+
+  .fbb-diamond {
+    width: 74px;
+    height: 60px;
+  }
+
+  .fbb-base {
+    width: 20px;
+    height: 20px;
+  }
+
+  .fbb-base.second {
+    left: 27px;
+    top: 0;
+  }
+
+  .fbb-base.third {
+    left: 6px;
+    top: 21px;
+  }
+
+  .fbb-base.first {
+    right: 6px;
+    top: 21px;
+  }
+
+  .fbb-status-strip-phase {
+    font-size: 14px;
+  }
+
+  .fbb-status-strip-line {
+    font-size: 10px;
+    padding: 6px 4px;
+  }
+}
