@@ -1,0 +1,251 @@
+.fp-wrap {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #111;
+  max-width: 100%;
+  padding: 4px;
+}
+
+.fp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 4px;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 3;
+}
+
+.fp-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.fp-subtitle {
+  font-size: 11px;
+  color: #555;
+}
+
+.fp-tabs {
+  display: flex;
+  overflow-x: auto;
+  gap: 3px;
+  padding: 4px 0;
+  position: sticky;
+  top: 37px;
+  background: #fff;
+  z-index: 2;
+  border-bottom: 1px solid #ddd;
+}
+
+.fp-tab,
+.fp-btn {
+  border: 1px solid #aaa;
+  background: #f7f7f7;
+  color: #111;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: 12px;
+  line-height: 1.1;
+  min-height: 24px;
+  white-space: nowrap;
+}
+
+.fp-tab.active,
+.fp-primary {
+  background: #222;
+  color: #fff;
+  border-color: #222;
+}
+
+.fp-danger {
+  background: #fff4f4;
+  border-color: #c66;
+  color: #900;
+}
+
+.fp-panel {
+  padding: 2px 0;
+}
+
+.fp-toolbar,
+.fp-actions,
+.fp-template-row,
+.fp-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 3px 0;
+}
+
+.fp-accordion {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin: 4px 0;
+  background: #fff;
+}
+
+.fp-accordion-head {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 4px;
+  background: #f2f2f2;
+  border-radius: 5px 5px 0 0;
+}
+
+.fp-accordion-toggle {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 4px;
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  color: #111;
+}
+
+.fp-caret {
+  width: 14px;
+  display: inline-block;
+}
+
+.fp-accordion-title {
+  font-weight: 700;
+}
+
+.fp-accordion-subtitle {
+  color: #555;
+  font-size: 11px;
+  margin-left: 5px;
+}
+
+.fp-accordion-actions {
+  padding: 2px;
+  display: flex;
+  align-items: center;
+}
+
+.fp-accordion-body {
+  padding: 4px;
+}
+
+.fp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 4px;
+}
+
+.fp-field,
+.fp-check {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 11px;
+  color: #333;
+}
+
+.fp-field-wide {
+  grid-column: 1 / -1;
+}
+
+.fp-field input,
+.fp-field select,
+.fp-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 13px;
+  padding: 3px;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  background: #fff;
+  color: #111;
+}
+
+.fp-field textarea {
+  resize: vertical;
+}
+
+.fp-check {
+  flex-direction: row;
+  align-items: center;
+  padding-top: 16px;
+}
+
+.fp-inline-card {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px;
+  margin: 3px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 4px;
+}
+
+.fp-chip {
+  border: 1px solid #bbb;
+  border-radius: 999px;
+  padding: 2px 6px;
+  background: #f7f7f7;
+  font-size: 11px;
+}
+
+.fp-mini-title {
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 5px;
+}
+
+.fp-muted {
+  color: #666;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.fp-error {
+  color: #900;
+  background: #fff0f0;
+  border: 1px solid #d99;
+  padding: 4px;
+  margin: 4px 0;
+}
+
+.fp-log-line {
+  border-bottom: 1px solid #eee;
+  padding: 3px 0;
+}
+
+@media (max-width: 520px) {
+  .fp-wrap {
+    font-size: 12px;
+    padding: 2px;
+  }
+
+  .fp-grid,
+  .fp-inline-card {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3px;
+  }
+
+  .fp-field-wide {
+    grid-column: 1 / -1;
+  }
+
+  .fp-field input,
+  .fp-field select,
+  .fp-field textarea {
+    font-size: 12px;
+    padding: 2px;
+  }
+
+  .fp-tab,
+  .fp-btn {
+    font-size: 11px;
+    padding: 3px 5px;
+  }
+}
