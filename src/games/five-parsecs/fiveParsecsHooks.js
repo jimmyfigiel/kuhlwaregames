@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import {
   FP_COLLECTIONS,
   addFiveParsecsRecord,
@@ -8,10 +9,12 @@ import {
   subscribeCrew,
   updateFiveParsecsRecord,
   getIdField,
+  undoFiveParsecsLogEntry,
 } from "./fiveParsecsFirestore";
 
 const emptyState = {
   crewMembers: [],
+  equipmentTemplates: [],
   equipment: [],
   worlds: [],
   patrons: [],
@@ -21,6 +24,7 @@ const emptyState = {
   encounters: [],
   encounterEnemies: [],
   enemyTemplates: [],
+  campaignTurns: [],
   logEntries: [],
 };
 
@@ -58,7 +62,10 @@ export function useFiveParsecsRecords(roomId, playerId) {
           roomId,
           collectionName,
           (items) => {
-            setRecords((prev) => ({ ...prev, [collectionName]: items }));
+            setRecords((prev) => ({
+              ...prev,
+              [collectionName]: items,
+            }));
           },
           (err) => {
             setError(err.message || String(err));
@@ -69,12 +76,14 @@ export function useFiveParsecsRecords(roomId, playerId) {
     });
 
     return () => {
-      unsubs.forEach((unsub) => unsub && unsub());
+      unsubs.forEach((unsub) => {
+        if (unsub) unsub();
+      });
     };
   }, [roomId]);
 
   async function saveCrew(crewRecord) {
-    await saveCrewRecord(roomId, crewRecord, playerId);
+    await saveCrewRecord(roomId, crewRecord, playerId, crew);
   }
 
   async function addRecord(collectionName, record) {
@@ -83,25 +92,77 @@ export function useFiveParsecsRecords(roomId, playerId) {
 
   async function updateRecord(collectionName, recordOrId, patch = null) {
     const idField = getIdField(collectionName);
-    const recordId = typeof recordOrId === "string" ? recordOrId : recordOrId[idField] || recordOrId.id;
+
+    const recordId =
+      typeof recordOrId === "string"
+        ? recordOrId
+        : recordOrId[idField] || recordOrId.id;
+
     const updatePatch = patch || recordOrId;
-    return updateFiveParsecsRecord(roomId, collectionName, recordId, updatePatch, playerId);
+
+    const oldRecord = records[collectionName]?.find(
+      (item) => item[idField] === recordId || item.id === recordId
+    );
+
+    return updateFiveParsecsRecord(
+      roomId,
+      collectionName,
+      recordId,
+      updatePatch,
+      playerId,
+      oldRecord
+    );
   }
 
   async function deleteRecord(collectionName, recordOrId) {
     const idField = getIdField(collectionName);
-    const recordId = typeof recordOrId === "string" ? recordOrId : recordOrId[idField] || recordOrId.id;
-    return deleteFiveParsecsRecord(roomId, collectionName, recordId);
+
+    const recordId =
+      typeof recordOrId === "string"
+        ? recordOrId
+        : recordOrId[idField] || recordOrId.id;
+
+    const oldRecord = records[collectionName]?.find(
+      (item) => item[idField] === recordId || item.id === recordId
+    );
+
+    return deleteFiveParsecsRecord(
+      roomId,
+      collectionName,
+      recordId,
+      playerId,
+      oldRecord
+    );
+  }
+
+  async function undoLogEntry(logEntry) {
+    return undoFiveParsecsLogEntry(roomId, logEntry, playerId);
   }
 
   return {
     loading,
     error,
+
     crew,
-    ...records,
+
+    crewMembers: records.crewMembers,
+    equipmentTemplates: records.equipmentTemplates,
+    equipment: records.equipment,
+    worlds: records.worlds,
+    patrons: records.patrons,
+    rivals: records.rivals,
+    quests: records.quests,
+    rumors: records.rumors,
+    encounters: records.encounters,
+    encounterEnemies: records.encounterEnemies,
+    enemyTemplates: records.enemyTemplates,
+    campaignTurns: records.campaignTurns,
+    logEntries: records.logEntries,
+
     saveCrew,
     addRecord,
     updateRecord,
     deleteRecord,
+    undoLogEntry,
   };
 }

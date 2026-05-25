@@ -1,10 +1,287 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
+
 import AccordionSection from "./AccordionSection";
-import { CompactField, CompactListField } from "./CompactField";
+import { CompactField } from "./CompactField";
+
+function safeNumber(value) {
+  if (value === "" || value === null || value === undefined) return 0;
+  return Number(value);
+}
+
+function getCrewMemberGearSummary(member, equipment) {
+  const items = equipment.filter((item) => {
+    return (
+      item.locationType === "crewMember" &&
+      item.crewMemberId === member.crewMemberId
+    );
+  });
+
+  if (items.length === 0) return "";
+
+  return items
+    .map((item) => {
+      if (item.category === "weapon") {
+        const weapon = item.weapon || {};
+        const parts = [
+          item.name,
+          weapon.range ? `R ${weapon.range}` : "",
+          weapon.shots !== "" && weapon.shots !== undefined
+            ? `S ${weapon.shots}`
+            : "",
+          weapon.damage !== "" && weapon.damage !== undefined
+            ? `D ${weapon.damage}`
+            : "",
+          Array.isArray(weapon.traits) && weapon.traits.length
+            ? weapon.traits.join("/")
+            : "",
+          Array.isArray(weapon.mods) && weapon.mods.length
+            ? `Mods: ${weapon.mods.join("/")}`
+            : "",
+          weapon.sight ? `Sight: ${weapon.sight}` : "",
+        ];
+
+        return parts.filter(Boolean).join(" ");
+      }
+
+      if (item.category === "protection") {
+        return `${item.name}${item.subtype ? ` (${item.subtype})` : ""}`;
+      }
+
+      return item.name;
+    })
+    .join(" | ");
+}
+
+function getCaptainName(crew, crewMembers) {
+  const captainId = crew?.captainCrewMemberId || "";
+
+  if (!captainId) return "";
+
+  const captain = crewMembers.find((member) => {
+    return member.crewMemberId === captainId;
+  });
+
+  return captain?.name || "";
+}
+
+function CrewDetailsRow({
+  member,
+  onUpdate,
+  onDelete,
+  onAddCrewMemberLog,
+}) {
+  function patch(patchValue) {
+    onUpdate("crewMembers", member.crewMemberId, patchValue);
+  }
+
+  return (
+    <tr className="fp-crew-details-row">
+      <td colSpan={13}>
+        <div className="fp-inline-card fp-crew-details-card">
+          <CompactField
+            label="Background"
+            value={member.background || ""}
+            textarea
+            onChange={(value) => patch({ background: value })}
+          />
+
+          <CompactField
+            label="Motivation"
+            value={member.motivation || ""}
+            textarea
+            onChange={(value) => patch({ motivation: value })}
+          />
+
+          <CompactField
+            label="Notes"
+            value={member.notes || ""}
+            textarea
+            onChange={(value) => patch({ notes: value })}
+          />
+
+          <div className="fp-actions fp-field-wide">
+            <button
+              className="fp-btn"
+              onClick={() => onAddCrewMemberLog(member.crewMemberId)}
+            >
+              Add Log
+            </button>
+
+            <button
+              className="fp-btn fp-danger"
+              onClick={() => onDelete("crewMembers", member.crewMemberId)}
+            >
+              Delete Crew Member
+            </button>
+          </div>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+function EditableCrewRow({
+  crew,
+  member,
+  equipment,
+  expanded,
+  onToggleExpanded,
+  onUpdate,
+  onSetCaptain,
+}) {
+  const gearSummary = getCrewMemberGearSummary(member, equipment);
+  const isCaptain = crew?.captainCrewMemberId === member.crewMemberId;
+
+  function patch(patchValue) {
+    onUpdate("crewMembers", member.crewMemberId, patchValue);
+  }
+
+  function toggleCaptain(event) {
+    if (event.target.checked) {
+      onSetCaptain(member.crewMemberId);
+      return;
+    }
+
+    if (isCaptain) {
+      onSetCaptain("");
+    }
+  }
+
+  return (
+    <tr className={isCaptain ? "fp-crew-captain-row" : ""}>
+      <td className="fp-crew-captain-cell">
+        <input
+          type="checkbox"
+          checked={isCaptain}
+          onChange={toggleCaptain}
+          title="Captain"
+        />
+      </td>
+
+      <td>
+        <input
+          className="fp-table-input fp-name-input"
+          value={member.name || ""}
+          onChange={(event) => patch({ name: event.target.value })}
+        />
+      </td>
+
+      <td>
+        <input
+          className="fp-table-input fp-short-text-input"
+          value={member.speciesType || ""}
+          onChange={(event) => patch({ speciesType: event.target.value })}
+        />
+      </td>
+
+      <td>
+        <input
+          className="fp-table-input fp-short-text-input"
+          value={member.class || ""}
+          onChange={(event) => patch({ class: event.target.value })}
+        />
+      </td>
+
+      <td>
+        <input
+          className="fp-table-input fp-stat-input"
+          type="number"
+          value={member.reactions ?? 0}
+          onChange={(event) =>
+            patch({ reactions: safeNumber(event.target.value) })
+          }
+        />
+      </td>
+
+      <td>
+        <input
+          className="fp-table-input fp-stat-input"
+          type="number"
+          value={member.speed ?? 0}
+          onChange={(event) =>
+            patch({ speed: safeNumber(event.target.value) })
+          }
+        />
+      </td>
+
+      <td>
+        <input
+          className="fp-table-input fp-stat-input"
+          type="number"
+          value={member.combatSkill ?? 0}
+          onChange={(event) =>
+            patch({ combatSkill: safeNumber(event.target.value) })
+          }
+        />
+      </td>
+
+      <td>
+        <input
+          className="fp-table-input fp-stat-input"
+          type="number"
+          value={member.toughness ?? 0}
+          onChange={(event) =>
+            patch({ toughness: safeNumber(event.target.value) })
+          }
+        />
+      </td>
+
+      <td>
+        <input
+          className="fp-table-input fp-stat-input"
+          type="number"
+          value={member.savvy ?? 0}
+          onChange={(event) =>
+            patch({ savvy: safeNumber(event.target.value) })
+          }
+        />
+      </td>
+
+      <td>
+        <input
+          className="fp-table-input fp-stat-input"
+          type="number"
+          value={member.luck ?? 0}
+          onChange={(event) =>
+            patch({ luck: safeNumber(event.target.value) })
+          }
+        />
+      </td>
+
+      <td>
+        <input
+          className="fp-table-input fp-stat-input"
+          type="number"
+          value={member.xp ?? 0}
+          onChange={(event) => patch({ xp: safeNumber(event.target.value) })}
+        />
+      </td>
+
+      <td>
+        <input
+          className="fp-table-input fp-status-input"
+          value={member.currentStatus || ""}
+          onChange={(event) => patch({ currentStatus: event.target.value })}
+        />
+      </td>
+
+      <td className="fp-wrap-cell fp-gear-summary-cell">
+        {gearSummary || <span className="fp-muted-inline">No gear</span>}
+      </td>
+
+      <td className="fp-table-actions-cell">
+        <button className="fp-btn fp-mini-btn" onClick={onToggleExpanded}>
+          {expanded ? "Hide" : "Details"}
+        </button>
+      </td>
+    </tr>
+  );
+}
 
 export default function CrewPanel({
   crew,
   crewMembers,
+  equipment,
   quests,
   rumors,
   onSaveCrew,
@@ -12,74 +289,215 @@ export default function CrewPanel({
   onDelete,
   onAddQuest,
   onAddRumor,
+  onAddCrewMember,
+  onAddCrewMemberLog,
   onAddLog,
 }) {
-  if (!crew) return <div className="fp-muted">Create a crew to begin.</div>;
+  const [expandedCrewMemberIds, setExpandedCrewMemberIds] = useState({});
 
-  function patchCrew(patch) {
-    onSaveCrew({ ...crew, ...patch });
+  const sortedCrewMembers = useMemo(() => {
+    return [...crewMembers].sort((a, b) => {
+      return (a.name || "").localeCompare(b.name || "");
+    });
+  }, [crewMembers]);
+
+  const activeQuestCount = quests.filter((quest) => {
+    return quest.status !== "complete" && quest.status !== "completed";
+  }).length;
+
+  const activeRumorCount = rumors.filter((rumor) => {
+    return rumor.status !== "complete" && rumor.status !== "completed";
+  }).length;
+
+  function patchCrew(patchValue) {
+    if (!crew) return;
+
+    onSaveCrew({
+      ...crew,
+      ...patchValue,
+    });
   }
 
-  function patchShip(patch) {
-    patchCrew({ ship: { ...(crew.ship || {}), ...patch } });
+  function toggleCrewMember(memberId) {
+    setExpandedCrewMemberIds((current) => ({
+      ...current,
+      [memberId]: !current[memberId],
+    }));
+  }
+
+  function setCaptain(crewMemberId) {
+    patchCrew({
+      captainCrewMemberId: crewMemberId,
+    });
+  }
+
+  if (!crew) {
+    return (
+      <div className="fp-panel">
+        <div className="fp-muted">
+          No adventure has been created yet. Use the Create Adventure button in
+          the header.
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="fp-panel">
-      <AccordionSection title="Crew Summary" defaultOpen actions={<button className="fp-btn" onClick={onAddLog}>Log</button>}>
+      <AccordionSection title="Adventure Summary" defaultOpen>
         <div className="fp-grid">
-          <CompactField label="Crew" value={crew.crewName} onChange={(v) => patchCrew({ crewName: v })} />
+          <CompactField
+            label="Adventure Name"
+            value={crew.crewName || ""}
+            onChange={(value) => patchCrew({ crewName: value })}
+          />
+
           <CompactField
             label="Captain"
-            value={crew.captainCrewMemberId}
-            onChange={(v) => patchCrew({ captainCrewMemberId: v })}
-            options={crewMembers.map((m) => m.crewMemberId)}
+            value={crew.captainCrewMemberId || ""}
+            options={[
+              { value: "", label: "No Captain" },
+              ...crewMembers.map((member) => ({
+                value: member.crewMemberId,
+                label: member.name || "Unnamed Crew Member",
+              })),
+            ]}
+            onChange={(value) => patchCrew({ captainCrewMemberId: value })}
           />
-          <CompactField label="Credits" type="number" value={crew.credits} onChange={(v) => patchCrew({ credits: v })} />
-          <CompactField label="Story Points" type="number" value={crew.storyPoints} onChange={(v) => patchCrew({ storyPoints: v })} />
-          <CompactField label="Turn" type="number" value={crew.campaignTurn} onChange={(v) => patchCrew({ campaignTurn: v })} />
-          <CompactField label="Clock" value={crew.clock} onChange={(v) => patchCrew({ clock: v })} />
-          <CompactField label="Event" value={crew.event} onChange={(v) => patchCrew({ event: v })} />
-          <CompactField label="Story Track" value={crew.storyTrack} onChange={(v) => patchCrew({ storyTrack: v })} textarea />
+
+          <CompactField
+            label="Story Points"
+            type="number"
+            value={crew.storyPoints ?? 0}
+            onChange={(value) => patchCrew({ storyPoints: safeNumber(value) })}
+          />
+
+          <CompactField
+            label="Credits"
+            type="number"
+            value={crew.credits ?? 0}
+            onChange={(value) => patchCrew({ credits: safeNumber(value) })}
+          />
+
+          <CompactField
+            label="Debt"
+            type="number"
+            value={crew.debt ?? 0}
+            onChange={(value) => patchCrew({ debt: safeNumber(value) })}
+          />
+
+          <CompactField
+            label="Campaign Turn"
+            type="number"
+            value={crew.campaignTurn ?? 1}
+            onChange={(value) =>
+              patchCrew({ campaignTurn: safeNumber(value) })
+            }
+          />
+
+          <CompactField
+            label="Adventure Notes"
+            value={crew.notes || ""}
+            textarea
+            onChange={(value) => patchCrew({ notes: value })}
+          />
+        </div>
+
+        <div className="fp-turn-summary">
+          Captain: {getCaptainName(crew, crewMembers) || "None"} · Crew:{" "}
+          {crewMembers.length} · Active Quests: {activeQuestCount} · Active
+          Rumors: {activeRumorCount}
+        </div>
+
+        <div className="fp-actions">
+          <button className="fp-btn" onClick={onAddQuest}>
+            Add Quest
+          </button>
+
+          <button className="fp-btn" onClick={onAddRumor}>
+            Add Rumor
+          </button>
+
+          <button className="fp-btn" onClick={onAddLog}>
+            Add Adventure Log
+          </button>
         </div>
       </AccordionSection>
 
-      <AccordionSection title="Ship" defaultOpen>
-        <div className="fp-grid">
-          <CompactField label="Name" value={crew.ship?.name} onChange={(v) => patchShip({ name: v })} />
-          <CompactField label="Type/Details" value={crew.ship?.type} onChange={(v) => patchShip({ type: v })} />
-          <CompactField label="Debt" type="number" value={crew.ship?.debt} onChange={(v) => patchShip({ debt: v })} />
-          <CompactField label="Hull" type="number" value={crew.ship?.hullPoints} onChange={(v) => patchShip({ hullPoints: v })} />
-          <CompactListField label="Traits" value={crew.ship?.traits || []} onChange={(v) => patchShip({ traits: v })} />
-          <CompactListField label="Upgrades" value={crew.ship?.upgrades || []} onChange={(v) => patchShip({ upgrades: v })} />
+      <AccordionSection
+        title="Crew"
+        subtitle={`${crewMembers.length} crew member${crewMembers.length === 1 ? "" : "s"}`}
+        defaultOpen
+      >
+        <div className="fp-actions">
+          <button className="fp-btn fp-primary" onClick={onAddCrewMember}>
+            Add Crew Member
+          </button>
         </div>
-      </AccordionSection>
 
-      <AccordionSection title="Quests" actions={<button className="fp-btn" onClick={onAddQuest}>Add</button>}>
-        {quests.map((q) => (
-          <AccordionSection key={q.questId} title={q.name || "Quest"} subtitle={q.status}>
-            <div className="fp-grid">
-              <CompactField label="Name" value={q.name} onChange={(v) => onUpdate("quests", q.questId, { name: v })} />
-              <CompactField label="Source" value={q.source} onChange={(v) => onUpdate("quests", q.questId, { source: v })} />
-              <CompactField label="Status" value={q.status} onChange={(v) => onUpdate("quests", q.questId, { status: v })} />
-              <CompactField label="Progress" value={q.progress} onChange={(v) => onUpdate("quests", q.questId, { progress: v })} textarea />
-            </div>
-            <button className="fp-btn fp-danger" onClick={() => onDelete("quests", q.questId)}>Delete</button>
-          </AccordionSection>
-        ))}
-      </AccordionSection>
+        <div className="fp-table-wrap fp-crew-table-wrap">
+          <table className="fp-table fp-crew-table">
+            <thead>
+              <tr>
+                <th>Cap</th>
+                <th>Name</th>
+                <th>Species</th>
+                <th>Class</th>
+                <th>Rea</th>
+                <th>Spd</th>
+                <th>Cbt</th>
+                <th>Tgh</th>
+                <th>Sav</th>
+                <th>Luck</th>
+                <th>XP</th>
+                <th>Status</th>
+                <th>Gear</th>
+                <th>Action</th>
+              </tr>
+            </thead>
 
-      <AccordionSection title="Rumors" actions={<button className="fp-btn" onClick={onAddRumor}>Add</button>}>
-        {rumors.map((r) => (
-          <AccordionSection key={r.rumorId} title={r.text || "Rumor"} subtitle={r.status}>
-            <div className="fp-grid">
-              <CompactField label="Text" value={r.text} onChange={(v) => onUpdate("rumors", r.rumorId, { text: v })} textarea />
-              <CompactField label="Source" value={r.source} onChange={(v) => onUpdate("rumors", r.rumorId, { source: v })} />
-              <CompactField label="Status" value={r.status} onChange={(v) => onUpdate("rumors", r.rumorId, { status: v })} />
-            </div>
-            <button className="fp-btn fp-danger" onClick={() => onDelete("rumors", r.rumorId)}>Delete</button>
-          </AccordionSection>
-        ))}
+            <tbody>
+              {sortedCrewMembers.map((member) => {
+                const expanded = Boolean(
+                  expandedCrewMemberIds[member.crewMemberId]
+                );
+
+                return (
+                  <React.Fragment key={member.crewMemberId}>
+                    <EditableCrewRow
+                      crew={crew}
+                      member={member}
+                      equipment={equipment}
+                      expanded={expanded}
+                      onToggleExpanded={() =>
+                        toggleCrewMember(member.crewMemberId)
+                      }
+                      onUpdate={onUpdate}
+                      onSetCaptain={setCaptain}
+                    />
+
+                    {expanded && (
+                      <CrewDetailsRow
+                        member={member}
+                        onUpdate={onUpdate}
+                        onDelete={onDelete}
+                        onAddCrewMemberLog={onAddCrewMemberLog}
+                      />
+                    )}
+                  </React.Fragment>
+                );
+              })}
+
+              {sortedCrewMembers.length === 0 && (
+                <tr>
+                  <td colSpan={14} className="fp-table-empty">
+                    No crew members yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </AccordionSection>
     </div>
   );

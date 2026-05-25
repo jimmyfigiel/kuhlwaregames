@@ -1,17 +1,39 @@
 import React from "react";
 
-export function CompactField({ label, value, onChange, type = "text", textarea = false, options = null }) {
+export function CompactField({
+  label,
+  value,
+  onChange,
+  type = "text",
+  textarea = false,
+  options = null,
+  placeholder = "",
+}) {
+  const safeValue = value ?? "";
+
   if (options) {
     return (
       <label className="fp-field">
-        <span>{label}</span>
-        <select value={value ?? ""} onChange={(e) => onChange(e.target.value)}>
-          <option value="">—</option>
-          {options.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
-          ))}
+        {label}
+        <select
+          value={safeValue}
+          onChange={(event) => onChange(event.target.value)}
+        >
+          {options.map((option) => {
+            if (typeof option === "string") {
+              return (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              );
+            }
+
+            return (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            );
+          })}
         </select>
       </label>
     );
@@ -20,45 +42,70 @@ export function CompactField({ label, value, onChange, type = "text", textarea =
   if (textarea) {
     return (
       <label className="fp-field fp-field-wide">
-        <span>{label}</span>
-        <textarea value={value ?? ""} onChange={(e) => onChange(e.target.value)} rows={2} />
+        {label}
+        <textarea
+          value={safeValue}
+          placeholder={placeholder}
+          onChange={(event) => onChange(event.target.value)}
+        />
       </label>
     );
   }
 
   return (
     <label className="fp-field">
-      <span>{label}</span>
-      <input value={value ?? ""} type={type} onChange={(e) => onChange(type === "number" ? Number(e.target.value) : e.target.value)} />
+      {label}
+      <input
+        type={type}
+        value={safeValue}
+        placeholder={placeholder}
+        onChange={(event) => onChange(event.target.value)}
+      />
     </label>
   );
 }
 
-export function CompactCheckbox({ label, checked, onChange }) {
+export function CompactCheckbox({
+  label,
+  checked,
+  onChange,
+}) {
   return (
     <label className="fp-check">
-      <input type="checkbox" checked={Boolean(checked)} onChange={(e) => onChange(e.target.checked)} />
-      <span>{label}</span>
+      <input
+        type="checkbox"
+        checked={Boolean(checked)}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      {label}
     </label>
   );
 }
 
-export function CompactListField({ label, value, onChange, placeholder = "comma, separated, values" }) {
-  const text = Array.isArray(value) ? value.join(", ") : value || "";
+export function CompactListField({
+  label,
+  value,
+  onChange,
+  placeholder = "Separate items with commas",
+}) {
+  const safeArray = Array.isArray(value) ? value : [];
+  const textValue = safeArray.join(", ");
+
+  function parseList(text) {
+    return text
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
+  }
+
   return (
     <label className="fp-field fp-field-wide">
-      <span>{label}</span>
+      {label}
       <input
-        value={text}
+        type="text"
+        value={textValue}
         placeholder={placeholder}
-        onChange={(e) =>
-          onChange(
-            e.target.value
-              .split(",")
-              .map((x) => x.trim())
-              .filter(Boolean)
-          )
-        }
+        onChange={(event) => onChange(parseList(event.target.value))}
       />
     </label>
   );

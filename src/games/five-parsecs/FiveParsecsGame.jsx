@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import "./fiveParsecs.css";
 
 import { useFiveParsecsRecords } from "./fiveParsecsHooks";
+
 import {
   createCrew,
   createCrewMember,
@@ -14,24 +15,30 @@ import {
   createEncounter,
   createEncounterEnemy,
   createEnemyTemplate,
+  createCampaignTurn,
   createLogEntry,
 } from "./utils/recordFactories";
 
 import CrewPanel from "./components/CrewPanel";
-import CrewMembersPanel from "./components/CrewMembersPanel";
+import ShipPanel from "./components/ShipPanel";
 import EquipmentPanel from "./components/EquipmentPanel";
 import WorldsPanel from "./components/WorldsPanel";
 import EncountersPanel from "./components/EncountersPanel";
 import EnemyTemplatesPanel from "./components/EnemyTemplatesPanel";
+import TurnPanel from "./components/TurnPanel";
+import RulesPanel from "./components/RulesPanel";
 import LogsPanel from "./components/LogsPanel";
+import DiceBar from "./components/DiceBar";
 
 const TABS = [
-  { id: "crew", label: "Crew" },
-  { id: "members", label: "People" },
+  { id: "crew", label: "Adventure" },
+  { id: "ship", label: "Ship" },
   { id: "equipment", label: "Gear" },
   { id: "worlds", label: "Worlds" },
   { id: "encounters", label: "Encounters" },
   { id: "templates", label: "Enemies" },
+  { id: "turn", label: "Turn" },
+  { id: "rules", label: "Rules" },
   { id: "logs", label: "Logs" },
 ];
 
@@ -51,12 +58,30 @@ function getPlayerId(props) {
   );
 }
 
+function getNextTurnNumber(campaignTurns, crew) {
+  if (campaignTurns.length === 0) {
+    return crew?.campaignTurn || 1;
+  }
+
+  const highestTurn = campaignTurns.reduce((highest, turn) => {
+    return Math.max(highest, Number(turn.turnNumber || 0));
+  }, 0);
+
+  return highestTurn + 1;
+}
+
 export default function FiveParsecsGame(props) {
   const roomId = getRoomId(props);
   const playerId = getPlayerId(props);
+
   const [activeTab, setActiveTab] = useState("crew");
+  const [rulesPage, setRulesPage] = useState(1);
+
+  const [localRulesPdfUrl, setLocalRulesPdfUrl] = useState("");
+  const [localRulesPdfName, setLocalRulesPdfName] = useState("");
 
   const recordsApi = useFiveParsecsRecords(roomId, playerId);
+
   const {
     loading,
     error,
@@ -71,7 +96,9 @@ export default function FiveParsecsGame(props) {
     encounters,
     encounterEnemies,
     enemyTemplates,
+    campaignTurns,
     logEntries,
+
     saveCrew,
     addRecord,
     updateRecord,
@@ -82,96 +109,272 @@ export default function FiveParsecsGame(props) {
 
   const worldLookups = useMemo(() => {
     const map = {};
+
     worlds.forEach((w) => {
       map[w.worldId] = w;
     });
+
     return map;
   }, [worlds]);
 
   async function ensureCrew() {
     if (crew) return crew;
-    const newCrew = createCrew({ roomId, playerId });
+
+    const newCrew = createCrew({
+      roomId,
+      playerId,
+    });
+
     await saveCrew(newCrew);
+
     return newCrew;
   }
 
   async function addCrewMember() {
     await ensureCrew();
-    await addRecord("crewMembers", createCrewMember({ roomId, crewId, playerId }));
+
+    await addRecord(
+      "crewMembers",
+      createCrewMember({
+        roomId,
+        crewId,
+        playerId,
+      })
+    );
   }
 
-  async function addEquipment() {
+  async function addBlankEquipment() {
     await ensureCrew();
-    await addRecord("equipment", createEquipment({ roomId, crewId, playerId }));
+
+    await addRecord(
+      "equipment",
+      createEquipment({
+        roomId,
+        crewId,
+        playerId,
+      })
+    );
+  }
+
+  async function addCatalogEquipment(equipmentRecord) {
+    await ensureCrew();
+
+    await addRecord("equipment", equipmentRecord);
   }
 
   async function addWorld() {
     await ensureCrew();
-    await addRecord("worlds", createWorld({ roomId, crewId, playerId }));
+
+    await addRecord(
+      "worlds",
+      createWorld({
+        roomId,
+        crewId,
+        playerId,
+      })
+    );
   }
 
   async function addPatron(worldId = "") {
     await ensureCrew();
-    await addRecord("patrons", createPatron({ roomId, crewId, worldId, playerId }));
+
+    await addRecord(
+      "patrons",
+      createPatron({
+        roomId,
+        crewId,
+        worldId,
+        playerId,
+      })
+    );
   }
 
   async function addRival(worldId = "") {
     await ensureCrew();
-    await addRecord("rivals", createRival({ roomId, crewId, worldId, playerId }));
+
+    await addRecord(
+      "rivals",
+      createRival({
+        roomId,
+        crewId,
+        worldId,
+        playerId,
+      })
+    );
   }
 
   async function addQuest() {
     await ensureCrew();
-    await addRecord("quests", createQuest({ roomId, crewId, playerId }));
+
+    await addRecord(
+      "quests",
+      createQuest({
+        roomId,
+        crewId,
+        playerId,
+      })
+    );
   }
 
   async function addRumor() {
     await ensureCrew();
-    await addRecord("rumors", createRumor({ roomId, crewId, playerId }));
+
+    await addRecord(
+      "rumors",
+      createRumor({
+        roomId,
+        crewId,
+        playerId,
+      })
+    );
   }
 
   async function addEncounter() {
     await ensureCrew();
-    await addRecord("encounters", createEncounter({ roomId, crewId, playerId }));
+
+    await addRecord(
+      "encounters",
+      createEncounter({
+        roomId,
+        crewId,
+        playerId,
+      })
+    );
   }
 
   async function addEncounterEnemy(encounterId, template = null) {
     await ensureCrew();
+
     await addRecord(
       "encounterEnemies",
-      createEncounterEnemy({ roomId, crewId, encounterId, template, playerId })
+      createEncounterEnemy({
+        roomId,
+        crewId,
+        encounterId,
+        template,
+        playerId,
+      })
     );
   }
 
   async function addEnemyTemplate() {
     await ensureCrew();
-    await addRecord("enemyTemplates", createEnemyTemplate({ roomId, crewId, playerId }));
+
+    await addRecord(
+      "enemyTemplates",
+      createEnemyTemplate({
+        roomId,
+        crewId,
+        playerId,
+      })
+    );
   }
 
-  async function addLogEntry(targetType = "crew", targetId = crewId) {
+  async function addCampaignTurn() {
     await ensureCrew();
-    await addRecord("logEntries", createLogEntry({ roomId, crewId, targetType, targetId, playerId }));
+
+    const turnNumber = getNextTurnNumber(campaignTurns, crew);
+
+    const newTurn = createCampaignTurn({
+      roomId,
+      crewId,
+      playerId,
+      turnNumber,
+    });
+
+    await addRecord("campaignTurns", newTurn);
+
+    if (crew) {
+      await saveCrew({
+        ...crew,
+        campaignTurn: turnNumber,
+      });
+    }
+  }
+
+  async function addManualLogEntry(targetType = "crew", targetId = crewId) {
+    await ensureCrew();
+
+    await addRecord(
+      "logEntries",
+      createLogEntry({
+        roomId,
+        crewId,
+        targetType,
+        targetId,
+        playerId,
+      })
+    );
+  }
+
+  function openRulesPage(page) {
+    const cleanPage = Math.max(1, Number(page || 1));
+
+    setRulesPage(cleanPage);
+    setActiveTab("rules");
+
+    if (crew) {
+      saveCrew({
+        ...crew,
+        rulesCurrentPage: cleanPage,
+      });
+    }
+  }
+
+  function loadLocalRulesPdf(file) {
+    if (!file) return;
+
+    if (localRulesPdfUrl) {
+      URL.revokeObjectURL(localRulesPdfUrl);
+    }
+
+    const nextUrl = URL.createObjectURL(file);
+
+    setLocalRulesPdfUrl(nextUrl);
+    setLocalRulesPdfName(file.name || "Local rules PDF");
+  }
+
+  function clearLocalRulesPdf() {
+    if (localRulesPdfUrl) {
+      URL.revokeObjectURL(localRulesPdfUrl);
+    }
+
+    setLocalRulesPdfUrl("");
+    setLocalRulesPdfName("");
   }
 
   if (!roomId) {
-    return <div className="fp-wrap">Missing room id. Pass roomId or room into FiveParsecsGame.</div>;
+    return (
+      <div className="fp-wrap">
+        Missing room id. Pass roomId or room into FiveParsecsGame.
+      </div>
+    );
   }
 
   return (
     <div className="fp-wrap">
       <div className="fp-header">
-        <div>
+        <div className="fp-header-main">
           <div className="fp-title">Five Parsecs Records</div>
-          <div className="fp-subtitle">{crew?.crewName || "No crew created yet"}</div>
+
+          <div className="fp-subtitle">
+            {crew?.crewName || "No adventure created yet"}
+          </div>
         </div>
-        {!crew && (
-          <button className="fp-btn fp-primary" onClick={ensureCrew}>
-            Create Crew
-          </button>
-        )}
+
+        <div className="fp-header-right">
+          {!crew && (
+            <button className="fp-btn fp-primary" onClick={ensureCrew}>
+              Create Adventure
+            </button>
+          )}
+
+          <DiceBar />
+        </div>
       </div>
 
       {error && <div className="fp-error">{error}</div>}
+
       {loading && <div className="fp-muted">Loading...</div>}
 
       <div className="fp-tabs">
@@ -190,6 +393,7 @@ export default function FiveParsecsGame(props) {
         <CrewPanel
           crew={crew}
           crewMembers={crewMembers}
+          equipment={equipment}
           quests={quests}
           rumors={rumors}
           onSaveCrew={saveCrew}
@@ -197,30 +401,36 @@ export default function FiveParsecsGame(props) {
           onDelete={deleteRecord}
           onAddQuest={addQuest}
           onAddRumor={addRumor}
-          onAddLog={() => addLogEntry("crew", crewId)}
+          onAddCrewMember={addCrewMember}
+          onAddCrewMemberLog={(memberId) =>
+            addManualLogEntry("crewMember", memberId)
+          }
+          onAddLog={() => addManualLogEntry("crew", crewId)}
         />
       )}
 
-      {activeTab === "members" && (
-        <CrewMembersPanel
-          crewMembers={crewMembers}
-          equipment={equipment}
-          logEntries={logEntries}
-          onAdd={addCrewMember}
-          onUpdate={updateRecord}
-          onDelete={deleteRecord}
-          onAddLog={(memberId) => addLogEntry("crewMember", memberId)}
+      {activeTab === "ship" && (
+        <ShipPanel
+          crew={crew}
+          playerId={playerId}
+          onSaveCrew={saveCrew}
         />
       )}
 
       {activeTab === "equipment" && (
         <EquipmentPanel
+          roomId={roomId}
+          crewId={crewId}
+          playerId={playerId}
           equipment={equipment}
           crewMembers={crewMembers}
-          onAdd={addEquipment}
+          onAddBlankEquipment={addBlankEquipment}
+          onAddCatalogEquipment={addCatalogEquipment}
           onUpdate={updateRecord}
           onDelete={deleteRecord}
-          onAddLog={(equipmentId) => addLogEntry("equipment", equipmentId)}
+          onAddLog={(equipmentId) =>
+            addManualLogEntry("equipment", equipmentId)
+          }
         />
       )}
 
@@ -235,7 +445,7 @@ export default function FiveParsecsGame(props) {
           onDelete={deleteRecord}
           onAddPatron={addPatron}
           onAddRival={addRival}
-          onAddLog={(worldId) => addLogEntry("world", worldId)}
+          onAddLog={(worldId) => addManualLogEntry("world", worldId)}
         />
       )}
 
@@ -249,7 +459,9 @@ export default function FiveParsecsGame(props) {
           onUpdate={updateRecord}
           onDelete={deleteRecord}
           onAddEnemy={addEncounterEnemy}
-          onAddLog={(encounterId) => addLogEntry("encounter", encounterId)}
+          onAddLog={(encounterId) =>
+            addManualLogEntry("encounter", encounterId)
+          }
         />
       )}
 
@@ -262,15 +474,38 @@ export default function FiveParsecsGame(props) {
         />
       )}
 
+      {activeTab === "turn" && (
+        <TurnPanel
+          campaignTurns={campaignTurns}
+          crew={crew}
+          onAddTurn={addCampaignTurn}
+          onUpdate={updateRecord}
+          onDelete={deleteRecord}
+          onAddLog={(campaignTurnId) =>
+            addManualLogEntry("campaignTurn", campaignTurnId)
+          }
+          onOpenRulesPage={openRulesPage}
+        />
+      )}
+
+      {activeTab === "rules" && (
+        <RulesPanel
+          roomId={roomId}
+          crew={crew}
+          rulesPage={rulesPage || crew?.rulesCurrentPage || 1}
+          localPdfUrl={localRulesPdfUrl}
+          localPdfName={localRulesPdfName}
+          onLoadLocalPdf={loadLocalRulesPdf}
+          onClearLocalPdf={clearLocalRulesPdf}
+          onRulesPageChange={setRulesPage}
+          onSaveCrew={saveCrew}
+        />
+      )}
+
       {activeTab === "logs" && (
         <LogsPanel
           logEntries={logEntries}
-          crewMembers={crewMembers}
-          worlds={worlds}
-          encounters={encounters}
-          onAdd={() => addLogEntry("crew", crewId)}
-          onUpdate={updateRecord}
-          onDelete={deleteRecord}
+          onAdd={() => addManualLogEntry("crew", crewId)}
         />
       )}
     </div>
