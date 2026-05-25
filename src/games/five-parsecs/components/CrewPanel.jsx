@@ -1,49 +1,30 @@
-import React, { useMemo, useState } from "react";
+import React, {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { createPortal } from "react-dom";
 
 import AccordionSection from "./AccordionSection";
 import { CompactField } from "./CompactField";
-import ShipPanel from "./ShipPanel";
-
-const WEAPON_TRAIT_HELP = {
-  Area:
-    "Area weapons may affect more than one target. Resolve the main attack, then apply the Area weapon rules.",
-  Clumsy:
-    "Clumsy weapons are awkward to use. They usually make close combat less flexible or less efficient.",
-  Critical:
-    "Critical weapons are especially dangerous when they score strong results.",
-  Elegant:
-    "Elegant melee weapons are refined and easier to use skillfully in close combat.",
-  Focused:
-    "Focused weapons concentrate their fire and are most useful when the shooter can line up a good shot.",
-  Heavy:
-    "Heavy weapons are cumbersome and may limit movement or firing options.",
-  Impact:
-    "Impact weapons hit with extra force and may knock enemies back or add force in close combat.",
-  Melee:
-    "Melee weapons are used in Brawling instead of normal shooting.",
-  Piercing:
-    "Piercing weapons are better at getting through armor or protection.",
-  Pistol:
-    "Pistol weapons are sidearms. Some mods, sights, and special rules only apply to pistols.",
-  "Single use":
-    "Single-use items are used once, then removed from inventory.",
-  "Snap Shot":
-    "Snap Shot weapons are easier to fire quickly or while reacting.",
-  Stun:
-    "Stun effects interfere with a target's ability to act.",
-  Terrifying:
-    "Terrifying weapons can affect enemy morale or reactions as described in the rules.",
-};
+import {
+  getWeaponTraitDescription,
+  normalizeWeaponTraitName,
+} from "../data/weaponTraits";
 
 function safeNumber(value) {
   if (value === "" || value === null || value === undefined) return 0;
-
-  const number = Number(value);
-  return Number.isFinite(number) ? number : 0;
+  return Number(value);
 }
 
-function asArray(value) {
-  return Array.isArray(value) ? value : [];
+function getCrewMemberGearItems(member, equipment) {
+  return equipment.filter((item) => {
+    return (
+      item.locationType === "crewMember" &&
+      item.crewMemberId === member.crewMemberId
+    );
+  });
 }
 
 function getCaptainName(crew, crewMembers) {
@@ -58,146 +39,229 @@ function getCaptainName(crew, crewMembers) {
   return captain?.name || "";
 }
 
-function getCrewMemberEquipment(member, equipment) {
-  return equipment.filter((item) => {
-    return (
-      item.locationType === "crewMember" &&
-      item.crewMemberId === member.crewMemberId
-    );
+function WeaponTraitTooltip({ trait }) {
+  const [open, setOpen] = useState(false);
+  const [position, setPosition] = useState({
+    top: 0,
+    left: 0,
+    transform: "translateX(-50%)",
   });
-}
 
-function getCategoryLabel(item) {
-  if (item.category === "weapon") return "Weapon";
-  if (item.category === "protection") return "Protection";
-  if (item.category === "consumable") return "Consumable";
-  if (item.category === "implant") return "Implant";
-  if (item.category === "utility") return "Utility";
-  if (item.category === "onBoard") return "On-board";
-  if (item.category === "gunMod") return "Gun Mod";
-  if (item.category === "gunSight") return "Gun Sight";
-  if (item.category === "shipComponent") return "Ship Component";
+  const triggerRef = useRef(null);
 
-  return item.category || "Gear";
-}
+  const normalizedTrait = normalizeWeaponTraitName(trait);
+  const description = getWeaponTraitDescription(normalizedTrait);
 
-function getWeaponRange(item) {
-  return item.weapon?.range || "";
-}
+  useLayoutEffect(() => {
+    if (!open || !triggerRef.current) return;
 
-function getWeaponShots(item) {
-  if (item.category !== "weapon") return "";
-  if (item.weapon?.shots === undefined || item.weapon?.shots === null) return "";
-  return item.weapon.shots;
-}
+    const rect = triggerRef.current.getBoundingClientRect();
+    const tooltipWidth = 360;
+    const screenPadding = 12;
 
-function getWeaponDamage(item) {
-  if (item.category !== "weapon") return "";
-  if (item.weapon?.damage === undefined || item.weapon?.damage === null) {
-    return "";
-  }
-  return item.weapon.damage;
-}
+    let left = rect.left + rect.width / 2;
+    let transform = "translateX(-50%)";
 
-function getWeaponTraits(item) {
-  if (item.category !== "weapon") return [];
-  return asArray(item.weapon?.traits);
-}
+    if (left - tooltipWidth / 2 < screenPadding) {
+      left = screenPadding;
+      transform = "translateX(0)";
+    }
 
-function getWeaponMods(item) {
-  if (item.category !== "weapon") return "";
-  return asArray(item.weapon?.mods).join(", ");
-}
+    if (left + tooltipWidth / 2 > window.innerWidth - screenPadding) {
+      left = window.innerWidth - screenPadding;
+      transform = "translateX(-100%)";
+    }
 
-function getWeaponSight(item) {
-  if (item.category !== "weapon") return "";
-  return item.weapon?.sight || "";
-}
+    setPosition({
+      top: rect.bottom + 8,
+      left,
+      transform,
+    });
+  }, [open]);
 
-function getGearEffect(item) {
-  if (item.category === "weapon") return "";
+  if (!normalizedTrait) return null;
 
-  return item.gear?.effect || item.armor?.effect || item.notes || "";
-}
-
-function TraitPill({ trait }) {
-  const help =
-    WEAPON_TRAIT_HELP[trait] ||
-    "No help text has been entered for this trait yet.";
+  const tooltip =
+    open && description
+      ? createPortal(
+          <div
+            className="fp-weapon-trait-tooltip"
+            role="tooltip"
+            style={{
+              position: "fixed",
+              zIndex: 999999,
+              top: `${position.top}px`,
+              left: `${position.left}px`,
+              transform: position.transform,
+              width: "360px",
+              maxWidth: "calc(100vw - 24px)",
+              padding: "8px 10px",
+              border: "1px solid #68d8ff",
+              borderRadius: "6px",
+              background: "#06131a",
+              color: "#d9faff",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.45)",
+              fontSize: "12px",
+              lineHeight: "1.4",
+              whiteSpace: "normal",
+              overflow: "visible",
+              pointerEvents: "none",
+            }}
+          >
+            <strong>{normalizedTrait}</strong>
+            <br />
+            {description}
+          </div>,
+          document.body
+        )
+      : null;
 
   return (
-    <span className="fp-trait-pill" title={help} data-tooltip={help}>
-      {trait}
-    </span>
+    <>
+      <span
+        ref={triggerRef}
+        className="fp-weapon-trait"
+        tabIndex={description ? 0 : -1}
+        aria-label={
+          description ? `${normalizedTrait}: ${description}` : normalizedTrait
+        }
+        style={{
+          display: "inline-block",
+          borderBottom: description ? "1px dotted currentColor" : "none",
+          cursor: description ? "help" : "default",
+        }}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+      >
+        {normalizedTrait}
+      </span>
+
+      {tooltip}
+    </>
   );
 }
 
-function TraitList({ traits }) {
-  if (!traits.length) return "";
+function WeaponTraits({ traits = [] }) {
+  if (!Array.isArray(traits) || traits.length === 0) return null;
 
   return (
-    <div className="fp-trait-list">
-      {traits.map((trait) => (
-        <TraitPill key={trait} trait={trait} />
-      ))}
-    </div>
+    <>
+      {traits.map((trait, index) => {
+        const normalizedTrait = normalizeWeaponTraitName(trait);
+
+        return (
+          <React.Fragment key={`${normalizedTrait}-${index}`}>
+            {index > 0 && "/"}
+            <WeaponTraitTooltip trait={normalizedTrait} />
+          </React.Fragment>
+        );
+      })}
+    </>
   );
 }
 
-function CrewEquipmentRows({ member, equipment }) {
-  const memberEquipment = getCrewMemberEquipment(member, equipment);
-
-  if (memberEquipment.length === 0) {
-    return null;
-  }
+function CrewEquipmentRow({ member, equipment }) {
+  const items = getCrewMemberGearItems(member, equipment);
 
   return (
     <tr className="fp-crew-equipment-row">
       <td colSpan={13}>
         <div className="fp-crew-equipment-indent">
-          <table className="fp-table fp-crew-gear-table">
+          <table className="fp-crew-gear-table">
             <thead>
               <tr>
                 <th>Item</th>
                 <th>Type</th>
                 <th>Subtype</th>
-                <th>Qty</th>
-                <th>Range</th>
+                <th>Rng</th>
                 <th>Shots</th>
-                <th>Damage</th>
+                <th>Dmg</th>
                 <th>Traits</th>
                 <th>Mods</th>
                 <th>Sight</th>
-                <th>Effect</th>
+                <th>Protection</th>
                 <th>Status</th>
+                <th>Notes</th>
               </tr>
             </thead>
 
             <tbody>
-              {memberEquipment.map((item) => {
-                const status = [
-                  item.damaged ? "Damaged" : "",
-                  item.destroyed ? "Destroyed" : "",
-                ]
-                  .filter(Boolean)
-                  .join(", ");
+              {items.length === 0 && (
+                <tr>
+                  <td colSpan={12} className="fp-table-empty">
+                    No gear assigned.
+                  </td>
+                </tr>
+              )}
+
+              {items.map((item) => {
+                const weapon = item.weapon || {};
+                const protection = item.protection || {};
 
                 return (
-                  <tr key={item.equipmentId}>
-                    <td>{item.name || "Unnamed Item"}</td>
-                    <td>{getCategoryLabel(item)}</td>
+                  <tr key={item.equipmentId || item.id || item.name}>
+                    <td>{item.name || "Unnamed item"}</td>
+                    <td>{item.category || ""}</td>
                     <td>{item.subtype || ""}</td>
-                    <td>{item.quantity || 1}</td>
-                    <td>{getWeaponRange(item)}</td>
-                    <td>{getWeaponShots(item)}</td>
-                    <td>{getWeaponDamage(item)}</td>
-                    <td className="fp-wrap-cell">
-                      <TraitList traits={getWeaponTraits(item)} />
+
+                    <td>
+                      {item.category === "weapon" && weapon.range
+                        ? weapon.range
+                        : ""}
                     </td>
-                    <td className="fp-wrap-cell">{getWeaponMods(item)}</td>
-                    <td>{getWeaponSight(item)}</td>
-                    <td className="fp-wrap-cell">{getGearEffect(item)}</td>
-                    <td>{status || "OK"}</td>
+
+                    <td>
+                      {item.category === "weapon" &&
+                      weapon.shots !== "" &&
+                      weapon.shots !== undefined
+                        ? weapon.shots
+                        : ""}
+                    </td>
+
+                    <td>
+                      {item.category === "weapon" &&
+                      weapon.damage !== "" &&
+                      weapon.damage !== undefined
+                        ? weapon.damage
+                        : ""}
+                    </td>
+
+                    <td>
+                      {item.category === "weapon" &&
+                      Array.isArray(weapon.traits) &&
+                      weapon.traits.length > 0 ? (
+                        <WeaponTraits traits={weapon.traits} />
+                      ) : (
+                        ""
+                      )}
+                    </td>
+
+                    <td>
+                      {item.category === "weapon" &&
+                      Array.isArray(weapon.mods) &&
+                      weapon.mods.length > 0
+                        ? weapon.mods.join("/")
+                        : ""}
+                    </td>
+
+                    <td>
+                      {item.category === "weapon" ? weapon.sight || "" : ""}
+                    </td>
+
+                    <td>
+                      {item.category === "protection"
+                        ? protection.armor ||
+                          protection.savingThrow ||
+                          protection.value ||
+                          item.protectionValue ||
+                          ""
+                        : ""}
+                    </td>
+
+                    <td>{item.status || ""}</td>
+                    <td>{item.notes || ""}</td>
                   </tr>
                 );
               })}
@@ -209,7 +273,12 @@ function CrewEquipmentRows({ member, equipment }) {
   );
 }
 
-function CrewDetailsRow({ member, onUpdate, onDelete, onAddCrewMemberLog }) {
+function CrewDetailsRow({
+  member,
+  onUpdate,
+  onDelete,
+  onAddCrewMemberLog,
+}) {
   function patch(patchValue) {
     onUpdate("crewMembers", member.crewMemberId, patchValue);
   }
@@ -217,34 +286,29 @@ function CrewDetailsRow({ member, onUpdate, onDelete, onAddCrewMemberLog }) {
   return (
     <tr className="fp-crew-details-row">
       <td colSpan={13}>
-        <div className="fp-crew-details-card">
-          <div className="fp-crew-details-grid">
-            <label className="fp-crew-detail-field">
-              <span>Background</span>
-              <input
-                value={member.background || ""}
-                onChange={(event) => patch({ background: event.target.value })}
-              />
-            </label>
+        <div className="fp-inline-card fp-crew-details-card">
+          <CompactField
+            label="Background"
+            value={member.background || ""}
+            textarea
+            onChange={(value) => patch({ background: value })}
+          />
 
-            <label className="fp-crew-detail-field">
-              <span>Motivation</span>
-              <input
-                value={member.motivation || ""}
-                onChange={(event) => patch({ motivation: event.target.value })}
-              />
-            </label>
+          <CompactField
+            label="Motivation"
+            value={member.motivation || ""}
+            textarea
+            onChange={(value) => patch({ motivation: value })}
+          />
 
-            <label className="fp-crew-detail-field fp-crew-notes-field">
-              <span>Notes</span>
-              <textarea
-                value={member.notes || ""}
-                onChange={(event) => patch({ notes: event.target.value })}
-              />
-            </label>
-          </div>
+          <CompactField
+            label="Notes"
+            value={member.notes || ""}
+            textarea
+            onChange={(value) => patch({ notes: value })}
+          />
 
-          <div className="fp-actions fp-crew-details-actions">
+          <div className="fp-actions fp-field-wide">
             <button
               className="fp-btn"
               onClick={() => onAddCrewMemberLog(member.crewMemberId)}
@@ -341,7 +405,9 @@ function EditableCrewRow({
           className="fp-table-input fp-stat-input"
           type="number"
           value={member.speed ?? 0}
-          onChange={(event) => patch({ speed: safeNumber(event.target.value) })}
+          onChange={(event) =>
+            patch({ speed: safeNumber(event.target.value) })
+          }
         />
       </td>
 
@@ -372,7 +438,9 @@ function EditableCrewRow({
           className="fp-table-input fp-stat-input"
           type="number"
           value={member.savvy ?? 0}
-          onChange={(event) => patch({ savvy: safeNumber(event.target.value) })}
+          onChange={(event) =>
+            patch({ savvy: safeNumber(event.target.value) })
+          }
         />
       </td>
 
@@ -381,7 +449,9 @@ function EditableCrewRow({
           className="fp-table-input fp-stat-input"
           type="number"
           value={member.luck ?? 0}
-          onChange={(event) => patch({ luck: safeNumber(event.target.value) })}
+          onChange={(event) =>
+            patch({ luck: safeNumber(event.target.value) })
+          }
         />
       </td>
 
@@ -417,7 +487,6 @@ export default function CrewPanel({
   equipment,
   quests,
   rumors,
-  playerId,
   onSaveCrew,
   onUpdate,
   onDelete,
@@ -610,7 +679,7 @@ export default function CrewPanel({
                       onSetCaptain={setCaptain}
                     />
 
-                    <CrewEquipmentRows member={member} equipment={equipment} />
+                    <CrewEquipmentRow member={member} equipment={equipment} />
 
                     {expanded && (
                       <CrewDetailsRow
@@ -634,10 +703,6 @@ export default function CrewPanel({
             </tbody>
           </table>
         </div>
-      </AccordionSection>
-
-      <AccordionSection title="Ship Summary" defaultOpen={false}>
-        <ShipPanel crew={crew} playerId={playerId} onSaveCrew={onSaveCrew} />
       </AccordionSection>
     </div>
   );

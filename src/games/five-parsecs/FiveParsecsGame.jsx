@@ -21,6 +21,7 @@ import {
 
 import CrewPanel from "./components/CrewPanel";
 import CreationTablesPanel from "./components/CreationTablesPanel";
+import ShipPanel from "./components/ShipPanel";
 import EquipmentPanel from "./components/EquipmentPanel";
 import WorldsPanel from "./components/WorldsPanel";
 import EncountersPanel from "./components/EncountersPanel";
@@ -32,6 +33,7 @@ import DiceBar from "./components/DiceBar";
 
 const TABS = [
   { id: "crew", label: "Adventure" },
+  { id: "ship", label: "Ship" },
   { id: "equipment", label: "Gear" },
   { id: "worlds", label: "Worlds" },
   { id: "encounters", label: "Encounters" },
@@ -110,8 +112,8 @@ export default function FiveParsecsGame(props) {
   const worldLookups = useMemo(() => {
     const map = {};
 
-    worlds.forEach((w) => {
-      map[w.worldId] = w;
+    worlds.forEach((world) => {
+      map[world.worldId] = world;
     });
 
     return map;
@@ -390,23 +392,55 @@ export default function FiveParsecsGame(props) {
       </div>
 
       {activeTab === "crew" && (
-        <CrewPanel
+        <>
+          <CrewPanel
+            crew={crew}
+            crewMembers={crewMembers}
+            equipment={equipment}
+            quests={quests}
+            rumors={rumors}
+            onSaveCrew={saveCrew}
+            onUpdate={updateRecord}
+            onDelete={deleteRecord}
+            onAddQuest={addQuest}
+            onAddRumor={addRumor}
+            onAddCrewMember={addCrewMember}
+            onAddCrewMemberLog={(memberId) =>
+              addManualLogEntry("crewMember", memberId)
+            }
+            onAddLog={() => addManualLogEntry("crew", crewId)}
+            roomId={roomId}
+            crewId={crewId}
+            playerId={playerId}
+            onAddEquipment={addCatalogEquipment}
+          />
+
+          <ShipPanel
+            crew={crew}
+            playerId={playerId}
+            onSaveCrew={saveCrew}
+          />
+        </>
+      )}
+
+      {activeTab === "creation" && (
+        <CreationTablesPanel
           crew={crew}
           crewMembers={crewMembers}
-          equipment={equipment}
-          quests={quests}
-          rumors={rumors}
+          roomId={roomId}
+          crewId={crewId}
           playerId={playerId}
+          onAddEquipment={addCatalogEquipment}
           onSaveCrew={saveCrew}
           onUpdate={updateRecord}
-          onDelete={deleteRecord}
-          onAddQuest={addQuest}
-          onAddRumor={addRumor}
-          onAddCrewMember={addCrewMember}
-          onAddCrewMemberLog={(memberId) =>
-            addManualLogEntry("crewMember", memberId)
-          }
-          onAddLog={() => addManualLogEntry("crew", crewId)}
+        />
+      )}
+
+      {activeTab === "ship" && (
+        <ShipPanel
+          crew={crew}
+          playerId={playerId}
+          onSaveCrew={saveCrew}
         />
       )}
 
@@ -492,19 +526,6 @@ export default function FiveParsecsGame(props) {
           onClearLocalPdf={clearLocalRulesPdf}
           onRulesPageChange={setRulesPage}
           onSaveCrew={saveCrew}
-        />
-      )}
-
-      {activeTab === "creation" && (
-        <CreationTablesPanel
-          crew={crew}
-          crewMembers={crewMembers}
-          roomId={roomId}
-          crewId={crewId}
-          playerId={playerId}
-          onAddEquipment={addCatalogEquipment}
-          onSaveCrew={saveCrew}
-          onUpdate={updateRecord}
         />
       )}
 
