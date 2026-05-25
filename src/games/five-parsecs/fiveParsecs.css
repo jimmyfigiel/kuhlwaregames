@@ -1318,3 +1318,79 @@ body:has(.fp-wrap),
   text-align: center;
   white-space: normal;
 }
+
+/* Crew table nested gear rows - cleaned layout */
+
+.fp-crew-action-cell,
+.fp-crew-table th:last-child,
+.fp-crew-table td:last-child {
+  width: 56px;
+  min-width: 56px;
+  max-width: 56px;
+  white-space: nowrap;
+}
+
+.fp-crew-table .fp-stat-input {
+  min-width: 64px;
+  max-width: 82px;
+}
+
+.fp-crew-equipment-row td {
+  background: #f7f3ff;
+  border-top: 0;
+  padding-top: 0;
+}
+
+.fp-crew-equipment-indent {
+  width: 80%;
+  margin-left: auto;
+  margin-right: 4px;
+  padding: 4px 0 8px 0;
+}
+
+.fp-crew-gear-table {
+  width: 100%;
+  font-size: var(--fp-small-font-size);
+  border: 2px solid #8b75b8;
+}
+
+.fp-crew-gear-table th {
+  background: #d8cdf2;
+  color: #1f1638;
+  padding: 3px 4px;
+  white-space: nowrap;
+}
+
+.fp-crew-gear-table td {
+  background: #ffffff;
+  color: #1f1638;
+  border: 1px solid #b9add8;
+  padding: 3px 4px;
+  vertical-align: top;
+}
+
+.fp-crew-gear-table tr:nth-child(even) td {
+  background: #f1ecff;
+}
+
+.fp-crew-gear-table th:nth-child(4),
+.fp-crew-gear-table td:nth-child(4),
+.fp-crew-gear-table th:nth-child(5),
+.fp-crew-gear-table td:nth-child(5),
+.fp-crew-gear-table th:nth-child(6),
+.fp-crew-gear-table td:nth-child(6),
+.fp-crew-gear-table th:nth-child(7),
+.fp-crew-gear-table td:nth-child(7) {
+  width: 56px;
+  min-width: 56px;
+  text-align: center;
+}
+
+.fp-crew-gear-table th:nth-child(8),
+.fp-crew-gear-table td:nth-child(8),
+.fp-crew-gear-table th:nth-child(9),
+.fp-crew-gear-table td:nth-child(9),
+.fp-crew-gear-table th:nth-child(11),
+.fp-crew-gear-table td:nth-child(11) {
+  min-width: 130px;
+}
