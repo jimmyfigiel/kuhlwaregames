@@ -6,51 +6,13 @@ import ShipPanel from "./ShipPanel";
 
 function safeNumber(value) {
   if (value === "" || value === null || value === undefined) return 0;
-  return Number(value);
+
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
 }
 
-function getCrewMemberGearSummary(member, equipment) {
-  const items = equipment.filter((item) => {
-    return (
-      item.locationType === "crewMember" &&
-      item.crewMemberId === member.crewMemberId
-    );
-  });
-
-  if (items.length === 0) return "";
-
-  return items
-    .map((item) => {
-      if (item.category === "weapon") {
-        const weapon = item.weapon || {};
-        const parts = [
-          item.name,
-          weapon.range ? `R ${weapon.range}` : "",
-          weapon.shots !== "" && weapon.shots !== undefined
-            ? `S ${weapon.shots}`
-            : "",
-          weapon.damage !== "" && weapon.damage !== undefined
-            ? `D ${weapon.damage}`
-            : "",
-          Array.isArray(weapon.traits) && weapon.traits.length
-            ? weapon.traits.join("/")
-            : "",
-          Array.isArray(weapon.mods) && weapon.mods.length
-            ? `Mods: ${weapon.mods.join("/")}`
-            : "",
-          weapon.sight ? `Sight: ${weapon.sight}` : "",
-        ];
-
-        return parts.filter(Boolean).join(" ");
-      }
-
-      if (item.category === "protection") {
-        return `${item.name}${item.subtype ? ` (${item.subtype})` : ""}`;
-      }
-
-      return item.name;
-    })
-    .join(" | ");
+function asArray(value) {
+  return Array.isArray(value) ? value : [];
 }
 
 function getCaptainName(crew, crewMembers) {
@@ -63,6 +25,109 @@ function getCaptainName(crew, crewMembers) {
   });
 
   return captain?.name || "";
+}
+
+function getCrewMemberEquipment(member, equipment) {
+  return equipment.filter((item) => {
+    return (
+      item.locationType === "crewMember" &&
+      item.crewMemberId === member.crewMemberId
+    );
+  });
+}
+
+function getCategoryLabel(item) {
+  if (item.category === "weapon") return "Weapon";
+  if (item.category === "protection") return "Protection";
+  if (item.category === "consumable") return "Consumable";
+  if (item.category === "implant") return "Implant";
+  if (item.category === "utility") return "Utility";
+  if (item.category === "onBoard") return "On-board";
+  if (item.category === "gunMod") return "Gun Mod";
+  if (item.category === "gunSight") return "Gun Sight";
+  if (item.category === "shipComponent") return "Ship Component";
+
+  return item.category || "Gear";
+}
+
+function getWeaponDetail(item) {
+  const weapon = item.weapon || {};
+
+  return [
+    weapon.range ? `Range ${weapon.range}` : "",
+    weapon.shots !== "" && weapon.shots !== undefined
+      ? `Shots ${weapon.shots}`
+      : "",
+    weapon.damage !== "" && weapon.damage !== undefined
+      ? `Damage ${weapon.damage}`
+      : "",
+    asArray(weapon.traits).length
+      ? `Traits: ${weapon.traits.join(", ")}`
+      : "",
+    asArray(weapon.mods).length ? `Mods: ${weapon.mods.join(", ")}` : "",
+    weapon.sight ? `Sight: ${weapon.sight}` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+function getGearDetail(item) {
+  if (item.category === "weapon") {
+    return getWeaponDetail(item);
+  }
+
+  return item.gear?.effect || item.armor?.effect || item.notes || "";
+}
+
+function CrewEquipmentRows({ member, equipment }) {
+  const memberEquipment = getCrewMemberEquipment(member, equipment);
+
+  if (memberEquipment.length === 0) {
+    return null;
+  }
+
+  return (
+    <tr className="fp-crew-equipment-row">
+      <td colSpan={14}>
+        <div className="fp-crew-equipment-indent">
+          <table className="fp-table fp-crew-gear-table">
+            <thead>
+              <tr>
+                <th>Gear / Weapon</th>
+                <th>Type</th>
+                <th>Subtype</th>
+                <th>Qty</th>
+                <th>Details</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {memberEquipment.map((item) => {
+                const status = [
+                  item.damaged ? "Damaged" : "",
+                  item.destroyed ? "Destroyed" : "",
+                ]
+                  .filter(Boolean)
+                  .join(", ");
+
+                return (
+                  <tr key={item.equipmentId}>
+                    <td>{item.name || "Unnamed Item"}</td>
+                    <td>{getCategoryLabel(item)}</td>
+                    <td>{item.subtype || ""}</td>
+                    <td>{item.quantity || 1}</td>
+                    <td className="fp-wrap-cell">{getGearDetail(item)}</td>
+                    <td>{status || "OK"}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </td>
+    </tr>
+  );
 }
 
 function CrewDetailsRow({ member, onUpdate, onDelete, onAddCrewMemberLog }) {
@@ -119,13 +184,11 @@ function CrewDetailsRow({ member, onUpdate, onDelete, onAddCrewMemberLog }) {
 function EditableCrewRow({
   crew,
   member,
-  equipment,
   expanded,
   onToggleExpanded,
   onUpdate,
   onSetCaptain,
 }) {
-  const gearSummary = getCrewMemberGearSummary(member, equipment);
   const isCaptain = crew?.captainCrewMemberId === member.crewMemberId;
 
   function patch(patchValue) {
@@ -253,10 +316,6 @@ function EditableCrewRow({
           value={member.currentStatus || ""}
           onChange={(event) => patch({ currentStatus: event.target.value })}
         />
-      </td>
-
-      <td className="fp-wrap-cell fp-gear-summary-cell">
-        {gearSummary || <span className="fp-muted-inline">No gear</span>}
       </td>
 
       <td className="fp-table-actions-cell">
@@ -444,7 +503,6 @@ export default function CrewPanel({
                 <th>Luck</th>
                 <th>XP</th>
                 <th>Status</th>
-                <th>Gear</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -460,7 +518,6 @@ export default function CrewPanel({
                     <EditableCrewRow
                       crew={crew}
                       member={member}
-                      equipment={equipment}
                       expanded={expanded}
                       onToggleExpanded={() =>
                         toggleCrewMember(member.crewMemberId)
@@ -468,6 +525,8 @@ export default function CrewPanel({
                       onUpdate={onUpdate}
                       onSetCaptain={setCaptain}
                     />
+
+                    <CrewEquipmentRows member={member} equipment={equipment} />
 
                     {expanded && (
                       <CrewDetailsRow
@@ -483,7 +542,7 @@ export default function CrewPanel({
 
               {sortedCrewMembers.length === 0 && (
                 <tr>
-                  <td colSpan={14} className="fp-table-empty">
+                  <td colSpan={13} className="fp-table-empty">
                     No crew members yet.
                   </td>
                 </tr>
