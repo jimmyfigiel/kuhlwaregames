@@ -27,7 +27,11 @@ function asArray(value) {
 }
 
 function getCategoryLabel(category) {
-  return EQUIPMENT_CATEGORIES.find((item) => item.value === category)?.label || category || "";
+  return (
+    EQUIPMENT_CATEGORIES.find((item) => item.value === category)?.label ||
+    category ||
+    ""
+  );
 }
 
 function getLocationLabel(item, crewMembers) {
@@ -45,8 +49,12 @@ function getWeaponSummary(item) {
 
   return [
     weapon.range ? `Range ${weapon.range}` : "",
-    weapon.shots !== "" && weapon.shots !== undefined ? `Shots ${weapon.shots}` : "",
-    weapon.damage !== "" && weapon.damage !== undefined ? `Damage ${weapon.damage}` : "",
+    weapon.shots !== "" && weapon.shots !== undefined
+      ? `Shots ${weapon.shots}`
+      : "",
+    weapon.damage !== "" && weapon.damage !== undefined
+      ? `Damage ${weapon.damage}`
+      : "",
     asArray(weapon.traits).length ? `Traits: ${weapon.traits.join(", ")}` : "",
     asArray(weapon.mods).length ? `Mods: ${weapon.mods.join(", ")}` : "",
     weapon.sight ? `Sight: ${weapon.sight}` : "",
@@ -263,11 +271,7 @@ function EquipmentEditor({
         onChange={(value) => patch({ notes: value })}
       />
 
-      {warning && (
-        <div className="fp-error fp-field-wide">
-          {warning}
-        </div>
-      )}
+      {warning && <div className="fp-error fp-field-wide">{warning}</div>}
 
       <div className="fp-actions fp-field-wide">
         {item.category === "weapon" && (
@@ -309,7 +313,9 @@ export default function EquipmentPanel({
   const [sightTarget, setSightTarget] = useState(null);
   const [message, setMessage] = useState("");
 
-  const selectedCatalog = EQUIPMENT_CATALOGS.find((catalog) => catalog.id === catalogId);
+  const selectedCatalog = EQUIPMENT_CATALOGS.find((catalog) => {
+    return catalog.id === catalogId;
+  });
 
   const stashItems = useMemo(() => {
     return equipment.filter((item) => item.locationType !== "crewMember");
@@ -346,6 +352,7 @@ export default function EquipmentPanel({
 
   function addModToTarget(mod) {
     const target = modTarget;
+
     if (!target) return;
 
     const result = canAttachGunModToWeapon({
@@ -374,6 +381,7 @@ export default function EquipmentPanel({
 
   function setSightOnTarget(sight) {
     const target = sightTarget;
+
     if (!target) return;
 
     const result = canAttachGunSightToWeapon({
@@ -401,88 +409,7 @@ export default function EquipmentPanel({
 
   return (
     <div className="fp-panel">
-      {message && (
-        <div className="fp-error">
-          {message}
-        </div>
-      )}
-
-      <AccordionSection title="Add Equipment From Rule Tables" defaultOpen>
-        <div className="fp-toolbar">
-          {EQUIPMENT_CATALOGS.map((catalog) => (
-            <button
-              key={catalog.id}
-              className="fp-btn fp-primary"
-              onClick={() => setCatalogId(catalog.id)}
-            >
-              {catalog.title}
-            </button>
-          ))}
-
-          <button className="fp-btn" onClick={onAddBlankEquipment}>
-            Blank Item
-          </button>
-        </div>
-      </AccordionSection>
-
-      <AccordionSection
-        title="Stash / Ship Inventory"
-        subtitle={`${stashItems.length} item${stashItems.length === 1 ? "" : "s"}`}
-        defaultOpen
-      >
-        {stashItems.length === 0 ? (
-          <div className="fp-muted">No items in stash.</div>
-        ) : (
-          stashItems.map((item) => (
-            <EquipmentEditor
-              key={item.equipmentId}
-              item={item}
-              equipment={equipment}
-              crewMembers={crewMembers}
-              onUpdate={onUpdate}
-              onDelete={onDelete}
-              onOpenMods={setModTarget}
-              onOpenSights={setSightTarget}
-            />
-          ))
-        )}
-      </AccordionSection>
-
-      <AccordionSection
-        title="Assigned Crew Equipment"
-        subtitle={`${assignedItems.length} assigned item${assignedItems.length === 1 ? "" : "s"}`}
-      >
-        {crewMembers.map((member) => {
-          const memberItems = assignedItems.filter(
-            (item) => item.crewMemberId === member.crewMemberId
-          );
-
-          return (
-            <AccordionSection
-              key={member.crewMemberId}
-              title={member.name || "Unnamed Crew Member"}
-              subtitle={`${memberItems.length} item${memberItems.length === 1 ? "" : "s"}`}
-            >
-              {memberItems.length === 0 ? (
-                <div className="fp-muted">No assigned items.</div>
-              ) : (
-                memberItems.map((item) => (
-                  <EquipmentEditor
-                    key={item.equipmentId}
-                    item={item}
-                    equipment={equipment}
-                    crewMembers={crewMembers}
-                    onUpdate={onUpdate}
-                    onDelete={onDelete}
-                    onOpenMods={setModTarget}
-                    onOpenSights={setSightTarget}
-                  />
-                ))
-              )}
-            </AccordionSection>
-          );
-        })}
-      </AccordionSection>
+      {message && <div className="fp-error">{message}</div>}
 
       <AccordionSection title="Inventory Summary" defaultOpen>
         <div className="fp-table-wrap">
@@ -517,6 +444,91 @@ export default function EquipmentPanel({
               )}
             </tbody>
           </table>
+        </div>
+      </AccordionSection>
+
+      <AccordionSection
+        title="Stash / Ship Inventory"
+        subtitle={`${stashItems.length} item${
+          stashItems.length === 1 ? "" : "s"
+        }`}
+        defaultOpen={false}
+      >
+        {stashItems.length === 0 ? (
+          <div className="fp-muted">No items in stash.</div>
+        ) : (
+          stashItems.map((item) => (
+            <EquipmentEditor
+              key={item.equipmentId}
+              item={item}
+              equipment={equipment}
+              crewMembers={crewMembers}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
+              onOpenMods={setModTarget}
+              onOpenSights={setSightTarget}
+            />
+          ))
+        )}
+      </AccordionSection>
+
+      <AccordionSection
+        title="Assigned Crew Equipment"
+        subtitle={`${assignedItems.length} assigned item${
+          assignedItems.length === 1 ? "" : "s"
+        }`}
+        defaultOpen={false}
+      >
+        {crewMembers.map((member) => {
+          const memberItems = assignedItems.filter((item) => {
+            return item.crewMemberId === member.crewMemberId;
+          });
+
+          return (
+            <AccordionSection
+              key={member.crewMemberId}
+              title={member.name || "Unnamed Crew Member"}
+              subtitle={`${memberItems.length} item${
+                memberItems.length === 1 ? "" : "s"
+              }`}
+              defaultOpen={false}
+            >
+              {memberItems.length === 0 ? (
+                <div className="fp-muted">No assigned items.</div>
+              ) : (
+                memberItems.map((item) => (
+                  <EquipmentEditor
+                    key={item.equipmentId}
+                    item={item}
+                    equipment={equipment}
+                    crewMembers={crewMembers}
+                    onUpdate={onUpdate}
+                    onDelete={onDelete}
+                    onOpenMods={setModTarget}
+                    onOpenSights={setSightTarget}
+                  />
+                ))
+              )}
+            </AccordionSection>
+          );
+        })}
+      </AccordionSection>
+
+      <AccordionSection title="Add Equipment From Rule Tables" defaultOpen={false}>
+        <div className="fp-toolbar">
+          {EQUIPMENT_CATALOGS.map((catalog) => (
+            <button
+              key={catalog.id}
+              className="fp-btn fp-primary"
+              onClick={() => setCatalogId(catalog.id)}
+            >
+              {catalog.title}
+            </button>
+          ))}
+
+          <button className="fp-btn" onClick={onAddBlankEquipment}>
+            Blank Item
+          </button>
         </div>
       </AccordionSection>
 
@@ -561,10 +573,15 @@ export default function EquipmentPanel({
             <div className="fp-modal-header">
               <div>
                 <div className="fp-modal-title">Current Sight</div>
-                <div className="fp-modal-subtitle">{sightTarget.weapon.sight}</div>
+                <div className="fp-modal-subtitle">
+                  {sightTarget.weapon.sight}
+                </div>
               </div>
 
-              <button className="fp-btn fp-danger" onClick={() => setSightTarget(null)}>
+              <button
+                className="fp-btn fp-danger"
+                onClick={() => setSightTarget(null)}
+              >
                 Close
               </button>
             </div>

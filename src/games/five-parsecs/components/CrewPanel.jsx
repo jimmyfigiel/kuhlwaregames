@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 
 import AccordionSection from "./AccordionSection";
 import { CompactField } from "./CompactField";
-import CreationTablesPanel from "./CreationTablesPanel";
+import ShipPanel from "./ShipPanel";
 
 function safeNumber(value) {
   if (value === "" || value === null || value === undefined) return 0;
@@ -65,12 +65,7 @@ function getCaptainName(crew, crewMembers) {
   return captain?.name || "";
 }
 
-function CrewDetailsRow({
-  member,
-  onUpdate,
-  onDelete,
-  onAddCrewMemberLog,
-}) {
+function CrewDetailsRow({ member, onUpdate, onDelete, onAddCrewMemberLog }) {
   function patch(patchValue) {
     onUpdate("crewMembers", member.crewMemberId, patchValue);
   }
@@ -199,9 +194,7 @@ function EditableCrewRow({
           className="fp-table-input fp-stat-input"
           type="number"
           value={member.speed ?? 0}
-          onChange={(event) =>
-            patch({ speed: safeNumber(event.target.value) })
-          }
+          onChange={(event) => patch({ speed: safeNumber(event.target.value) })}
         />
       </td>
 
@@ -232,9 +225,7 @@ function EditableCrewRow({
           className="fp-table-input fp-stat-input"
           type="number"
           value={member.savvy ?? 0}
-          onChange={(event) =>
-            patch({ savvy: safeNumber(event.target.value) })
-          }
+          onChange={(event) => patch({ savvy: safeNumber(event.target.value) })}
         />
       </td>
 
@@ -243,9 +234,7 @@ function EditableCrewRow({
           className="fp-table-input fp-stat-input"
           type="number"
           value={member.luck ?? 0}
-          onChange={(event) =>
-            patch({ luck: safeNumber(event.target.value) })
-          }
+          onChange={(event) => patch({ luck: safeNumber(event.target.value) })}
         />
       </td>
 
@@ -285,6 +274,7 @@ export default function CrewPanel({
   equipment,
   quests,
   rumors,
+  playerId,
   onSaveCrew,
   onUpdate,
   onDelete,
@@ -293,10 +283,6 @@ export default function CrewPanel({
   onAddCrewMember,
   onAddCrewMemberLog,
   onAddLog,
-  roomId,
-  crewId,
-  playerId,
-  onAddEquipment,
 }) {
   const [expandedCrewMemberIds, setExpandedCrewMemberIds] = useState({});
 
@@ -429,19 +415,11 @@ export default function CrewPanel({
         </div>
       </AccordionSection>
 
-
-      <CreationTablesPanel
-        crew={crew}
-        roomId={roomId}
-        crewId={crewId}
-        playerId={playerId}
-        onAddEquipment={onAddEquipment}
-        onSaveCrew={onSaveCrew}
-      />
-
       <AccordionSection
         title="Crew"
-        subtitle={`${crewMembers.length} crew member${crewMembers.length === 1 ? "" : "s"}`}
+        subtitle={`${crewMembers.length} crew member${
+          crewMembers.length === 1 ? "" : "s"
+        }`}
         defaultOpen
       >
         <div className="fp-actions">
@@ -513,6 +491,10 @@ export default function CrewPanel({
             </tbody>
           </table>
         </div>
+      </AccordionSection>
+
+      <AccordionSection title="Ship Summary" defaultOpen={false}>
+        <ShipPanel crew={crew} playerId={playerId} onSaveCrew={onSaveCrew} />
       </AccordionSection>
     </div>
   );

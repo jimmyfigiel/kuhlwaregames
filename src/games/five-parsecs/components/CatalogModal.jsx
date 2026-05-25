@@ -4,6 +4,7 @@ function stringifyValue(value) {
   if (Array.isArray(value)) return value.join(", ");
   if (typeof value === "boolean") return value ? "Yes" : "No";
   if (value === null || value === undefined) return "";
+  if (typeof value === "object") return "";
   return String(value);
 }
 
@@ -12,9 +13,46 @@ function rowMatchesSearch(row, search) {
 
   if (!term) return true;
 
-  return Object.values(row).some((value) => {
+  return Object.entries(row).some(([key, value]) => {
+    if (key.startsWith("__")) return false;
     return stringifyValue(value).toLowerCase().includes(term);
   });
+}
+
+function getRowKey(row) {
+  if (row?.__rowKey) return row.__rowKey;
+
+  const raw = row?.__raw || row;
+
+  return [
+    raw?.rollMin ?? "",
+    raw?.rollMax ?? "",
+    raw?.name ?? "",
+    raw?.result ?? "",
+    raw?.ship ?? "",
+    raw?.weaponKey ?? "",
+    raw?.itemKey ?? "",
+  ].join("::");
+}
+
+function renderCellValue(row, column) {
+  if (column === "roll") {
+    if (row.roll) return row.roll;
+
+    if (
+      row.rollMin !== undefined &&
+      row.rollMax !== undefined &&
+      row.rollMin === row.rollMax
+    ) {
+      return String(row.rollMin);
+    }
+
+    if (row.rollMin !== undefined && row.rollMax !== undefined) {
+      return `${row.rollMin}-${row.rollMax}`;
+    }
+  }
+
+  return stringifyValue(row[column]);
 }
 
 export default function CatalogModal({
@@ -25,6 +63,11 @@ export default function CatalogModal({
   actionLabel = "Add",
   onSelect,
   onClose,
+  onRoll,
+  rollLabel = "Roll",
+  headerControls = null,
+  highlightedRowKey = "",
+  rollSummary = "",
 }) {
   const [search, setSearch] = useState("");
 
@@ -39,9 +82,7 @@ export default function CatalogModal({
           <div>
             <div className="fp-modal-title">{title}</div>
 
-            {subtitle && (
-              <div className="fp-modal-subtitle">{subtitle}</div>
-            )}
+            {subtitle && <div className="fp-modal-subtitle">{subtitle}</div>}
           </div>
 
           <button className="fp-btn fp-danger" onClick={onClose}>
@@ -49,7 +90,7 @@ export default function CatalogModal({
           </button>
         </div>
 
-        <div className="fp-toolbar">
+        <div className="fp-toolbar fp-catalog-toolbar">
           <label className="fp-field fp-field-wide">
             Search
             <input
@@ -57,7 +98,17 @@ export default function CatalogModal({
               onChange={(event) => setSearch(event.target.value)}
             />
           </label>
+
+          {headerControls}
+
+          {onRoll && (
+            <button className="fp-btn fp-primary" onClick={onRoll}>
+              {rollLabel}
+            </button>
+          )}
         </div>
+
+        {rollSummary && <div className="fp-turn-summary">{rollSummary}</div>}
 
         <div className="fp-table-wrap fp-catalog-table-wrap">
           <table className="fp-table fp-catalog-table">
@@ -72,24 +123,32 @@ export default function CatalogModal({
             </thead>
 
             <tbody>
-              {filteredRows.map((row) => (
-                <tr key={row.name}>
-                  {columns.map((column) => (
-                    <td key={`${row.name}-${column}`} className="fp-catalog-cell">
-                      {stringifyValue(row[column])}
-                    </td>
-                  ))}
+              {filteredRows.map((row) => {
+                const rowKey = getRowKey(row);
+                const isHighlighted = highlightedRowKey === rowKey;
 
-                  <td>
-                    <button
-                      className="fp-btn fp-primary"
-                      onClick={() => onSelect(row)}
-                    >
-                      {actionLabel}
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                return (
+                  <tr
+                    key={rowKey}
+                    className={isHighlighted ? "fp-selected-roll-row" : ""}
+                  >
+                    {columns.map((column) => (
+                      <td key={`${rowKey}-${column}`} className="fp-catalog-cell">
+                        {renderCellValue(row, column)}
+                      </td>
+                    ))}
+
+                    <td>
+                      <button
+                        className="fp-btn fp-primary"
+                        onClick={() => onSelect(row)}
+                      >
+                        {actionLabel}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
 
               {filteredRows.length === 0 && (
                 <tr>

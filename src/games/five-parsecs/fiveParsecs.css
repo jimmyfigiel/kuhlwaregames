@@ -1246,7 +1246,9 @@ body:has(.fp-wrap),
     min-width: 760px;
   }
 }
+
 /* Creation / equipment / ship table helpers */
+
 .fp-creation-table-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -1269,4 +1271,50 @@ body:has(.fp-wrap),
 
 .fp-tight-actions .fp-btn {
   padding: 3px 6px;
+}
+
+/* Creation table roll/apply helpers */
+
+.fp-catalog-toolbar {
+  align-items: end;
+}
+
+.fp-field-medium {
+  min-width: 180px;
+}
+
+.fp-selected-roll-row td {
+  background: #fff4c2;
+  font-weight: 700;
+}
+
+/* Force table roll highlight to override alternating row colors */
+.fp-table tr.fp-selected-roll-row td,
+.fp-catalog-table tr.fp-selected-roll-row td,
+.fp-catalog-table tbody tr.fp-selected-roll-row td,
+.fp-table tbody tr.fp-selected-roll-row td {
+  background: #fff4c2 !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+  outline: 3px solid #ff9d00;
+  outline-offset: -3px;
+}
+
+/* Creation table launcher buttons */
+
+.fp-creation-button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.fp-creation-table-button {
+  width: 100%;
+  min-height: 58px;
+  padding: 12px 14px;
+  font-size: calc(var(--fp-button-font-size) + 2px);
+  text-align: center;
+  white-space: normal;
 }

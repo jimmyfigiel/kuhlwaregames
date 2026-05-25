@@ -20,7 +20,7 @@ import {
 } from "./utils/recordFactories";
 
 import CrewPanel from "./components/CrewPanel";
-import ShipPanel from "./components/ShipPanel";
+import CreationTablesPanel from "./components/CreationTablesPanel";
 import EquipmentPanel from "./components/EquipmentPanel";
 import WorldsPanel from "./components/WorldsPanel";
 import EncountersPanel from "./components/EncountersPanel";
@@ -32,13 +32,13 @@ import DiceBar from "./components/DiceBar";
 
 const TABS = [
   { id: "crew", label: "Adventure" },
-  { id: "ship", label: "Ship" },
   { id: "equipment", label: "Gear" },
   { id: "worlds", label: "Worlds" },
   { id: "encounters", label: "Encounters" },
   { id: "templates", label: "Enemies" },
   { id: "turn", label: "Turn" },
   { id: "rules", label: "Rules" },
+  { id: "creation", label: "Creation" },
   { id: "logs", label: "Logs" },
 ];
 
@@ -396,6 +396,7 @@ export default function FiveParsecsGame(props) {
           equipment={equipment}
           quests={quests}
           rumors={rumors}
+          playerId={playerId}
           onSaveCrew={saveCrew}
           onUpdate={updateRecord}
           onDelete={deleteRecord}
@@ -406,18 +407,6 @@ export default function FiveParsecsGame(props) {
             addManualLogEntry("crewMember", memberId)
           }
           onAddLog={() => addManualLogEntry("crew", crewId)}
-          roomId={roomId}
-          crewId={crewId}
-          playerId={playerId}
-          onAddEquipment={addCatalogEquipment}
-        />
-      )}
-
-      {activeTab === "ship" && (
-        <ShipPanel
-          crew={crew}
-          playerId={playerId}
-          onSaveCrew={saveCrew}
         />
       )}
 
@@ -503,6 +492,19 @@ export default function FiveParsecsGame(props) {
           onClearLocalPdf={clearLocalRulesPdf}
           onRulesPageChange={setRulesPage}
           onSaveCrew={saveCrew}
+        />
+      )}
+
+      {activeTab === "creation" && (
+        <CreationTablesPanel
+          crew={crew}
+          crewMembers={crewMembers}
+          roomId={roomId}
+          crewId={crewId}
+          playerId={playerId}
+          onAddEquipment={addCatalogEquipment}
+          onSaveCrew={saveCrew}
+          onUpdate={updateRecord}
         />
       )}
 
