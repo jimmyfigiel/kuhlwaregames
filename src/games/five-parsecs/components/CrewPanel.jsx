@@ -4,6 +4,37 @@ import AccordionSection from "./AccordionSection";
 import { CompactField } from "./CompactField";
 import ShipPanel from "./ShipPanel";
 
+const WEAPON_TRAIT_HELP = {
+  Area:
+    "Area weapons may affect more than one target. Resolve the main attack, then apply the Area weapon rules.",
+  Clumsy:
+    "Clumsy weapons are awkward to use. They usually make close combat less flexible or less efficient.",
+  Critical:
+    "Critical weapons are especially dangerous when they score strong results.",
+  Elegant:
+    "Elegant melee weapons are refined and easier to use skillfully in close combat.",
+  Focused:
+    "Focused weapons concentrate their fire and are most useful when the shooter can line up a good shot.",
+  Heavy:
+    "Heavy weapons are cumbersome and may limit movement or firing options.",
+  Impact:
+    "Impact weapons hit with extra force and may knock enemies back or add force in close combat.",
+  Melee:
+    "Melee weapons are used in Brawling instead of normal shooting.",
+  Piercing:
+    "Piercing weapons are better at getting through armor or protection.",
+  Pistol:
+    "Pistol weapons are sidearms. Some mods, sights, and special rules only apply to pistols.",
+  "Single use":
+    "Single-use items are used once, then removed from inventory.",
+  "Snap Shot":
+    "Snap Shot weapons are easier to fire quickly or while reacting.",
+  Stun:
+    "Stun effects interfere with a target's ability to act.",
+  Terrifying:
+    "Terrifying weapons can affect enemy morale or reactions as described in the rules.",
+};
+
 function safeNumber(value) {
   if (value === "" || value === null || value === undefined) return 0;
 
@@ -62,13 +93,15 @@ function getWeaponShots(item) {
 
 function getWeaponDamage(item) {
   if (item.category !== "weapon") return "";
-  if (item.weapon?.damage === undefined || item.weapon?.damage === null) return "";
+  if (item.weapon?.damage === undefined || item.weapon?.damage === null) {
+    return "";
+  }
   return item.weapon.damage;
 }
 
 function getWeaponTraits(item) {
-  if (item.category !== "weapon") return "";
-  return asArray(item.weapon?.traits).join(", ");
+  if (item.category !== "weapon") return [];
+  return asArray(item.weapon?.traits);
 }
 
 function getWeaponMods(item) {
@@ -85,6 +118,30 @@ function getGearEffect(item) {
   if (item.category === "weapon") return "";
 
   return item.gear?.effect || item.armor?.effect || item.notes || "";
+}
+
+function TraitPill({ trait }) {
+  const help =
+    WEAPON_TRAIT_HELP[trait] ||
+    "No help text has been entered for this trait yet.";
+
+  return (
+    <span className="fp-trait-pill" title={help} data-tooltip={help}>
+      {trait}
+    </span>
+  );
+}
+
+function TraitList({ traits }) {
+  if (!traits.length) return "";
+
+  return (
+    <div className="fp-trait-list">
+      {traits.map((trait) => (
+        <TraitPill key={trait} trait={trait} />
+      ))}
+    </div>
+  );
 }
 
 function CrewEquipmentRows({ member, equipment }) {
@@ -134,7 +191,9 @@ function CrewEquipmentRows({ member, equipment }) {
                     <td>{getWeaponRange(item)}</td>
                     <td>{getWeaponShots(item)}</td>
                     <td>{getWeaponDamage(item)}</td>
-                    <td className="fp-wrap-cell">{getWeaponTraits(item)}</td>
+                    <td className="fp-wrap-cell">
+                      <TraitList traits={getWeaponTraits(item)} />
+                    </td>
                     <td className="fp-wrap-cell">{getWeaponMods(item)}</td>
                     <td>{getWeaponSight(item)}</td>
                     <td className="fp-wrap-cell">{getGearEffect(item)}</td>
@@ -158,29 +217,34 @@ function CrewDetailsRow({ member, onUpdate, onDelete, onAddCrewMemberLog }) {
   return (
     <tr className="fp-crew-details-row">
       <td colSpan={13}>
-        <div className="fp-inline-card fp-crew-details-card">
-          <CompactField
-            label="Background"
-            value={member.background || ""}
-            textarea
-            onChange={(value) => patch({ background: value })}
-          />
+        <div className="fp-crew-details-card">
+          <div className="fp-crew-details-grid">
+            <label className="fp-crew-detail-field">
+              <span>Background</span>
+              <input
+                value={member.background || ""}
+                onChange={(event) => patch({ background: event.target.value })}
+              />
+            </label>
 
-          <CompactField
-            label="Motivation"
-            value={member.motivation || ""}
-            textarea
-            onChange={(value) => patch({ motivation: value })}
-          />
+            <label className="fp-crew-detail-field">
+              <span>Motivation</span>
+              <input
+                value={member.motivation || ""}
+                onChange={(event) => patch({ motivation: event.target.value })}
+              />
+            </label>
 
-          <CompactField
-            label="Notes"
-            value={member.notes || ""}
-            textarea
-            onChange={(value) => patch({ notes: value })}
-          />
+            <label className="fp-crew-detail-field fp-crew-notes-field">
+              <span>Notes</span>
+              <textarea
+                value={member.notes || ""}
+                onChange={(event) => patch({ notes: event.target.value })}
+              />
+            </label>
+          </div>
 
-          <div className="fp-actions fp-field-wide">
+          <div className="fp-actions fp-crew-details-actions">
             <button
               className="fp-btn"
               onClick={() => onAddCrewMemberLog(member.crewMemberId)}

@@ -1360,3 +1360,87 @@ body:has(.fp-wrap),
     min-width: 180px;
   }
 }
+
+/* =========================================================
+   Weapon trait hover help
+   ========================================================= */
+
+.fp-trait-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  align-items: flex-start;
+}
+
+.fp-trait-pill {
+  position: relative;
+  display: inline-block;
+
+  padding: 2px 5px;
+
+  color: var(--fp-text-dark, #1f1638);
+  background: #eee7ff;
+  border: 2px solid #7f6cb0;
+  border-radius: 999px;
+
+  font-size: var(--fp-small-font-size, 11px);
+  font-weight: 900;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: help;
+}
+
+.fp-trait-pill:hover,
+.fp-trait-pill:focus {
+  background: #d8cdf2;
+  border-color: #4d3f78;
+  outline: none;
+}
+
+.fp-trait-pill:hover::after,
+.fp-trait-pill:focus::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  z-index: 9999;
+
+  left: 0;
+  top: calc(100% + 6px);
+
+  width: max-content;
+  max-width: 280px;
+  padding: 7px 9px;
+
+  color: #1f1638;
+  background: #ffffff;
+  border: 2px solid #4d3f78;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+
+  white-space: normal;
+  text-align: left;
+  font-size: var(--fp-small-font-size, 11px);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.fp-trait-pill:hover::before,
+.fp-trait-pill:focus::before {
+  content: "";
+  position: absolute;
+  z-index: 10000;
+
+  left: 10px;
+  top: calc(100% + 1px);
+
+  border-width: 0 6px 6px 6px;
+  border-style: solid;
+  border-color: transparent transparent #4d3f78 transparent;
+}
+
+/* On narrow screens, make the tooltip less likely to run off the edge. */
+@media (max-width: 700px) {
+  .fp-trait-pill:hover::after,
+  .fp-trait-pill:focus::after {
+    max-width: 220px;
+  }
+}
