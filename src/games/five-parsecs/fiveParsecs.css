@@ -1246,3 +1246,27 @@ body:has(.fp-wrap),
     min-width: 760px;
   }
 }
+/* Creation / equipment / ship table helpers */
+.fp-creation-table-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 6px;
+}
+
+.fp-creation-table-card {
+  padding: 6px;
+}
+
+.fp-card-title {
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.fp-tight-actions {
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.fp-tight-actions .fp-btn {
+  padding: 3px 6px;
+}

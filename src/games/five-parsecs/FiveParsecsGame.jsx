@@ -406,6 +406,10 @@ export default function FiveParsecsGame(props) {
             addManualLogEntry("crewMember", memberId)
           }
           onAddLog={() => addManualLogEntry("crew", crewId)}
+          roomId={roomId}
+          crewId={crewId}
+          playerId={playerId}
+          onAddEquipment={addCatalogEquipment}
         />
       )}
 

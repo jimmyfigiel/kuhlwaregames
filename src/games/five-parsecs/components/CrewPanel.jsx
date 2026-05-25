@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 
 import AccordionSection from "./AccordionSection";
 import { CompactField } from "./CompactField";
+import CreationTablesPanel from "./CreationTablesPanel";
 
 function safeNumber(value) {
   if (value === "" || value === null || value === undefined) return 0;
@@ -76,7 +77,7 @@ function CrewDetailsRow({
 
   return (
     <tr className="fp-crew-details-row">
-      <td colSpan={13}>
+      <td colSpan={14}>
         <div className="fp-inline-card fp-crew-details-card">
           <CompactField
             label="Background"
@@ -292,6 +293,10 @@ export default function CrewPanel({
   onAddCrewMember,
   onAddCrewMemberLog,
   onAddLog,
+  roomId,
+  crewId,
+  playerId,
+  onAddEquipment,
 }) {
   const [expandedCrewMemberIds, setExpandedCrewMemberIds] = useState({});
 
@@ -423,6 +428,16 @@ export default function CrewPanel({
           </button>
         </div>
       </AccordionSection>
+
+
+      <CreationTablesPanel
+        crew={crew}
+        roomId={roomId}
+        crewId={crewId}
+        playerId={playerId}
+        onAddEquipment={onAddEquipment}
+        onSaveCrew={onSaveCrew}
+      />
 
       <AccordionSection
         title="Crew"
