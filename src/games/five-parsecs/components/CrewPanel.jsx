@@ -50,31 +50,39 @@ function getCategoryLabel(item) {
   return item.category || "Gear";
 }
 
-function getWeaponDetail(item) {
-  const weapon = item.weapon || {};
-
-  return [
-    weapon.range ? `Range ${weapon.range}` : "",
-    weapon.shots !== "" && weapon.shots !== undefined
-      ? `Shots ${weapon.shots}`
-      : "",
-    weapon.damage !== "" && weapon.damage !== undefined
-      ? `Damage ${weapon.damage}`
-      : "",
-    asArray(weapon.traits).length
-      ? `Traits: ${weapon.traits.join(", ")}`
-      : "",
-    asArray(weapon.mods).length ? `Mods: ${weapon.mods.join(", ")}` : "",
-    weapon.sight ? `Sight: ${weapon.sight}` : "",
-  ]
-    .filter(Boolean)
-    .join(" · ");
+function getWeaponRange(item) {
+  return item.weapon?.range || "";
 }
 
-function getGearDetail(item) {
-  if (item.category === "weapon") {
-    return getWeaponDetail(item);
-  }
+function getWeaponShots(item) {
+  if (item.category !== "weapon") return "";
+  if (item.weapon?.shots === undefined || item.weapon?.shots === null) return "";
+  return item.weapon.shots;
+}
+
+function getWeaponDamage(item) {
+  if (item.category !== "weapon") return "";
+  if (item.weapon?.damage === undefined || item.weapon?.damage === null) return "";
+  return item.weapon.damage;
+}
+
+function getWeaponTraits(item) {
+  if (item.category !== "weapon") return "";
+  return asArray(item.weapon?.traits).join(", ");
+}
+
+function getWeaponMods(item) {
+  if (item.category !== "weapon") return "";
+  return asArray(item.weapon?.mods).join(", ");
+}
+
+function getWeaponSight(item) {
+  if (item.category !== "weapon") return "";
+  return item.weapon?.sight || "";
+}
+
+function getGearEffect(item) {
+  if (item.category === "weapon") return "";
 
   return item.gear?.effect || item.armor?.effect || item.notes || "";
 }
@@ -88,16 +96,22 @@ function CrewEquipmentRows({ member, equipment }) {
 
   return (
     <tr className="fp-crew-equipment-row">
-      <td colSpan={14}>
+      <td colSpan={13}>
         <div className="fp-crew-equipment-indent">
           <table className="fp-table fp-crew-gear-table">
             <thead>
               <tr>
-                <th>Gear / Weapon</th>
+                <th>Item</th>
                 <th>Type</th>
                 <th>Subtype</th>
                 <th>Qty</th>
-                <th>Details</th>
+                <th>Range</th>
+                <th>Shots</th>
+                <th>Damage</th>
+                <th>Traits</th>
+                <th>Mods</th>
+                <th>Sight</th>
+                <th>Effect</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -117,7 +131,13 @@ function CrewEquipmentRows({ member, equipment }) {
                     <td>{getCategoryLabel(item)}</td>
                     <td>{item.subtype || ""}</td>
                     <td>{item.quantity || 1}</td>
-                    <td className="fp-wrap-cell">{getGearDetail(item)}</td>
+                    <td>{getWeaponRange(item)}</td>
+                    <td>{getWeaponShots(item)}</td>
+                    <td>{getWeaponDamage(item)}</td>
+                    <td className="fp-wrap-cell">{getWeaponTraits(item)}</td>
+                    <td className="fp-wrap-cell">{getWeaponMods(item)}</td>
+                    <td>{getWeaponSight(item)}</td>
+                    <td className="fp-wrap-cell">{getGearEffect(item)}</td>
                     <td>{status || "OK"}</td>
                   </tr>
                 );
@@ -137,7 +157,7 @@ function CrewDetailsRow({ member, onUpdate, onDelete, onAddCrewMemberLog }) {
 
   return (
     <tr className="fp-crew-details-row">
-      <td colSpan={14}>
+      <td colSpan={13}>
         <div className="fp-inline-card fp-crew-details-card">
           <CompactField
             label="Background"
@@ -318,7 +338,7 @@ function EditableCrewRow({
         />
       </td>
 
-      <td className="fp-table-actions-cell">
+      <td className="fp-table-actions-cell fp-crew-action-cell">
         <button className="fp-btn fp-mini-btn" onClick={onToggleExpanded}>
           {expanded ? "Hide" : "Details"}
         </button>
