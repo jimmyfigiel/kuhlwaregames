@@ -1,0 +1,58 @@
+/* ---------- Creation / catalog helpers ---------- */
+
+.fp-creation-table-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 6px;
+}
+
+.fp-creation-table-card {
+  padding: 6px;
+}
+
+.fp-card-title {
+  margin-bottom: 2px;
+  font-weight: 700;
+}
+
+.fp-tight-actions {
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.fp-tight-actions .fp-btn {
+  padding: 3px 6px;
+}
+
+.fp-creation-button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.fp-creation-table-button {
+  width: 100%;
+  min-height: 58px;
+  padding: 12px 14px;
+  font-size: calc(var(--fp-button-font-size) + 2px);
+  text-align: center;
+  white-space: normal;
+}
+
+.fp-catalog-toolbar {
+  align-items: end;
+}
+
+.fp-selected-roll-row td,
+.fp-table tr.fp-selected-roll-row td,
+.fp-catalog-table tr.fp-selected-roll-row td,
+.fp-catalog-table tbody tr.fp-selected-roll-row td,
+.fp-table tbody tr.fp-selected-roll-row td {
+  background: #fff4c2 !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+  outline: 3px solid #ff9d00;
+  outline-offset: -3px;
+}

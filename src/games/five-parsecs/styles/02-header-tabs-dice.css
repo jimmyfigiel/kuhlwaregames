@@ -1,0 +1,121 @@
+/* ---------- Header ---------- */
+
+.fp-header {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 6px;
+  color: var(--fp-text-dark);
+}
+
+.fp-header-main {
+  flex: 1;
+  min-width: 0;
+  background: var(--fp-mauve);
+  color: var(--fp-text-dark);
+  border-radius: 0 var(--fp-radius-lg) var(--fp-radius-lg) 0;
+  padding: 10px 18px 10px 14px;
+}
+
+.fp-title {
+  font-size: var(--fp-title-font-size);
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  line-height: 1.05;
+}
+
+.fp-subtitle {
+  margin-top: 2px;
+  font-size: var(--fp-subtitle-font-size);
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.fp-header-right {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ---------- Dice bar ---------- */
+
+.fp-dice-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 100%;
+  background: var(--fp-purple);
+  color: var(--fp-text-dark);
+  border-radius: var(--fp-radius-lg) 0 0 var(--fp-radius-lg);
+  padding: 8px 10px 8px 16px;
+}
+
+.fp-dice-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fp-die {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--fp-black);
+  color: var(--fp-text-light);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.fp-die:hover {
+  filter: brightness(1.25);
+}
+
+.fp-dice-total {
+  min-width: 38px;
+  text-align: center;
+  font-weight: 900;
+  color: var(--fp-text-dark);
+}
+
+.fp-dice-label {
+  font-size: var(--fp-small-font-size);
+  font-weight: 800;
+  color: var(--fp-text-dark);
+}
+
+/* ---------- Tabs ---------- */
+
+.fp-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  width: 100%;
+  margin: 0 0 8px 0;
+  padding: 0;
+}
+
+.fp-tab {
+  border: 0;
+  border-radius: var(--fp-radius-md) var(--fp-radius-md) 0 0;
+  padding: 8px 14px;
+  background: var(--fp-blue);
+  color: var(--fp-text-dark);
+  font-size: var(--fp-button-font-size);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.fp-tab:hover {
+  filter: brightness(1.12);
+}
+
+.fp-tab.active {
+  background: var(--fp-orange);
+  color: var(--fp-text-dark);
+}

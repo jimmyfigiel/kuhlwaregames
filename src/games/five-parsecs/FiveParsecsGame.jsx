@@ -33,12 +33,11 @@ import DiceBar from "./components/DiceBar";
 
 const TABS = [
   { id: "crew", label: "Adventure" },
-  { id: "ship", label: "Ship" },
   { id: "equipment", label: "Gear" },
   { id: "worlds", label: "Worlds" },
   { id: "encounters", label: "Encounters" },
   { id: "templates", label: "Enemies" },
-  { id: "turn", label: "Turn" },
+  { id: "turn", label: "Campaign" },
   { id: "rules", label: "Rules" },
   { id: "creation", label: "Creation" },
   { id: "logs", label: "Logs" },
@@ -415,33 +414,8 @@ export default function FiveParsecsGame(props) {
             onAddEquipment={addCatalogEquipment}
           />
 
-          <ShipPanel
-            crew={crew}
-            playerId={playerId}
-            onSaveCrew={saveCrew}
-          />
+          <ShipPanel crew={crew} playerId={playerId} onSaveCrew={saveCrew} />
         </>
-      )}
-
-      {activeTab === "creation" && (
-        <CreationTablesPanel
-          crew={crew}
-          crewMembers={crewMembers}
-          roomId={roomId}
-          crewId={crewId}
-          playerId={playerId}
-          onAddEquipment={addCatalogEquipment}
-          onSaveCrew={saveCrew}
-          onUpdate={updateRecord}
-        />
-      )}
-
-      {activeTab === "ship" && (
-        <ShipPanel
-          crew={crew}
-          playerId={playerId}
-          onSaveCrew={saveCrew}
-        />
       )}
 
       {activeTab === "equipment" && (
@@ -505,6 +479,14 @@ export default function FiveParsecsGame(props) {
         <TurnPanel
           campaignTurns={campaignTurns}
           crew={crew}
+          crewMembers={crewMembers}
+          equipment={equipment}
+          worlds={worlds}
+          patrons={patrons}
+          rivals={rivals}
+          quests={quests}
+          rumors={rumors}
+          onSaveCrew={saveCrew}
           onAddTurn={addCampaignTurn}
           onUpdate={updateRecord}
           onDelete={deleteRecord}
@@ -526,6 +508,22 @@ export default function FiveParsecsGame(props) {
           onClearLocalPdf={clearLocalRulesPdf}
           onRulesPageChange={setRulesPage}
           onSaveCrew={saveCrew}
+        />
+      )}
+
+      {activeTab === "creation" && (
+        <CreationTablesPanel
+          crew={crew}
+          crewMembers={crewMembers}
+          worlds={worlds}
+          patrons={patrons}
+          campaignTurns={campaignTurns}
+          roomId={roomId}
+          crewId={crewId}
+          playerId={playerId}
+          onAddEquipment={addCatalogEquipment}
+          onSaveCrew={saveCrew}
+          onUpdate={updateRecord}
         />
       )}
 

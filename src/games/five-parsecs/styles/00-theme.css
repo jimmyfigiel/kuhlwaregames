@@ -1,0 +1,47 @@
+/* =========================================================
+   Five Parsecs - LCARS Clean Theme
+   Full replacement for fiveParsecs.css
+   ========================================================= */
+
+/* ---------- Theme variables ---------- */
+
+:root {
+  /*
+    Change this one value to control the app width.
+
+    Examples:
+    --fp-app-width: 100vw;   edge to edge
+    --fp-app-width: 95vw;    almost full screen
+    --fp-app-width: 90vw;    slight side margins
+    --fp-app-width: 1200px;  fixed width
+  */
+  --fp-app-width: 90vw;
+
+  --fp-bg: #000000;
+
+  --fp-mauve: #d8a7ca;
+  --fp-purple: #9298ee;
+  --fp-salmon: #cf6668;
+  --fp-orange: #ff9d00;
+  --fp-gold: #f0ce6a;
+  --fp-lavender: #a0a0d2;
+  --fp-blue: #8e95e2;
+
+  --fp-black: #000000;
+  --fp-text-dark: #050505;
+  --fp-text-light: #e8fbff;
+
+  --fp-font-size: 15px;
+  --fp-title-font-size: 24px;
+  --fp-subtitle-font-size: 13px;
+  --fp-label-font-size: 12px;
+  --fp-button-font-size: 13px;
+  --fp-input-font-size: 14px;
+  --fp-table-font-size: 14px;
+  --fp-table-header-font-size: 12px;
+  --fp-small-font-size: 12px;
+
+  --fp-radius-lg: 26px;
+  --fp-radius-md: 15px;
+  --fp-radius-sm: 7px;
+}

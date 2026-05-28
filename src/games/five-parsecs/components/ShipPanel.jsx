@@ -36,11 +36,7 @@ function rollDie(sides) {
   return Math.floor(Math.random() * sides) + 1;
 }
 
-export default function ShipPanel({
-  crew,
-  playerId,
-  onSaveCrew,
-}) {
+export default function ShipPanel({ crew, playerId, onSaveCrew }) {
   const [showComponents, setShowComponents] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -51,7 +47,9 @@ export default function ShipPanel({
   if (!crew) {
     return (
       <div className="fp-panel">
-        <div className="fp-muted">Create an adventure before editing the ship.</div>
+        <div className="fp-muted">
+          Create an adventure before editing the ship.
+        </div>
       </div>
     );
   }
@@ -119,22 +117,26 @@ export default function ShipPanel({
       hullDamage: Number(starship.hullDamage || 0) + damage,
     });
 
-    setMessage(`Emergency Take-off caused ${damage} Hull damage. Rolled [${dice.join(", ")}].`);
+    setMessage(
+      `Emergency Take-off caused ${damage} Hull damage. Rolled [${dice.join(
+        ", "
+      )}].`
+    );
   }
 
   const installedCount = getInstalledComponentCount(starship.components);
   const fuelSurcharge = getInstalledComponentFuelSurcharge(starship.components);
+  const visibleComponents = starship.components.filter(
+    (component) => !component.removed
+  );
+
   const isWrecked =
     starship.hullThreshold > 0 &&
     starship.hullDamage >= starship.hullThreshold;
 
   return (
     <div className="fp-panel">
-      {message && (
-        <div className="fp-error">
-          {message}
-        </div>
-      )}
+      {message && <div className="fp-error">{message}</div>}
 
       <AccordionSection title="Ship Summary" defaultOpen>
         <div className="fp-grid">
@@ -154,7 +156,9 @@ export default function ShipPanel({
             <input
               type="checkbox"
               checked={Boolean(starship.hasShip)}
-              onChange={(event) => saveStarship({ hasShip: event.target.checked })}
+              onChange={(event) =>
+                saveStarship({ hasShip: event.target.checked })
+              }
             />
             Crew Has Ship
           </label>
@@ -163,14 +167,18 @@ export default function ShipPanel({
             label="Hull Damage"
             type="number"
             value={starship.hullDamage}
-            onChange={(value) => saveStarship({ hullDamage: Number(value || 0) })}
+            onChange={(value) =>
+              saveStarship({ hullDamage: Number(value || 0) })
+            }
           />
 
           <CompactField
             label="Hull Threshold"
             type="number"
             value={starship.hullThreshold}
-            onChange={(value) => saveStarship({ hullThreshold: Number(value || 0) })}
+            onChange={(value) =>
+              saveStarship({ hullThreshold: Number(value || 0) })
+            }
           />
 
           <CompactField
@@ -184,7 +192,9 @@ export default function ShipPanel({
             label="Financed Amount"
             type="number"
             value={starship.financedAmount}
-            onChange={(value) => saveStarship({ financedAmount: Number(value || 0) })}
+            onChange={(value) =>
+              saveStarship({ financedAmount: Number(value || 0) })
+            }
           />
 
           <CompactField
@@ -196,9 +206,12 @@ export default function ShipPanel({
         </div>
 
         <div className="fp-turn-summary">
-          Installed Components: {installedCount} · Fuel Surcharge: +{fuelSurcharge} credits
+          Installed Components: {installedCount} · Fuel Surcharge: +
+          {fuelSurcharge} credits
           {isWrecked ? " · Ship Wrecked/Lost" : ""}
-          {starship.hullDamage > 0 && !isWrecked ? " · Damaged: travel is unsafe" : ""}
+          {starship.hullDamage > 0 && !isWrecked
+            ? " · Damaged: travel is unsafe"
+            : ""}
         </div>
 
         <div className="fp-actions">
@@ -209,15 +222,7 @@ export default function ShipPanel({
           <button className="fp-btn fp-danger" onClick={emergencyTakeoff}>
             Emergency Take-off: 3D6 Damage
           </button>
-        </div>
-      </AccordionSection>
 
-      <AccordionSection
-        title="Ship Components"
-        subtitle={`${installedCount} installed`}
-        defaultOpen
-      >
-        <div className="fp-actions">
           <button
             className="fp-btn fp-primary"
             onClick={() => setShowComponents(true)}
@@ -225,6 +230,8 @@ export default function ShipPanel({
             Add Component
           </button>
         </div>
+
+        <div className="fp-mini-title">Ship Components</div>
 
         <div className="fp-table-wrap">
           <table className="fp-table">
@@ -240,51 +247,49 @@ export default function ShipPanel({
             </thead>
 
             <tbody>
-              {starship.components
-                .filter((component) => !component.removed)
-                .map((component) => (
-                  <tr key={component.shipComponentId}>
-                    <td>{component.name}</td>
-                    <td>{component.cost}</td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={Boolean(component.installed)}
-                        onChange={(event) =>
-                          updateComponent(component.shipComponentId, {
-                            installed: event.target.checked,
-                          })
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={Boolean(component.damaged)}
-                        onChange={(event) =>
-                          updateComponent(component.shipComponentId, {
-                            damaged: event.target.checked,
-                          })
-                        }
-                      />
-                    </td>
-                    <td className="fp-wrap-cell">
-                      <strong>{component.description}</strong>
-                      <br />
-                      {component.effect}
-                    </td>
-                    <td>
-                      <button
-                        className="fp-btn fp-danger"
-                        onClick={() => removeComponent(component.shipComponentId)}
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+              {visibleComponents.map((component) => (
+                <tr key={component.shipComponentId}>
+                  <td>{component.name}</td>
+                  <td>{component.cost}</td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(component.installed)}
+                      onChange={(event) =>
+                        updateComponent(component.shipComponentId, {
+                          installed: event.target.checked,
+                        })
+                      }
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(component.damaged)}
+                      onChange={(event) =>
+                        updateComponent(component.shipComponentId, {
+                          damaged: event.target.checked,
+                        })
+                      }
+                    />
+                  </td>
+                  <td className="fp-wrap-cell">
+                    <strong>{component.description}</strong>
+                    <br />
+                    {component.effect}
+                  </td>
+                  <td>
+                    <button
+                      className="fp-btn fp-danger"
+                      onClick={() => removeComponent(component.shipComponentId)}
+                    >
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              ))}
 
-              {starship.components.filter((component) => !component.removed).length === 0 && (
+              {visibleComponents.length === 0 && (
                 <tr>
                   <td colSpan={6} className="fp-table-empty">
                     No ship components installed.

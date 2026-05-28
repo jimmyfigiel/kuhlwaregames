@@ -1,0 +1,273 @@
+/* ---------- Editable crew table ---------- */
+
+.fp-crew-table-wrap {
+  overflow-x: hidden;
+}
+
+.fp-crew-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+  border-spacing: 2px;
+}
+
+.fp-crew-table th,
+.fp-crew-table td {
+  padding: 1px 2px;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: clip;
+  vertical-align: top;
+}
+
+.fp-crew-table th:nth-child(1),
+.fp-crew-table td:nth-child(1) {
+  width: 34px;
+  text-align: center;
+}
+
+.fp-crew-table th:nth-child(2),
+.fp-crew-table td:nth-child(2) {
+  width: 14%;
+}
+
+.fp-crew-table th:nth-child(3),
+.fp-crew-table td:nth-child(3),
+.fp-crew-table th:nth-child(4),
+.fp-crew-table td:nth-child(4),
+.fp-crew-table th:nth-child(12),
+.fp-crew-table td:nth-child(12) {
+  width: 9%;
+}
+
+.fp-crew-table th:nth-child(5),
+.fp-crew-table td:nth-child(5),
+.fp-crew-table th:nth-child(6),
+.fp-crew-table td:nth-child(6),
+.fp-crew-table th:nth-child(7),
+.fp-crew-table td:nth-child(7),
+.fp-crew-table th:nth-child(8),
+.fp-crew-table td:nth-child(8),
+.fp-crew-table th:nth-child(9),
+.fp-crew-table td:nth-child(9),
+.fp-crew-table th:nth-child(10),
+.fp-crew-table td:nth-child(10),
+.fp-crew-table th:nth-child(11),
+.fp-crew-table td:nth-child(11) {
+  width: 48px;
+}
+
+.fp-crew-table th:nth-child(13),
+.fp-crew-table td:nth-child(13),
+.fp-crew-action-cell,
+.fp-crew-table th:last-child,
+.fp-crew-table td:last-child {
+  width: 54px;
+  min-width: 54px;
+  max-width: 54px;
+  white-space: nowrap;
+}
+
+.fp-table-input {
+  min-width: 72px;
+}
+
+.fp-name-input {
+  min-width: 150px;
+}
+
+.fp-stat-input {
+  min-width: 58px;
+  max-width: 74px;
+}
+
+.fp-table-actions-cell {
+  min-width: 126px;
+}
+
+.fp-crew-table .fp-table-input {
+  min-width: 0;
+  width: 100%;
+  padding: 1px 2px;
+  border-width: 2px;
+  border-radius: 0 4px 0 4px;
+  font-size: var(--fp-input-font-size);
+  line-height: 1.05;
+}
+
+.fp-crew-table .fp-name-input,
+.fp-crew-table .fp-short-text-input,
+.fp-crew-table .fp-status-input {
+  min-width: 0;
+  max-width: none;
+}
+
+.fp-crew-table .fp-stat-input {
+  min-width: 0;
+  max-width: none;
+  text-align: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.fp-crew-table input[type="number"]::-webkit-outer-spin-button,
+.fp-crew-table input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.fp-crew-table input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.fp-crew-captain-cell input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0 0;
+}
+
+.fp-crew-table .fp-table-actions-cell {
+  min-width: 0;
+  width: 54px;
+}
+
+.fp-crew-captain-row td {
+  background: var(--fp-orange) !important;
+  color: var(--fp-text-dark);
+}
+
+.fp-crew-details-row td {
+  padding: 2px;
+  overflow: visible;
+  background: transparent !important;
+  border: 0;
+}
+
+.fp-crew-details-card {
+  width: 100%;
+  margin: 4px 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+/* ---------- Crew member nested gear rows ---------- */
+
+.fp-crew-equipment-row td {
+  background: #f7f3ff !important;
+  border-top: 0;
+  padding: 2px 4px 8px 4px;
+  overflow: visible;
+}
+
+.fp-crew-equipment-indent {
+  width: calc(100% - 18px);
+  max-width: calc(100% - 18px);
+  margin-left: 18px;
+  margin-right: 0;
+  padding: 3px 0 6px 0;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+
+.fp-crew-gear-table {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+  border-spacing: 0;
+  border-collapse: collapse;
+
+  font-size: var(--fp-small-font-size);
+  border: 2px solid #8b75b8;
+  box-sizing: border-box;
+}
+
+.fp-crew-gear-table th {
+  background: #d8cdf2 !important;
+  color: #1f1638;
+  padding: 3px 4px;
+  white-space: nowrap;
+}
+
+.fp-crew-gear-table td {
+  background: #ffffff !important;
+  color: #1f1638;
+  border: 1px solid #b9add8;
+  padding: 3px 4px;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.fp-crew-gear-table tr:nth-child(even) td {
+  background: #f1ecff !important;
+}
+
+.fp-crew-gear-table th:nth-child(1),
+.fp-crew-gear-table td:nth-child(1) {
+  width: 105px;
+}
+
+.fp-crew-gear-table th:nth-child(2),
+.fp-crew-gear-table td:nth-child(2),
+.fp-crew-gear-table th:nth-child(3),
+.fp-crew-gear-table td:nth-child(3) {
+  width: 78px;
+}
+
+.fp-crew-gear-table th:nth-child(4),
+.fp-crew-gear-table td:nth-child(4),
+.fp-crew-gear-table th:nth-child(5),
+.fp-crew-gear-table td:nth-child(5),
+.fp-crew-gear-table th:nth-child(6),
+.fp-crew-gear-table td:nth-child(6),
+.fp-crew-gear-table th:nth-child(7),
+.fp-crew-gear-table td:nth-child(7),
+.fp-crew-gear-table th:nth-child(10),
+.fp-crew-gear-table td:nth-child(10),
+.fp-crew-gear-table th:nth-child(12),
+.fp-crew-gear-table td:nth-child(12) {
+  width: 52px;
+  text-align: center;
+}
+
+.fp-crew-gear-table th:nth-child(8),
+.fp-crew-gear-table td:nth-child(8),
+.fp-crew-gear-table th:nth-child(9),
+.fp-crew-gear-table td:nth-child(9),
+.fp-crew-gear-table th:nth-child(11),
+.fp-crew-gear-table td:nth-child(11) {
+  width: auto;
+  min-width: 90px;
+}
+
+/* ---------- Old crew card compatibility ---------- */
+
+.fp-crew-card {
+  margin-bottom: 10px;
+  padding: 6px;
+  background: transparent;
+  border: 0;
+}
+
+.fp-crew-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.fp-crew-card-title {
+  color: var(--fp-text-light);
+  font-size: var(--fp-title-font-size);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.fp-crew-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}

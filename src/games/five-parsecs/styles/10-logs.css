@@ -1,0 +1,41 @@
+/* ---------- Logs ---------- */
+
+.fp-log-text-screen {
+  margin-top: 6px;
+  padding: 4px;
+  background: transparent;
+}
+
+.fp-log-text-entry {
+  padding: 6px;
+  margin-bottom: 5px;
+
+  color: var(--fp-text-dark);
+  background: var(--fp-purple);
+  border: 4px solid var(--fp-black);
+  border-radius: 0 var(--fp-radius-sm) 0 var(--fp-radius-sm);
+}
+
+.fp-log-line-main,
+.fp-log-line-change {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: var(--fp-small-font-size);
+  font-weight: 900;
+}
+
+.fp-log-line-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+
+  color: var(--fp-text-dark);
+  font-size: var(--fp-small-font-size);
+  font-weight: 700;
+}
+
+.fp-log-line-body {
+  margin-top: 3px;
+  white-space: pre-wrap;
+  font-size: var(--fp-small-font-size);
+}

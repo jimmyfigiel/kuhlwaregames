@@ -1,0 +1,65 @@
+/* ---------- Buttons ---------- */
+
+.fp-btn {
+  appearance: none;
+  min-height: 28px;
+  padding: 5px 10px;
+
+  color: var(--fp-text-dark);
+  background: var(--fp-gold);
+  border: 4px solid var(--fp-black);
+  border-radius: 0 var(--fp-radius-md) 0 var(--fp-radius-md);
+
+  font-size: var(--fp-button-font-size);
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.fp-btn:hover {
+  filter: brightness(1.05);
+}
+
+.fp-primary,
+.fp-btn.fp-primary {
+  color: var(--fp-text-dark);
+  background: var(--fp-orange);
+}
+
+.fp-danger,
+.fp-btn.fp-danger {
+  color: var(--fp-text-dark);
+  background: var(--fp-salmon);
+}
+
+.fp-mini-btn {
+  display: block;
+  width: 100%;
+  min-height: 20px;
+  margin: 0;
+  padding: 1px 2px;
+  border-width: 2px;
+  font-size: var(--fp-small-font-size);
+  line-height: 1.05;
+}
+
+/* ---------- Toolbars / actions ---------- */
+
+.fp-toolbar,
+.fp-actions,
+.fp-template-row,
+.fp-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+
+  width: 100%;
+  max-width: none;
+  padding: 3px 0;
+}
+
+.fp-toolbar-bottom {
+  margin-top: 6px;
+  justify-content: center;
+}

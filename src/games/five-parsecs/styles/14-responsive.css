@@ -1,0 +1,113 @@
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  :root {
+    --fp-app-width: 100vw;
+    --fp-font-size: 14px;
+    --fp-title-font-size: 20px;
+    --fp-input-font-size: 13px;
+  }
+
+  .fp-wrap {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 4px;
+  }
+
+  .fp-header {
+    flex-direction: column;
+  }
+
+  .fp-header-main,
+  .fp-dice-bar {
+    border-radius: 0 var(--fp-radius-lg) 0 var(--fp-radius-lg);
+  }
+
+  .fp-header-right {
+    justify-content: stretch;
+  }
+
+  .fp-dice-bar {
+    width: 100%;
+  }
+
+  .fp-tabs {
+    gap: 3px;
+  }
+
+  .fp-tab {
+    padding: 7px 9px;
+  }
+
+  .fp-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fp-accordion-body {
+    padding-left: 4px;
+    border-left-width: 6px;
+  }
+
+  .fp-modal {
+    width: 100%;
+    max-height: 96vh;
+  }
+
+  .fp-catalog-table-wrap {
+    max-height: 72vh;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --fp-font-size: 13px;
+    --fp-title-font-size: 18px;
+    --fp-button-font-size: 12px;
+    --fp-input-font-size: 12px;
+    --fp-table-font-size: 12px;
+  }
+
+  .fp-btn {
+    min-height: 26px;
+    padding: 4px 7px;
+    border-width: 3px;
+  }
+
+  .fp-field,
+  .fp-checkbox-row,
+  .fp-muted,
+  .fp-error,
+  .fp-turn-summary,
+  .fp-turn-task,
+  .fp-rules-book-card {
+    border-width: 3px;
+  }
+
+  .fp-table th,
+  .fp-table td,
+  .fp-crew-table th,
+  .fp-crew-table td,
+  .fp-member-table th,
+  .fp-member-table td,
+  .fp-equipment-table th,
+  .fp-equipment-table td {
+    padding: 3px 4px;
+    border-width: 3px;
+  }
+
+  .fp-crew-equipment-indent {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+  }
+
+  .fp-crew-gear-table th,
+  .fp-crew-gear-table td {
+    padding: 2px 3px;
+  }
+
+  .fp-rules-viewer-wrap {
+    height: calc(100vh - 210px);
+    min-height: 320px;
+  }
+}

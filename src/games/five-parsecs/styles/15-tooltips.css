@@ -1,0 +1,361 @@
+/* =========================================================
+   Weapon trait hover help
+   ========================================================= */
+
+.fp-trait-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  align-items: flex-start;
+}
+
+.fp-trait-pill {
+  position: relative;
+  display: inline-block;
+
+  padding: 2px 5px;
+
+  color: var(--fp-text-dark, #1f1638);
+  background: #eee7ff;
+  border: 2px solid #7f6cb0;
+  border-radius: 999px;
+
+  font-size: var(--fp-small-font-size, 11px);
+  font-weight: 900;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: help;
+}
+
+.fp-trait-pill:hover,
+.fp-trait-pill:focus {
+  background: #d8cdf2;
+  border-color: #4d3f78;
+  outline: none;
+}
+
+.fp-trait-pill:hover::after,
+.fp-trait-pill:focus::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  z-index: 9999;
+
+  left: 0;
+  top: calc(100% + 6px);
+
+  width: max-content;
+  max-width: 280px;
+  padding: 7px 9px;
+
+  color: #1f1638;
+  background: #ffffff;
+  border: 2px solid #4d3f78;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+
+  white-space: normal;
+  text-align: left;
+  font-size: var(--fp-small-font-size, 11px);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.fp-trait-pill:hover::before,
+.fp-trait-pill:focus::before {
+  content: "";
+  position: absolute;
+  z-index: 10000;
+
+  left: 10px;
+  top: calc(100% + 1px);
+
+  border-width: 0 6px 6px 6px;
+  border-style: solid;
+  border-color: transparent transparent #4d3f78 transparent;
+}
+
+/* On narrow screens, make the tooltip less likely to run off the edge. */
+@media (max-width: 700px) {
+  .fp-trait-pill:hover::after,
+  .fp-trait-pill:focus::after {
+    max-width: 220px;
+  }
+}
+
+.fp-wrap {
+  --fp-card-bg: #ffffff;
+  --fp-card-text: #1f2937;
+  --fp-card-border: #d7d7d7;
+}
+
+.fp-inline-card {
+  background: var(--fp-card-bg);
+  color: var(--fp-card-text);
+  border: 1px solid var(--fp-card-border);
+}
+
+.fp-campaign-step-card {
+  background: var(--fp-card-bg);
+  color: var(--fp-card-text);
+  border: 1px solid var(--fp-card-border);
+}
+
+.fp-campaign-step-card h3,
+.fp-campaign-step-card h4,
+.fp-campaign-step-card h5,
+.fp-inline-card h3,
+.fp-inline-card h4,
+.fp-inline-card h5,
+.fp-inline-card strong,
+.fp-inline-card p,
+.fp-inline-card div,
+.fp-inline-card span,
+.fp-inline-card label {
+  color: var(--fp-card-text);
+}
+
+.fp-inline-card .fp-muted,
+.fp-inline-card .fp-muted-inline,
+.fp-campaign-step-card .fp-muted,
+.fp-campaign-step-card .fp-muted-inline {
+  color: #4b5563;
+}
+
+.fp-inline-card input,
+.fp-inline-card select,
+.fp-inline-card textarea,
+.fp-campaign-step-card input,
+.fp-campaign-step-card select,
+.fp-campaign-step-card textarea {
+  background: #ffffff;
+  color: #111827;
+  border-color: #9ca3af;
+}
+
+.fp-wrap {
+  --fp-card-bg: #ffffff;
+  --fp-card-text: #1f2937;
+  --fp-card-border: #d7d7d7;
+}
+
+.fp-inline-card {
+  background: var(--fp-card-bg);
+  color: var(--fp-card-text);
+  border: 1px solid var(--fp-card-border);
+}
+
+.fp-campaign-step-table {
+  width: 100%;
+  margin: 0 0 6px 0;
+  border: 1px solid var(--fp-card-border, #d7d7d7);
+  background: var(--fp-card-bg, #ffffff);
+  color: var(--fp-card-text, #1f2937);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.fp-campaign-step-row {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 90px 58px;
+  align-items: center;
+  gap: 0;
+  min-height: 38px;
+  border-bottom: 1px solid var(--fp-card-border, #d7d7d7);
+}
+
+.fp-campaign-step-complete-cell,
+.fp-campaign-step-status-cell,
+.fp-campaign-step-action-cell {
+  padding: 4px 6px;
+  color: var(--fp-card-text, #1f2937);
+}
+
+.fp-campaign-step-complete-cell {
+  display: flex;
+  justify-content: center;
+}
+
+.fp-campaign-step-title-cell {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 38px;
+  padding: 4px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--fp-card-text, #1f2937);
+  text-align: left;
+  cursor: pointer;
+}
+
+.fp-campaign-step-title-cell:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.fp-campaign-step-phase {
+  font-size: 0.72rem;
+  font-weight: 700;
+  opacity: 0.72;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.fp-campaign-step-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fp-campaign-step-status-cell {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.fp-campaign-step-action-cell {
+  display: flex;
+  justify-content: center;
+}
+
+.fp-campaign-step-body {
+  padding: 8px;
+  background: var(--fp-card-bg, #ffffff);
+  color: var(--fp-card-text, #1f2937);
+}
+
+.fp-campaign-step-body p,
+.fp-campaign-step-body h3,
+.fp-campaign-step-body h4,
+.fp-campaign-step-body h5,
+.fp-campaign-step-body div,
+.fp-campaign-step-body span,
+.fp-campaign-step-body label,
+.fp-campaign-step-body strong,
+.fp-inline-card h3,
+.fp-inline-card h4,
+.fp-inline-card h5,
+.fp-inline-card strong,
+.fp-inline-card p,
+.fp-inline-card div,
+.fp-inline-card span,
+.fp-inline-card label {
+  color: var(--fp-card-text, #1f2937);
+}
+
+.fp-campaign-step-body p {
+  margin: 4px 0 8px 0;
+}
+
+.fp-campaign-step-body h5 {
+  margin: 8px 0 4px 0;
+}
+
+.fp-btn-compact {
+  padding: 3px 8px;
+  min-height: 26px;
+  font-size: 0.78rem;
+  line-height: 1.1;
+}
+
+.fp-progress-table-wrap {
+  margin-top: 10px;
+  overflow-x: auto;
+  border: 1px solid var(--fp-card-border, #d7d7d7);
+  border-radius: 8px;
+  background: var(--fp-card-bg, #ffffff);
+}
+
+.fp-progress-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--fp-card-text, #1f2937);
+  font-size: 0.86rem;
+}
+
+.fp-progress-table th,
+.fp-progress-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--fp-card-border, #d7d7d7);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.fp-progress-table th {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.fp-progress-table td:first-child,
+.fp-progress-table th:first-child {
+  width: 44px;
+  text-align: center;
+}
+
+.fp-progress-table td:last-child,
+.fp-progress-table th:last-child {
+  width: 58px;
+  text-align: center;
+}
+
+.fp-progress-active-row {
+  background: rgba(0, 0, 0, 0.06);
+  font-weight: 700;
+}
+
+.fp-progress-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.fp-campaign-step-body .fp-grid {
+  gap: 6px;
+}
+
+.fp-campaign-step-body .fp-field {
+  margin: 0;
+}
+
+.fp-campaign-step-body .fp-actions {
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.fp-campaign-step-body .fp-inline-card {
+  margin-top: 6px;
+  padding: 8px;
+}
+
+.fp-inline-card .fp-muted,
+.fp-inline-card .fp-muted-inline,
+.fp-campaign-step-body .fp-muted,
+.fp-campaign-step-body .fp-muted-inline {
+  color: #4b5563;
+}
+
+.fp-inline-card input,
+.fp-inline-card select,
+.fp-inline-card textarea,
+.fp-campaign-step-body input,
+.fp-campaign-step-body select,
+.fp-campaign-step-body textarea {
+  background: #ffffff;
+  color: #111827;
+  border-color: #9ca3af;
+}
+
+.fp-campaign-rule-list {
+  margin: 6px 0 0 18px;
+  padding: 0;
+}
+
+.fp-campaign-rule-list li {
+  margin: 0 0 6px 0;
+  padding: 0;
+  line-height: 1.35;
+}

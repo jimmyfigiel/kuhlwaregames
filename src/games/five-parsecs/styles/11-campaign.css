@@ -1,0 +1,48 @@
+/* ---------- Campaign turn tracker ---------- */
+
+.fp-turn-summary {
+  margin: 6px 0;
+  padding: 7px 10px;
+
+  color: var(--fp-text-dark);
+  background: var(--fp-salmon);
+  border: 4px solid var(--fp-black);
+  border-radius: 0 var(--fp-radius-md) 0 var(--fp-radius-md);
+
+  font-weight: 900;
+}
+
+.fp-turn-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.fp-turn-task {
+  padding: 6px;
+
+  color: var(--fp-text-dark);
+  background: var(--fp-purple);
+  border: 4px solid var(--fp-black);
+  border-radius: 0 var(--fp-radius-md) 0 var(--fp-radius-md);
+}
+
+.fp-turn-task-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  color: var(--fp-text-dark);
+  font-weight: 900;
+}
+
+.fp-turn-task-check em {
+  color: var(--fp-text-dark);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.fp-turn-task-controls {
+  margin: 5px 0;
+}

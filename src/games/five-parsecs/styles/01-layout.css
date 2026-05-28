@@ -1,0 +1,64 @@
+/* ---------- Global / full-width reset ---------- */
+
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body:has(.fp-wrap),
+#root:has(.fp-wrap),
+.app:has(.fp-wrap),
+.main-content:has(.fp-wrap),
+.game-content:has(.fp-wrap),
+.game-shell:has(.fp-wrap),
+.room-game:has(.fp-wrap),
+.game-view:has(.fp-wrap),
+.five-parsecs:has(.fp-wrap),
+.five-parsecs-game:has(.fp-wrap) {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ---------- Main shell ---------- */
+
+.fp-wrap {
+  width: var(--fp-app-width);
+  max-width: none;
+  min-width: 0;
+  min-height: 100vh;
+  margin-left: calc(50% - (var(--fp-app-width) / 2));
+  margin-right: calc(50% - (var(--fp-app-width) / 2));
+  padding: 6px;
+  overflow-x: hidden;
+
+  background: var(--fp-bg);
+  color: var(--fp-text-light);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: var(--fp-font-size);
+  line-height: 1.2;
+}
+
+.fp-panel {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 2px 0;
+  background: transparent;
+  color: var(--fp-text-light);
+}

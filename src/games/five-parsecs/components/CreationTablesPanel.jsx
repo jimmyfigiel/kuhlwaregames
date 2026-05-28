@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 
 import AccordionSection from "./AccordionSection";
 import CatalogModal from "./CatalogModal";
+import LookupTableModal from "./LookupTableModal";
 
 import {
   CREW_CREATION_TABLES,
@@ -12,6 +13,13 @@ import {
   rollOnEquipmentTable,
 } from "../data/startingEquipmentTables";
 import { rollShip } from "../data/shipTables";
+import {
+  getCampaignLookupTables,
+  isEquipmentLookupTable,
+  isCrewMemberLookupTable,
+  isShipLookupTable,
+} from "../data/lookupTables";
+import { createLookupApplyTargets } from "../data/lookupApplyTargets";
 import {
   findByRoll,
   rollD100,
@@ -36,11 +44,13 @@ const EQUIPMENT_TABLE_IDS = [
 ];
 
 function isEquipmentTable(tableId) {
-  return EQUIPMENT_TABLE_IDS.includes(tableId);
+  return EQUIPMENT_TABLE_IDS.includes(tableId) || isEquipmentLookupTable(tableId);
 }
 
 function isCrewMemberTable(tableId) {
-  return CREW_MEMBER_TABLE_IDS.includes(tableId);
+  return (
+    CREW_MEMBER_TABLE_IDS.includes(tableId) || isCrewMemberLookupTable(tableId)
+  );
 }
 
 function safeNumber(value) {
@@ -374,11 +384,11 @@ function getDisplayRowForRawRow(rawRow) {
 }
 
 function getRawRow(row) {
-  return row?.__raw || row;
+  return row?.__raw || row?.raw || row;
 }
 
 function getRowLabel(row) {
-  return row?.name || row?.result || row?.ship || "selected result";
+  return row?.title || row?.name || row?.result || row?.ship || "selected result";
 }
 
 function getRollSummary({ tableTitle, roll, result, extra = "" }) {
@@ -387,9 +397,20 @@ function getRollSummary({ tableTitle, roll, result, extra = "" }) {
   }.${extra ? ` ${extra}` : ""}`;
 }
 
+function makeCampaignResultNote({ table, row, roll }) {
+  const rollText = roll === null || roll === undefined ? "selected" : roll;
+  const title = row.title || row.name || row.result || "Result";
+  const description = row.description || row.effect || "";
+
+  return `${table.label || table.title}: ${rollText}. ${title}. ${description}`;
+}
+
 export default function CreationTablesPanel({
   crew,
   crewMembers = [],
+  worlds = [],
+  patrons = [],
+  campaignTurns = [],
   roomId,
   crewId,
   playerId,
@@ -398,10 +419,26 @@ export default function CreationTablesPanel({
   onUpdate,
 }) {
   const [activeTable, setActiveTable] = useState(null);
+  const [activeCampaignTableId, setActiveCampaignTableId] = useState("");
   const [selectedCrewMemberId, setSelectedCrewMemberId] = useState("");
   const [highlightedRowKey, setHighlightedRowKey] = useState("");
   const [message, setMessage] = useState("");
   const [popupRollSummary, setPopupRollSummary] = useState("");
+
+  const campaignLookupTables = useMemo(() => {
+    return getCampaignLookupTables();
+  }, []);
+
+  const campaignLookupApplyTargets = useMemo(() => {
+    return createLookupApplyTargets({
+      tableId: activeCampaignTableId,
+      crew,
+      crewMembers,
+      worlds,
+      patrons,
+      campaignTurns,
+    });
+  }, [activeCampaignTableId, crew, crewMembers, worlds, patrons, campaignTurns]);
 
   const tableRows = useMemo(() => {
     if (!activeTable) return [];
@@ -417,12 +454,20 @@ export default function CreationTablesPanel({
     const table = CREW_CREATION_TABLES.find((item) => item.id === tableId);
 
     setActiveTable(table || null);
+    setActiveCampaignTableId("");
     setHighlightedRowKey("");
     setPopupRollSummary("");
 
     if (!selectedCrewMemberId && crewMembers.length) {
       setSelectedCrewMemberId(crewMembers[0].crewMemberId);
     }
+  }
+
+  function openCampaignLookupTable(tableId) {
+    setActiveTable(null);
+    setActiveCampaignTableId(tableId);
+    setHighlightedRowKey("");
+    setPopupRollSummary("");
   }
 
   async function addEquipmentFromSelectedRow(displayRow) {
@@ -473,89 +518,234 @@ export default function CreationTablesPanel({
     const row = getRawRow(displayRow);
     const debtRoll = Math.floor(Math.random() * 6) + 1;
 
-    const rollResult = {
-      roll: displayRow.roll || "selected",
-      result: row,
-      debtRoll,
-      generatedDebt: debtRoll + safeNumber(row.debtBonus),
-    };
+    const rollResult =
+      row?.shipKey || row?.debt
+        ? {
+            tableId: activeTable.id,
+            tableTitle: activeTable.title,
+            roll: displayRow.roll || "selected",
+            result: row,
+            generatedDebt: rollShip(row, debtRoll)?.generatedDebt ?? 0,
+            debtRoll,
+          }
+        : {
+            tableId: activeTable.id,
+            tableTitle: activeTable.title,
+            roll: displayRow.roll || "selected",
+            result: row,
+            generatedDebt: 0,
+            debtRoll,
+          };
 
-    if (crew && onSaveCrew) {
-      await onSaveCrew(createShipPatchFromRollResult(crew, rollResult));
+    const updatedCrew = createShipPatchFromRollResult(crew, rollResult);
+
+    if (onSaveCrew) {
+      await onSaveCrew(updatedCrew);
     }
 
-    const nextMessage = `Ship Table: applied ${row.name || "ship"}. Debt: ${
-      rollResult.generatedDebt
-    }.`;
+    const nextMessage = `${activeTable.title}: applied ${
+      row.name || row.ship || "ship"
+    } to the adventure. Debt roll ${debtRoll}; debt ${rollResult.generatedDebt}.`;
 
     setMessage(nextMessage);
     setPopupRollSummary(nextMessage);
   }
 
-  async function applyRowToCrewMember(displayRow, table = activeTable) {
-    if (!table || !onUpdate) return;
+  async function applyRowToCrewMember(displayRow) {
+    if (!activeTable) return;
 
     const row = getRawRow(displayRow);
+    const profile = row?.profileKey ? CREW_TYPE_PROFILES[row.profileKey] : null;
 
-    const member = crewMembers.find((item) => {
-      return item.crewMemberId === selectedCrewMemberId;
-    });
+    if (!selectedCrewMember && isCrewMemberTable(activeTable.id)) {
+      const nextMessage = "Select a crew member before applying this result.";
 
-    if (!member) {
-      setMessage("Select a crew member before applying this table result.");
-      setPopupRollSummary("Select a crew member before applying this table result.");
+      setMessage(nextMessage);
+      setPopupRollSummary(nextMessage);
+
       return;
     }
 
-    const profile = row.profileKey ? CREW_TYPE_PROFILES[row.profileKey] : null;
-
-    const memberPatch = createCrewMemberPatch({
-      member,
-      tableId: table.id,
-      row,
-      profile,
-    });
-
-    await onUpdate("crewMembers", member.crewMemberId, memberPatch);
-
-    if (crew && onSaveCrew && row.resources?.length) {
-      const crewPatch = createCrewResourcePatch({
-        crew,
+    if (isCrewMemberTable(activeTable.id)) {
+      const patch = createCrewMemberPatch({
+        member: selectedCrewMember,
+        tableId: activeTable.id,
         row,
-        tableTitle: table.title,
+        profile,
       });
 
-      if (Object.keys(crewPatch).length) {
-        await onSaveCrew({
-          ...crew,
-          ...crewPatch,
-        });
+      if (onUpdate) {
+        await onUpdate("crewMembers", selectedCrewMember.crewMemberId, patch);
       }
+
+      const nextMessage = `${activeTable.title}: applied ${getRowLabel(
+        row
+      )} to ${selectedCrewMember.name || "crew member"}.`;
+
+      setMessage(nextMessage);
+      setPopupRollSummary(nextMessage);
+
+      return;
     }
 
-    const nextMessage = `Applied ${getRowLabel(row)} from ${table.title} to ${
-      member.name || "crew member"
-    }.`;
+    const crewPatch = createCrewResourcePatch({
+      crew,
+      row,
+      tableTitle: activeTable.title,
+    });
+
+    if (Object.keys(crewPatch).length && onSaveCrew) {
+      await onSaveCrew({
+        ...crew,
+        ...crewPatch,
+      });
+    }
+
+    const nextMessage = `${activeTable.title}: applied ${getRowLabel(row)}.`;
 
     setMessage(nextMessage);
     setPopupRollSummary(nextMessage);
+  }
+
+  async function applyCampaignLookupResult({ table, row, roll, applyTo }) {
+    const note = makeCampaignResultNote({ table, row, roll });
+    const targetType = applyTo?.targetType || "crewNotes";
+    const recordId = applyTo?.recordId || "";
+    const rawTarget = applyTo?.raw || null;
+
+    if (targetType === "world" && onUpdate && recordId) {
+      const existingTraits = Array.isArray(rawTarget?.traits)
+        ? rawTarget.traits
+        : [];
+
+      await onUpdate("worlds", recordId, {
+        traits: [
+          ...existingTraits,
+          {
+            source: table.id,
+            sourceLabel: table.label || table.title,
+            roll,
+            title: row.title,
+            description: row.description,
+          },
+        ],
+        worldTrait: row.title,
+        worldTraitRoll: roll,
+        worldTraitDescription: row.description,
+        notes: appendNote(rawTarget?.notes || "", note),
+      });
+
+      setMessage(`${table.label}: applied ${row.title} to ${applyTo.label}.`);
+      setActiveCampaignTableId("");
+      return;
+    }
+
+    if (targetType === "campaignTurn" && onUpdate && recordId) {
+      await onUpdate("campaignTurns", recordId, {
+        notes: appendNote(rawTarget?.notes || "", note),
+        lookupResults: [
+          ...(Array.isArray(rawTarget?.lookupResults)
+            ? rawTarget.lookupResults
+            : []),
+          {
+            tableId: table.id,
+            tableLabel: table.label || table.title,
+            roll,
+            title: row.title,
+            description: row.description,
+          },
+        ],
+      });
+
+      setMessage(`${table.label}: applied ${row.title} to ${applyTo.label}.`);
+      setActiveCampaignTableId("");
+      return;
+    }
+
+    if (targetType === "crewMember" && onUpdate && recordId) {
+      await onUpdate("crewMembers", recordId, {
+        notes: appendNote(rawTarget?.notes || "", note),
+      });
+
+      setMessage(`${table.label}: applied ${row.title} to ${applyTo.label}.`);
+      setActiveCampaignTableId("");
+      return;
+    }
+
+    if (targetType === "patron" && onUpdate && recordId) {
+      await onUpdate("patrons", recordId, {
+        notes: appendNote(rawTarget?.notes || "", note),
+        jobLookupResults: [
+          ...(Array.isArray(rawTarget?.jobLookupResults)
+            ? rawTarget.jobLookupResults
+            : []),
+          {
+            tableId: table.id,
+            tableLabel: table.label || table.title,
+            roll,
+            title: row.title,
+            description: row.description,
+          },
+        ],
+      });
+
+      setMessage(`${table.label}: applied ${row.title} to ${applyTo.label}.`);
+      setActiveCampaignTableId("");
+      return;
+    }
+
+    if (targetType === "starship" && onSaveCrew && crew) {
+      await onSaveCrew({
+        ...crew,
+        starship: {
+          ...(crew.starship || {}),
+          notes: appendNote(crew.starship?.notes || "", note),
+          travelEvents: [
+            ...(Array.isArray(crew.starship?.travelEvents)
+              ? crew.starship.travelEvents
+              : []),
+            {
+              tableId: table.id,
+              tableLabel: table.label || table.title,
+              roll,
+              title: row.title,
+              description: row.description,
+            },
+          ],
+        },
+      });
+
+      setMessage(`${table.label}: applied ${row.title} to ${applyTo.label}.`);
+      setActiveCampaignTableId("");
+      return;
+    }
+
+    if (onSaveCrew && crew) {
+      await onSaveCrew({
+        ...crew,
+        notes: appendNote(crew.notes || "", note),
+      });
+    }
+
+    setMessage(`${table.label}: applied ${row.title} to Adventure Notes.`);
+    setActiveCampaignTableId("");
   }
 
   function rollInPopup() {
     if (!activeTable) return;
 
     if (isEquipmentTable(activeTable.id)) {
-      const rollResult = rollOnEquipmentTable(activeTable.id);
-      const displayRow = getDisplayRowForRawRow(rollResult.result);
+      const rolled = rollOnEquipmentTable(activeTable.id);
+      const displayRow = getDisplayRowForRawRow(rolled.result);
 
       setHighlightedRowKey(displayRow?.__rowKey || "");
 
       const nextMessage = getRollSummary({
         tableTitle: activeTable.title,
-        roll: rollResult.roll,
-        result: rollResult.result,
+        roll: rolled.roll,
+        result: rolled.result,
         extra:
-          "Use the Add button on the highlighted row to add it, or choose any other row.",
+          "Use the Apply button on the highlighted row to add it to the stash, or choose another row.",
       });
 
       setMessage(nextMessage);
@@ -564,17 +754,18 @@ export default function CreationTablesPanel({
       return;
     }
 
-    if (activeTable.id === "ship") {
-      const rollResult = rollShip();
-      const displayRow = getDisplayRowForRawRow(rollResult.result);
+    if (activeTable.id === "ship" || isShipLookupTable(activeTable.id)) {
+      const debtRoll = Math.floor(Math.random() * 6) + 1;
+      const rolled = rollShip(null, debtRoll);
+      const displayRow = getDisplayRowForRawRow(rolled.result);
 
       setHighlightedRowKey(displayRow?.__rowKey || "");
 
       const nextMessage = getRollSummary({
-        tableTitle: "Ship Table",
-        roll: rollResult.roll,
-        result: rollResult.result,
-        extra: `Debt would be ${rollResult.generatedDebt}. Use the Apply button on the highlighted row to apply it, or choose another ship.`,
+        tableTitle: activeTable.title,
+        roll: rolled.roll,
+        result: rolled.result,
+        extra: `Debt roll ${debtRoll}; generated debt ${rolled.generatedDebt}. Use the Apply button on the highlighted row to apply it, or choose another ship.`,
       });
 
       setMessage(nextMessage);
@@ -619,7 +810,7 @@ export default function CreationTablesPanel({
       return;
     }
 
-    if (activeTable.id === "ship") {
+    if (activeTable.id === "ship" || isShipLookupTable(activeTable.id)) {
       await applyShipFromSelectedRow(displayRow);
       return;
     }
@@ -631,10 +822,12 @@ export default function CreationTablesPanel({
     <div className="fp-panel">
       <AccordionSection
         title="Creation Tables"
-        subtitle="crew, equipment, and ship"
+        subtitle="crew, equipment, ship, and shared lookup tables"
         defaultOpen
       >
         {message && <div className="fp-turn-summary">{message}</div>}
+
+        <div className="fp-mini-title">Crew / Equipment / Ship Tables</div>
 
         <div className="fp-creation-button-grid">
           {CREW_CREATION_TABLES.map((table) => (
@@ -644,6 +837,20 @@ export default function CreationTablesPanel({
               onClick={() => openTable(table.id)}
             >
               {table.title}
+            </button>
+          ))}
+        </div>
+
+        <div className="fp-mini-title">Campaign Lookup Tables</div>
+
+        <div className="fp-creation-button-grid">
+          {campaignLookupTables.map((table) => (
+            <button
+              key={table.id}
+              className="fp-btn fp-primary fp-creation-table-button"
+              onClick={() => openCampaignLookupTable(table.id)}
+            >
+              {table.label || table.title}
             </button>
           ))}
         </div>
@@ -667,9 +874,9 @@ export default function CreationTablesPanel({
             actionLabel={
               isEquipmentTable(activeTable.id)
                 ? "Add"
-                : activeTable.id === "ship"
-                ? "Apply"
-                : "Apply"
+                : activeTable.id === "ship" || isShipLookupTable(activeTable.id)
+                  ? "Apply"
+                  : "Apply"
             }
             onSelect={selectRow}
             onClose={() => setActiveTable(null)}
@@ -701,6 +908,16 @@ export default function CreationTablesPanel({
                 </label>
               ) : null
             }
+          />
+        )}
+
+        {activeCampaignTableId && (
+          <LookupTableModal
+            tableId={activeCampaignTableId}
+            applyLabel="Apply"
+            applyTargets={campaignLookupApplyTargets}
+            onApply={applyCampaignLookupResult}
+            onClose={() => setActiveCampaignTableId("")}
           />
         )}
       </AccordionSection>

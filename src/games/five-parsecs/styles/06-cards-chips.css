@@ -1,0 +1,41 @@
+/* ---------- Inline cards / chips ---------- */
+
+.fp-inline-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 5px;
+
+  width: 100%;
+  max-width: none;
+  margin: 4px 0;
+  padding: 0;
+
+  background: transparent;
+  border: 0;
+}
+
+.fp-chip {
+  display: inline-block;
+  padding: 3px 8px;
+
+  color: var(--fp-text-dark);
+  background: var(--fp-gold);
+  border: 3px solid var(--fp-black);
+  border-radius: 999px;
+
+  font-size: var(--fp-small-font-size);
+  font-weight: 900;
+}
+
+.fp-mini-title {
+  margin-top: 5px;
+  color: var(--fp-text-light);
+  font-size: var(--fp-small-font-size);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.fp-muted-inline {
+  opacity: 0.7;
+  font-size: var(--fp-small-font-size);
+}
