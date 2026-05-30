@@ -1,4 +1,5 @@
 import React, {
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -7,7 +8,10 @@ import React, {
 import { createPortal } from "react-dom";
 
 import AccordionSection from "./AccordionSection";
+import CampaignTodosPanel from "./campaign/CampaignTodosPanel";
 import { CompactField } from "./CompactField";
+import { getLatestCampaignTurn, getRecordId } from "./campaign/campaignStepUtils";
+import { completeTodo, deleteTodo } from "./campaign/campaignTodoUtils";
 import {
   getWeaponTraitDescription,
   normalizeWeaponTraitName,
@@ -37,6 +41,77 @@ function getCaptainName(crew, crewMembers) {
   });
 
   return captain?.name || "";
+}
+
+
+const CREW_GEAR_COLUMN_STORAGE_KEY = "fiveParsecsCrewGearColumnWidths";
+
+const DEFAULT_CREW_GEAR_COLUMN_WIDTHS = {
+  item: 18,
+  type: 7,
+  subtype: 8,
+  range: 5,
+  shots: 5,
+  damage: 5,
+  traits: 14,
+  mods: 6,
+  sight: 6,
+  protection: 8,
+  status: 7,
+  notes: 11,
+};
+
+const CREW_GEAR_COLUMNS = [
+  { id: "item", label: "Item" },
+  { id: "type", label: "Type" },
+  { id: "subtype", label: "Subtype" },
+  { id: "range", label: "Rng" },
+  { id: "shots", label: "Shots" },
+  { id: "damage", label: "Dmg" },
+  { id: "traits", label: "Traits" },
+  { id: "mods", label: "Mods" },
+  { id: "sight", label: "Sight" },
+  { id: "protection", label: "Protection" },
+  { id: "status", label: "Status" },
+  { id: "notes", label: "Notes" },
+];
+
+function clampGearColumnWidth(value) {
+  return Math.max(4, Math.min(45, value));
+}
+
+function loadCrewGearColumnWidths() {
+  if (typeof window === "undefined") return DEFAULT_CREW_GEAR_COLUMN_WIDTHS;
+
+  try {
+    const saved = window.localStorage.getItem(CREW_GEAR_COLUMN_STORAGE_KEY);
+    if (!saved) return DEFAULT_CREW_GEAR_COLUMN_WIDTHS;
+
+    const parsed = JSON.parse(saved);
+
+    return {
+      ...DEFAULT_CREW_GEAR_COLUMN_WIDTHS,
+      ...parsed,
+    };
+  } catch (error) {
+    console.warn("Could not load crew gear column widths", error);
+    return DEFAULT_CREW_GEAR_COLUMN_WIDTHS;
+  }
+}
+
+function ResizableCrewGearHeader({ column, onBeginResize }) {
+  return (
+    <th>
+      <div className="fp-resizable-th">
+        {column.label}
+        <span
+          className="fp-column-resizer"
+          title={`Resize ${column.label} column`}
+          onMouseDown={(event) => onBeginResize(event, column.id)}
+        />
+      </div>
+    </th>
+  );
 }
 
 function WeaponTraitTooltip({ trait }) {
@@ -162,28 +237,35 @@ function WeaponTraits({ traits = [] }) {
   );
 }
 
-function CrewEquipmentRow({ member, equipment }) {
+function CrewEquipmentRow({ member, equipment, columnWidths, onBeginColumnResize }) {
   const items = getCrewMemberGearItems(member, equipment);
 
   return (
     <tr className="fp-crew-equipment-row">
       <td colSpan={13}>
         <div className="fp-crew-equipment-indent">
-          <table className="fp-crew-gear-table">
+          <table
+            className="fp-crew-gear-table"
+            style={{ width: "100%", tableLayout: "fixed" }}
+          >
+            <colgroup>
+              {CREW_GEAR_COLUMNS.map((column) => (
+                <col
+                  key={column.id}
+                  style={{ width: `${columnWidths[column.id] || 8}%` }}
+                />
+              ))}
+            </colgroup>
+
             <thead>
               <tr>
-                <th>Item</th>
-                <th>Type</th>
-                <th>Subtype</th>
-                <th>Rng</th>
-                <th>Shots</th>
-                <th>Dmg</th>
-                <th>Traits</th>
-                <th>Mods</th>
-                <th>Sight</th>
-                <th>Protection</th>
-                <th>Status</th>
-                <th>Notes</th>
+                {CREW_GEAR_COLUMNS.map((column) => (
+                  <ResizableCrewGearHeader
+                    key={column.id}
+                    column={column}
+                    onBeginResize={onBeginColumnResize}
+                  />
+                ))}
               </tr>
             </thead>
 
@@ -487,6 +569,7 @@ export default function CrewPanel({
   equipment,
   quests,
   rumors,
+  campaignTurns = [],
   onSaveCrew,
   onUpdate,
   onDelete,
@@ -497,6 +580,80 @@ export default function CrewPanel({
   onAddLog,
 }) {
   const [expandedCrewMemberIds, setExpandedCrewMemberIds] = useState({});
+  const [crewGearColumnWidths, setCrewGearColumnWidths] = useState(() =>
+    loadCrewGearColumnWidths()
+  );
+
+  const gearResizeStateRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    try {
+      window.localStorage.setItem(
+        CREW_GEAR_COLUMN_STORAGE_KEY,
+        JSON.stringify(crewGearColumnWidths)
+      );
+    } catch (error) {
+      console.warn("Could not save crew gear column widths", error);
+    }
+  }, [crewGearColumnWidths]);
+
+  useEffect(() => {
+    return () => {
+      window.removeEventListener("mousemove", resizeCrewGearColumn);
+      window.removeEventListener("mouseup", endCrewGearColumnResize);
+    };
+  }, []);
+
+  function beginCrewGearColumnResize(event, columnId) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    gearResizeStateRef.current = {
+      columnId,
+      startX: event.clientX,
+      startWidths: { ...crewGearColumnWidths },
+    };
+
+    window.addEventListener("mousemove", resizeCrewGearColumn);
+    window.addEventListener("mouseup", endCrewGearColumnResize);
+  }
+
+  function resizeCrewGearColumn(event) {
+    const resizeState = gearResizeStateRef.current;
+    if (!resizeState) return;
+
+    const tableWidth =
+      document.querySelector(".fp-crew-gear-table")?.clientWidth || 900;
+    const deltaPixels = event.clientX - resizeState.startX;
+    const deltaPercent = (deltaPixels / tableWidth) * 100;
+
+    const columnId = resizeState.columnId;
+    const pairedColumnId = columnId === "notes" ? "item" : "notes";
+
+    const nextWidths = { ...resizeState.startWidths };
+    nextWidths[columnId] = clampGearColumnWidth(
+      resizeState.startWidths[columnId] + deltaPercent
+    );
+
+    const actualDelta = nextWidths[columnId] - resizeState.startWidths[columnId];
+    nextWidths[pairedColumnId] = clampGearColumnWidth(
+      resizeState.startWidths[pairedColumnId] - actualDelta
+    );
+
+    setCrewGearColumnWidths(nextWidths);
+  }
+
+  function endCrewGearColumnResize() {
+    gearResizeStateRef.current = null;
+
+    window.removeEventListener("mousemove", resizeCrewGearColumn);
+    window.removeEventListener("mouseup", endCrewGearColumnResize);
+  }
+
+  const currentTurn = getLatestCampaignTurn(campaignTurns);
+  const currentTurnId = getRecordId(currentTurn);
 
   const sortedCrewMembers = useMemo(() => {
     return [...crewMembers].sort((a, b) => {
@@ -531,6 +688,22 @@ export default function CrewPanel({
   function setCaptain(crewMemberId) {
     patchCrew({
       captainCrewMemberId: crewMemberId,
+    });
+  }
+
+  async function completeCampaignTodo(todoId) {
+    if (!currentTurn || !currentTurnId || !onUpdate) return;
+
+    await onUpdate("campaignTurns", currentTurnId, {
+      todos: completeTodo(currentTurn.todos, todoId),
+    });
+  }
+
+  async function deleteCampaignTodo(todoId) {
+    if (!currentTurn || !currentTurnId || !onUpdate) return;
+
+    await onUpdate("campaignTurns", currentTurnId, {
+      todos: deleteTodo(currentTurn.todos, todoId),
     });
   }
 
@@ -598,6 +771,15 @@ export default function CrewPanel({
             }
           />
 
+        </div>
+
+        <CampaignTodosPanel
+          currentTurn={currentTurn}
+          onCompleteTodo={completeCampaignTodo}
+          onDeleteTodo={deleteCampaignTodo}
+        />
+
+        <div className="fp-adventure-notes-row" style={{ marginTop: "10px" }}>
           <CompactField
             label="Adventure Notes"
             value={crew.notes || ""}
@@ -679,7 +861,12 @@ export default function CrewPanel({
                       onSetCaptain={setCaptain}
                     />
 
-                    <CrewEquipmentRow member={member} equipment={equipment} />
+                    <CrewEquipmentRow
+                      member={member}
+                      equipment={equipment}
+                      columnWidths={crewGearColumnWidths}
+                      onBeginColumnResize={beginCrewGearColumnResize}
+                    />
 
                     {expanded && (
                       <CrewDetailsRow

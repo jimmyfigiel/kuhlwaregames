@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import "./fiveParsecs.css";
 
 import { useFiveParsecsRecords } from "./fiveParsecsHooks";
@@ -30,6 +30,7 @@ import TurnPanel from "./components/TurnPanel";
 import RulesPanel from "./components/RulesPanel";
 import LogsPanel from "./components/LogsPanel";
 import DiceBar from "./components/DiceBar";
+import { appendTodo } from "./components/campaign/campaignTodoUtils";
 
 const TABS = [
   { id: "crew", label: "Adventure" },
@@ -71,12 +72,25 @@ function getNextTurnNumber(campaignTurns, crew) {
   return highestTurn + 1;
 }
 
+function getLatestCampaignTurn(campaignTurns) {
+  if (!Array.isArray(campaignTurns) || campaignTurns.length === 0) return null;
+
+  return [...campaignTurns].sort((a, b) => {
+    return Number(b.turnNumber || 0) - Number(a.turnNumber || 0);
+  })[0];
+}
+
+function getCampaignTurnId(turn) {
+  return turn?.campaignTurnId || turn?.id || turn?.recordId || "";
+}
+
 export default function FiveParsecsGame(props) {
   const roomId = getRoomId(props);
   const playerId = getPlayerId(props);
 
   const [activeTab, setActiveTab] = useState("crew");
   const [rulesPage, setRulesPage] = useState(1);
+  const autoCreatedCampaignTurnRef = useRef(null);
 
   const [localRulesPdfUrl, setLocalRulesPdfUrl] = useState("");
   const [localRulesPdfName, setLocalRulesPdfName] = useState("");
@@ -284,6 +298,7 @@ export default function FiveParsecsGame(props) {
     });
 
     await addRecord("campaignTurns", newTurn);
+    autoCreatedCampaignTurnRef.current = newTurn;
 
     if (crew) {
       await saveCrew({
@@ -291,20 +306,82 @@ export default function FiveParsecsGame(props) {
         campaignTurn: turnNumber,
       });
     }
+
+    return newTurn;
   }
 
-  async function addManualLogEntry(targetType = "crew", targetId = crewId) {
+  async function ensureCampaignTurn() {
+    const latestTurn = getLatestCampaignTurn(campaignTurns);
+
+    if (latestTurn) {
+      autoCreatedCampaignTurnRef.current = latestTurn;
+      return latestTurn;
+    }
+
+    if (autoCreatedCampaignTurnRef.current) {
+      return autoCreatedCampaignTurnRef.current;
+    }
+
+    return addCampaignTurn();
+  }
+
+  async function addTodoToCurrentCampaignTurn(todo) {
+    if (!todo?.taskText) return;
+
+    const turn = await ensureCampaignTurn();
+    const turnId = getCampaignTurnId(turn);
+
+    if (!turnId) return;
+
+    const nextTodos = appendTodo(turn.todos, todo);
+
+    autoCreatedCampaignTurnRef.current = {
+      ...turn,
+      todos: nextTodos,
+    };
+
+    await updateRecord("campaignTurns", turnId, {
+      todos: nextTodos,
+    });
+  }
+
+  async function addManualLogEntry(targetTypeOrEntry = "crew", targetId = crewId) {
     await ensureCrew();
+
+    const isEntryObject =
+      targetTypeOrEntry &&
+      typeof targetTypeOrEntry === "object" &&
+      !Array.isArray(targetTypeOrEntry);
+
+    const entry = isEntryObject ? targetTypeOrEntry : {};
+    const cleanTargetType = entry.targetType || targetTypeOrEntry || "crew";
+    const cleanTargetId = entry.targetId || targetId || crewId;
+    const message = entry.message || entry.notes || entry.body || "";
 
     await addRecord(
       "logEntries",
-      createLogEntry({
+      {
+        ...createLogEntry({
+          roomId,
+          crewId,
+          targetType: cleanTargetType,
+          targetId: cleanTargetId,
+          playerId,
+        }),
+        ...entry,
         roomId,
         crewId,
-        targetType,
-        targetId,
+        targetType: cleanTargetType,
+        targetId: cleanTargetId,
         playerId,
-      })
+        title: entry.title || "Adventure Log",
+        message,
+        notes: entry.notes || message,
+        body: entry.body || entry.notes || message,
+        text: entry.text || entry.notes || message,
+        logText: entry.logText || entry.notes || message,
+        createdAt: entry.createdAt || new Date().toISOString(),
+      }
     );
   }
 
@@ -398,6 +475,7 @@ export default function FiveParsecsGame(props) {
             equipment={equipment}
             quests={quests}
             rumors={rumors}
+            campaignTurns={campaignTurns}
             onSaveCrew={saveCrew}
             onUpdate={updateRecord}
             onDelete={deleteRecord}
@@ -416,6 +494,24 @@ export default function FiveParsecsGame(props) {
 
           <ShipPanel crew={crew} playerId={playerId} onSaveCrew={saveCrew} />
         </>
+      )}
+
+      {activeTab === "creation" && (
+        <CreationTablesPanel
+          crew={crew}
+          crewMembers={crewMembers}
+          worlds={worlds}
+          patrons={patrons}
+          campaignTurns={campaignTurns}
+          roomId={roomId}
+          crewId={crewId}
+          playerId={playerId}
+          onAddEquipment={addCatalogEquipment}
+          onSaveCrew={saveCrew}
+          onUpdate={updateRecord}
+          onAddTodo={addTodoToCurrentCampaignTurn}
+          onAddLogEntry={addManualLogEntry}
+        />
       )}
 
       {activeTab === "equipment" && (
@@ -486,8 +582,8 @@ export default function FiveParsecsGame(props) {
           rivals={rivals}
           quests={quests}
           rumors={rumors}
-          onSaveCrew={saveCrew}
           onAddTurn={addCampaignTurn}
+          onSaveCrew={saveCrew}
           onUpdate={updateRecord}
           onDelete={deleteRecord}
           onAddLog={(campaignTurnId) =>
@@ -508,22 +604,6 @@ export default function FiveParsecsGame(props) {
           onClearLocalPdf={clearLocalRulesPdf}
           onRulesPageChange={setRulesPage}
           onSaveCrew={saveCrew}
-        />
-      )}
-
-      {activeTab === "creation" && (
-        <CreationTablesPanel
-          crew={crew}
-          crewMembers={crewMembers}
-          worlds={worlds}
-          patrons={patrons}
-          campaignTurns={campaignTurns}
-          roomId={roomId}
-          crewId={crewId}
-          playerId={playerId}
-          onAddEquipment={addCatalogEquipment}
-          onSaveCrew={saveCrew}
-          onUpdate={updateRecord}
         />
       )}
 

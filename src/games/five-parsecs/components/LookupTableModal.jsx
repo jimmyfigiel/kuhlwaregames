@@ -204,15 +204,24 @@ export default function LookupTableModal({
 
     setSelectedRowKey(row.rowKey);
 
-    if (onApply) {
-      await onApply({
-        tableId,
-        table,
-        row,
-        rawRow: row.raw || row,
-        roll: rolledValue,
-        applyTo: selectedApplyTarget,
-      });
+    try {
+      if (onApply) {
+        await onApply({
+          tableId,
+          table,
+          row,
+          rawRow: row.raw || row,
+          roll: rolledValue,
+          applyTo: selectedApplyTarget,
+        });
+      }
+
+      if (onClose) {
+        onClose();
+      }
+    } catch (error) {
+      console.error("Lookup table apply failed", error);
+      setMessage(error?.message || "Apply failed. Check the console for details.");
     }
   }
 

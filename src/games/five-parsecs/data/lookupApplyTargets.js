@@ -29,7 +29,6 @@ export function createLookupApplyTargets({
   if (tableId === "worldTraits") {
     worlds.forEach((world) => {
       const recordId = getId(world, "worldId");
-
       if (!recordId) return;
 
       targets.push({
@@ -58,7 +57,6 @@ export function createLookupApplyTargets({
   if (tableId === "tradeTable" || tableId === "explorationTable") {
     crewMembers.forEach((member) => {
       const recordId = getId(member, "crewMemberId");
-
       if (!recordId) return;
 
       targets.push({
@@ -84,7 +82,6 @@ export function createLookupApplyTargets({
   ) {
     patrons.forEach((patron) => {
       const recordId = getId(patron, "patronId");
-
       if (!recordId) return;
 
       targets.push({
@@ -101,7 +98,6 @@ export function createLookupApplyTargets({
   if (includeCampaignTurns) {
     campaignTurns.forEach((turn) => {
       const recordId = getId(turn, "campaignTurnId");
-
       if (!recordId) return;
 
       targets.push({
