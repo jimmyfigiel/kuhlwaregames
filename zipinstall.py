@@ -21,25 +21,32 @@ class ZipToSrcInstaller(tk.Tk):
         super().__init__()
 
         self.title(APP_TITLE)
-        self.geometry("1080x860")
-        self.minsize(880, 680)
+        self.geometry("1120x900")
+        self.minsize(900, 700)
 
         self.zip_path_var = tk.StringVar()
         self.project_root_var = tk.StringVar()
         self.src_path_var = tk.StringVar()
+
         self.dev_command_var = tk.StringVar(value="npm run dev")
         self.dev_url_var = tk.StringVar(value="http://localhost:5173")
+        self.dev_separate_window_var = tk.BooleanVar(value=True)
+
+        self.publish_command_var = tk.StringVar(value="npm run build && firebase deploy")
         self.git_message_var = tk.StringVar(value="Update Five Parsecs files")
+
         self.status_var = tk.StringVar(value="Select a zip file and your project folders.")
         self.detected_root_var = tk.StringVar(value="")
         self.dev_status_var = tk.StringVar(value="Dev app is not running.")
         self.git_status_var = tk.StringVar(value="Git commands have not run yet.")
+        self.publish_status_var = tk.StringVar(value="Publish has not run yet.")
 
         self.preview_rows = []
         self.extracted_temp_dir = None
         self.detected_source_root = None
         self.dev_process = None
         self.dev_output_thread = None
+        self.command_threads = []
 
         self._build_ui()
         self.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -102,6 +109,15 @@ class ZipToSrcInstaller(tk.Tk):
             side="left", padx=(6, 12)
         )
 
+        separate_row = ttk.Frame(dev_frame)
+        separate_row.pack(fill="x", pady=(0, 6))
+
+        ttk.Checkbutton(
+            separate_row,
+            text="Run dev app in separate Command Prompt window",
+            variable=self.dev_separate_window_var,
+        ).pack(side="left")
+
         button_row = ttk.Frame(dev_frame)
         button_row.pack(fill="x")
 
@@ -115,9 +131,31 @@ class ZipToSrcInstaller(tk.Tk):
         ttk.Button(button_row, text="Open Browser", command=self.open_browser).pack(
             side="left", padx=(8, 0)
         )
+        ttk.Button(button_row, text="Kill Node on 5173", command=self.kill_port_5173).pack(
+            side="left", padx=(8, 0)
+        )
 
         ttk.Label(dev_frame, textvariable=self.dev_status_var, foreground="#555555").pack(
             anchor="w", pady=(6, 0)
+        )
+
+        publish_frame = ttk.LabelFrame(main, text="Publish Controls", padding=10)
+        publish_frame.pack(fill="x", pady=(0, 8))
+
+        publish_row = ttk.Frame(publish_frame)
+        publish_row.pack(fill="x", pady=(0, 6))
+
+        ttk.Label(publish_row, text="Publish command:").pack(side="left")
+        ttk.Entry(publish_row, textvariable=self.publish_command_var).pack(
+            side="left", fill="x", expand=True, padx=(6, 8)
+        )
+        ttk.Button(publish_row, text="Publish", command=self.publish_app).pack(side="left")
+        ttk.Button(publish_row, text="Build Only", command=self.build_only).pack(
+            side="left", padx=(8, 0)
+        )
+
+        ttk.Label(publish_frame, textvariable=self.publish_status_var, foreground="#555555").pack(
+            anchor="w"
         )
 
         git_frame = ttk.LabelFrame(main, text="Git Controls", padding=10)
@@ -161,7 +199,7 @@ class ZipToSrcInstaller(tk.Tk):
             main,
             textvariable=self.detected_root_var,
             foreground="#555555",
-            wraplength=1000,
+            wraplength=1040,
         )
         detected.pack(anchor="w", pady=(0, 8))
 
@@ -172,7 +210,7 @@ class ZipToSrcInstaller(tk.Tk):
         lower_pane.add(preview_frame, weight=3)
 
         columns = ("action", "relative_path", "source_path", "destination_path")
-        self.tree = ttk.Treeview(preview_frame, columns=columns, show="headings", height=13)
+        self.tree = ttk.Treeview(preview_frame, columns=columns, show="headings", height=12)
 
         self.tree.heading("action", text="Action")
         self.tree.heading("relative_path", text="Relative Path")
@@ -181,8 +219,8 @@ class ZipToSrcInstaller(tk.Tk):
 
         self.tree.column("action", width=90, anchor="center")
         self.tree.column("relative_path", width=280)
-        self.tree.column("source_path", width=300)
-        self.tree.column("destination_path", width=300)
+        self.tree.column("source_path", width=330)
+        self.tree.column("destination_path", width=330)
 
         y_scroll = ttk.Scrollbar(preview_frame, orient="vertical", command=self.tree.yview)
         x_scroll = ttk.Scrollbar(preview_frame, orient="horizontal", command=self.tree.xview)
@@ -212,6 +250,9 @@ class ZipToSrcInstaller(tk.Tk):
     def log_output(self, text):
         self.output_box.insert("end", text + "\n")
         self.output_box.see("end")
+
+    def log_output_threadsafe(self, text):
+        self.after(0, lambda: self.log_output(text))
 
     def browse_zip(self):
         path = filedialog.askopenfilename(
@@ -317,6 +358,24 @@ class ZipToSrcInstaller(tk.Tk):
                 "Please select your project root folder, the folder that contains package.json."
             )
             return None
+
+        return project_root
+
+    def validate_package_root(self):
+        project_root = self.validate_project_root()
+        if not project_root:
+            return None
+
+        package_json = project_root / "package.json"
+        if not package_json.exists():
+            proceed = messagebox.askyesno(
+                "package.json not found",
+                f"I do not see package.json in:\n\n{project_root}\n\n"
+                "Build/publish usually needs to be started from the project root.\n\n"
+                "Continue anyway?"
+            )
+            if not proceed:
+                return None
 
         return project_root
 
@@ -591,6 +650,49 @@ class ZipToSrcInstaller(tk.Tk):
                 status_var.set(f"Command error: {exc}")
             return 1, "", str(exc)
 
+    def run_command_streaming(self, command, cwd, status_var=None, done_message="Command finished."):
+        def worker():
+            self.log_output_threadsafe("")
+            self.log_output_threadsafe(f"> {command}")
+            self.log_output_threadsafe(f"cwd: {cwd}")
+
+            if status_var:
+                self.after(0, lambda: status_var.set(f"Running: {command}"))
+
+            try:
+                process = subprocess.Popen(
+                    command,
+                    cwd=str(cwd),
+                    shell=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    bufsize=1,
+                )
+
+                for line in process.stdout:
+                    clean = line.rstrip()
+                    if clean:
+                        self.log_output_threadsafe(clean)
+
+                return_code = process.wait()
+                self.log_output_threadsafe(f"exit code: {return_code}")
+
+                if status_var:
+                    if return_code == 0:
+                        self.after(0, lambda: status_var.set(done_message))
+                    else:
+                        self.after(0, lambda: status_var.set(f"Command failed: {command}"))
+
+            except Exception as exc:
+                self.log_output_threadsafe(str(exc))
+                if status_var:
+                    self.after(0, lambda: status_var.set(f"Command error: {exc}"))
+
+        thread = threading.Thread(target=worker, daemon=True)
+        self.command_threads.append(thread)
+        thread.start()
+
     def git_status(self):
         project_root = self.validate_git_root()
         if not project_root:
@@ -702,25 +804,62 @@ class ZipToSrcInstaller(tk.Tk):
 
         self.run_command_capture("git push", project_root, self.git_status_var)
 
-    def start_dev_app(self):
-        if self.dev_process and self.dev_process.poll() is None:
-            messagebox.showinfo("Dev app already running", "The dev app is already running.")
-            return
-
-        project_root = self.validate_project_root()
+    def publish_app(self):
+        project_root = self.validate_package_root()
         if not project_root:
             return
 
-        package_json = project_root / "package.json"
-        if not package_json.exists():
-            proceed = messagebox.askyesno(
-                "package.json not found",
-                f"I do not see package.json in:\n\n{project_root}\n\n"
-                "The dev app usually needs to be started from the project root.\n\n"
-                "Continue anyway?"
+        command = self.publish_command_var.get().strip()
+        if not command:
+            messagebox.showerror(
+                "Missing publish command",
+                "Enter a publish command, such as npm run build && firebase deploy."
             )
-            if not proceed:
-                return
+            return
+
+        proceed = messagebox.askyesno(
+            "Confirm Publish",
+            "This will publish/deploy your app using:\n\n"
+            f"{command}\n\n"
+            "Run this only after testing the dev app.\n\n"
+            "Continue?"
+        )
+
+        if not proceed:
+            return
+
+        self.run_command_streaming(
+            command,
+            project_root,
+            self.publish_status_var,
+            done_message="Publish completed.",
+        )
+
+    def build_only(self):
+        project_root = self.validate_package_root()
+        if not project_root:
+            return
+
+        self.run_command_streaming(
+            "npm run build",
+            project_root,
+            self.publish_status_var,
+            done_message="Build completed.",
+        )
+
+    def start_dev_app(self):
+        if self.dev_process:
+            try:
+                if self.dev_process.poll() is None:
+                    messagebox.showinfo("Dev app already running", "The dev app is already running.")
+                    return
+            except Exception:
+                self.dev_process = None
+                self.dev_status_var.set("Old dev app handle was invalid and has been cleared.")
+
+        project_root = self.validate_package_root()
+        if not project_root:
+            return
 
         command = self.dev_command_var.get().strip()
         if not command:
@@ -728,6 +867,28 @@ class ZipToSrcInstaller(tk.Tk):
             return
 
         try:
+            if self.dev_separate_window_var.get() and os.name == "nt":
+                cmd_command = f'cmd /k "{command}"'
+
+                self.dev_process = subprocess.Popen(
+                    cmd_command,
+                    cwd=str(project_root),
+                    shell=True,
+                    creationflags=subprocess.CREATE_NEW_CONSOLE,
+                )
+
+                self.dev_status_var.set(
+                    f"Dev app launched in a separate Command Prompt window. PID {self.dev_process.pid}."
+                )
+                self.status_var.set("Dev app launched in separate Command Prompt.")
+                self.log_output("")
+                self.log_output(f"> {cmd_command}")
+                self.log_output(f"cwd: {project_root}")
+                self.log_output("Dev app is running in a separate Command Prompt window.")
+                self.log_output("To stop it: click in that window and press Ctrl+C.")
+                self.after(1500, self.open_browser_if_running)
+                return
+
             self.dev_process = subprocess.Popen(
                 command,
                 cwd=str(project_root),
@@ -783,28 +944,44 @@ class ZipToSrcInstaller(tk.Tk):
             self.status_var.set("Dev app is running.")
 
     def handle_dev_process_ended(self):
-        if self.dev_process and self.dev_process.poll() is not None:
-            code = self.dev_process.poll()
-            self.dev_status_var.set(f"Dev app stopped. Exit code: {code}")
-            self.status_var.set("Dev app stopped.")
+        try:
+            if self.dev_process and self.dev_process.poll() is not None:
+                code = self.dev_process.poll()
+                self.dev_status_var.set(f"Dev app stopped. Exit code: {code}")
+                self.status_var.set("Dev app stopped.")
+        except Exception:
+            self.dev_process = None
+            self.dev_status_var.set("Dev app handle cleared.")
 
     def stop_dev_app(self):
-        if not self.dev_process or self.dev_process.poll() is not None:
-            self.dev_process = None
+        if not self.dev_process:
             self.dev_status_var.set("Dev app is not running.")
             return
 
         try:
-            if os.name == "nt":
-                self.dev_process.send_signal(signal.CTRL_BREAK_EVENT)
-                time.sleep(0.8)
+            if self.dev_process.poll() is not None:
+                self.dev_process = None
+                self.dev_status_var.set("Dev app is not running.")
+                return
+        except Exception:
+            self.dev_process = None
+            self.dev_status_var.set("Invalid dev app handle cleared.")
+            return
 
-                if self.dev_process.poll() is None:
+        try:
+            if os.name == "nt":
+                try:
+                    self.dev_process.send_signal(signal.CTRL_BREAK_EVENT)
+                    time.sleep(0.8)
+                except Exception:
+                    pass
+
+                if self.dev_process and self.dev_process.poll() is None:
                     self.dev_process.terminate()
 
                 time.sleep(0.8)
 
-                if self.dev_process.poll() is None:
+                if self.dev_process and self.dev_process.poll() is None:
                     self.dev_process.kill()
             else:
                 self.dev_process.terminate()
@@ -813,33 +990,75 @@ class ZipToSrcInstaller(tk.Tk):
                 if self.dev_process.poll() is None:
                     self.dev_process.kill()
 
+            self.dev_process = None
             self.dev_status_var.set("Dev app stopped.")
             self.status_var.set("Dev app stopped.")
 
         except Exception as exc:
-            messagebox.showerror("Could not stop dev app", str(exc))
+            self.dev_process = None
+            self.dev_status_var.set("Dev app handle cleared after stop error.")
+            messagebox.showwarning(
+                "Dev app handle cleared",
+                f"The stored process handle was invalid or could not be stopped cleanly.\n\n{exc}\n\n"
+                "If the server is still running, close the Command Prompt window or use Kill Node on 5173."
+            )
 
     def restart_dev_app(self):
         self.stop_dev_app()
         self.after(1000, self.start_dev_app)
 
     def open_browser_if_running(self):
-        if self.dev_process and self.dev_process.poll() is None:
-            self.open_browser()
+        if self.dev_process:
+            try:
+                if self.dev_process.poll() is None:
+                    self.open_browser()
+            except Exception:
+                self.dev_process = None
 
     def open_browser(self):
         url = self.dev_url_var.get().strip() or "http://localhost:5173"
         webbrowser.open(url)
 
-    def on_close(self):
-        if self.dev_process and self.dev_process.poll() is None:
-            proceed = messagebox.askyesno(
-                "Dev app is still running",
-                "The dev app is still running. Stop it before closing?"
-            )
+    def kill_port_5173(self):
+        proceed = messagebox.askyesno(
+            "Kill Node on port 5173",
+            "This will try to find and kill the process listening on port 5173.\n\n"
+            "Continue?"
+        )
 
-            if proceed:
-                self.stop_dev_app()
+        if not proceed:
+            return
+
+        if os.name != "nt":
+            self.run_command_capture("lsof -ti:5173 | xargs kill -9", Path.cwd(), self.dev_status_var)
+            self.dev_process = None
+            return
+
+        command = (
+            'for /f "tokens=5" %a in (\'netstat -ano ^| findstr :5173 ^| findstr LISTENING\') '
+            'do taskkill /PID %a /F'
+        )
+
+        project_root = self.validate_project_root() or Path.cwd()
+        self.run_command_capture(command, project_root, self.dev_status_var)
+        self.dev_process = None
+
+    def on_close(self):
+        if self.dev_process:
+            try:
+                running = self.dev_process.poll() is None
+            except Exception:
+                running = False
+                self.dev_process = None
+
+            if running:
+                proceed = messagebox.askyesno(
+                    "Dev app is still running",
+                    "The dev app is still running. Stop it before closing?"
+                )
+
+                if proceed:
+                    self.stop_dev_app()
 
         self.cleanup_temp_dir()
         self.destroy()

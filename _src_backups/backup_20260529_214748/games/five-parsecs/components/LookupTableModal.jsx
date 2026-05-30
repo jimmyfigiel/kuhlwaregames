@@ -43,14 +43,6 @@ function getRowsForTable(table) {
   }));
 }
 
-function getApplyErrorMessage(error) {
-  if (!error) return "Apply failed.";
-
-  if (typeof error === "string") return error;
-
-  return error.message || String(error);
-}
-
 export default function LookupTableModal({
   tableId,
   title = "",
@@ -76,7 +68,6 @@ export default function LookupTableModal({
   );
   const [rolledValue, setRolledValue] = useState(null);
   const [message, setMessage] = useState("");
-  const [applyingRowKey, setApplyingRowKey] = useState("");
 
   const [columnWidths, setColumnWidths] = useState({
     roll: 10,
@@ -101,13 +92,6 @@ export default function LookupTableModal({
       setSelectedApplyTargetId(normalizedApplyTargets[0]?.id || "notes");
     }
   }, [normalizedApplyTargets, selectedApplyTargetId]);
-
-  useEffect(() => {
-    return () => {
-      window.removeEventListener("mousemove", resizeColumn);
-      window.removeEventListener("mouseup", endColumnResize);
-    };
-  }, []);
 
   function beginColumnResize(event, columnName) {
     event.preventDefault();
@@ -219,8 +203,6 @@ export default function LookupTableModal({
     }
 
     setSelectedRowKey(row.rowKey);
-    setApplyingRowKey(row.rowKey);
-    setMessage("");
 
     try {
       if (onApply) {
@@ -238,9 +220,8 @@ export default function LookupTableModal({
         onClose();
       }
     } catch (error) {
-      setMessage(`Apply failed: ${getApplyErrorMessage(error)}`);
-    } finally {
-      setApplyingRowKey("");
+      console.error("Lookup table apply failed", error);
+      setMessage(error?.message || "Apply failed. Check the console for details.");
     }
   }
 
@@ -302,7 +283,6 @@ export default function LookupTableModal({
             <select
               value={selectedApplyTargetId}
               onChange={(event) => setSelectedApplyTargetId(event.target.value)}
-              disabled={Boolean(applyingRowKey)}
             >
               {normalizedApplyTargets.map((target) => (
                 <option key={target.id} value={target.id}>
@@ -317,7 +297,7 @@ export default function LookupTableModal({
           )}
         </div>
 
-        {message && <div className="fp-error">{message}</div>}
+        {message && <div className="fp-muted">{message}</div>}
 
         <div className="fp-roll-table-wrap">
           <table className="fp-roll-table">
@@ -369,7 +349,6 @@ export default function LookupTableModal({
             <tbody>
               {rows.map((row) => {
                 const isSelected = row.rowKey === selectedRowKey;
-                const isApplying = row.rowKey === applyingRowKey;
 
                 return (
                   <tr
@@ -388,13 +367,12 @@ export default function LookupTableModal({
                     <td>
                       <button
                         className="fp-btn fp-btn-compact"
-                        disabled={Boolean(applyingRowKey)}
                         onClick={(event) => {
                           event.stopPropagation();
                           handleApply(row);
                         }}
                       >
-                        {isApplying ? "Applying..." : applyLabel}
+                        {applyLabel}
                       </button>
                     </td>
                   </tr>
