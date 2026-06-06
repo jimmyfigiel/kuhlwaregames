@@ -30,34 +30,63 @@ function getJoinUrl(joinCode) {
   return url.toString();
 }
 
+function isSuperuser(player) {
+  return player?.isSuperuser || player?.isSuperUser || false;
+}
+
+function getUpdatedAtMillis(room) {
+  if (room.updatedAt?.toMillis) {
+    return room.updatedAt.toMillis();
+  }
+
+  if (room.updatedAt?.toDate) {
+    return room.updatedAt.toDate().getTime();
+  }
+
+  if (typeof room.updatedAt === "number") {
+    return room.updatedAt;
+  }
+
+  if (typeof room.updatedAt === "string") {
+    const parsedDate = Date.parse(room.updatedAt);
+    return Number.isNaN(parsedDate) ? 0 : parsedDate;
+  }
+
+  return 0;
+}
+
 export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
   const [rooms, setRooms] = useState([]);
   const [message, setMessage] = useState("");
   const [loadingRooms, setLoadingRooms] = useState(true);
 
+  const superuser = isSuperuser(player);
+
   useEffect(() => {
     loadRooms();
-  }, [player.id, refreshKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [player.id, player.isSuperuser, player.isSuperUser, refreshKey]);
 
   async function loadRooms() {
     setLoadingRooms(true);
     setMessage("");
 
     try {
-      const roomsSnapshot = await getDocs(
-        query(collection(db, "rooms"), where("playerIds", "array-contains", player.id))
-      );
+      const roomsQuery = superuser
+        ? query(collection(db, "rooms"))
+        : query(
+            collection(db, "rooms"),
+            where("playerIds", "array-contains", player.id)
+          );
+
+      const roomsSnapshot = await getDocs(roomsQuery);
 
       const loadedRooms = roomsSnapshot.docs
         .map((roomDoc) => ({
           id: roomDoc.id,
           ...roomDoc.data(),
         }))
-        .sort((a, b) => {
-          const aDate = a.updatedAt?.toMillis ? a.updatedAt.toMillis() : 0;
-          const bDate = b.updatedAt?.toMillis ? b.updatedAt.toMillis() : 0;
-          return bDate - aDate;
-        });
+        .sort((a, b) => getUpdatedAtMillis(b) - getUpdatedAtMillis(a));
 
       setRooms(loadedRooms);
     } catch (error) {
@@ -69,7 +98,7 @@ export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
   }
 
   async function deleteRoom(room) {
-    if (room.createdBy !== player.id && !player.isSuperuser) {
+    if (room.createdBy !== player.id && !superuser) {
       setMessage("Only the room creator or a superuser can delete this room.");
       return;
     }
@@ -103,14 +132,23 @@ export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
       setMessage("Join link copied.");
     } catch (error) {
       console.error(error);
-      setMessage("Could not copy link. Your browser may have blocked clipboard access.");
+      setMessage(
+        "Could not copy link. Your browser may have blocked clipboard access."
+      );
     }
   }
 
   return (
     <article className="card">
       <div className="section-heading-row">
-        <h2>Active Rooms</h2>
+        <div>
+          <h2>{superuser ? "All Rooms" : "Active Rooms"}</h2>
+          {superuser && (
+            <p className="muted">
+              Superuser view: all rooms sorted by last used.
+            </p>
+          )}
+        </div>
 
         <button type="button" className="secondary-button" onClick={loadRooms}>
           Refresh
@@ -120,7 +158,11 @@ export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
       {loadingRooms ? (
         <p className="muted">Loading rooms...</p>
       ) : rooms.length === 0 ? (
-        <p className="muted">You are not in any active rooms yet.</p>
+        <p className="muted">
+          {superuser
+            ? "There are no rooms in the system."
+            : "You are not in any active rooms yet."}
+        </p>
       ) : (
         <div className="room-list">
           {rooms.map((room) => (
@@ -132,6 +174,9 @@ export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
                   {room.createdByName || room.createdBy}
                 </p>
                 <p className="muted">Updated: {formatDate(room.updatedAt)}</p>
+                {superuser && (
+                  <p className="small-muted">Room ID: {room.id}</p>
+                )}
                 {room.joinCode && (
                   <p className="small-muted">Join Code: {room.joinCode}</p>
                 )}
@@ -152,7 +197,7 @@ export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
                   </button>
                 )}
 
-                {(room.createdBy === player.id || player.isSuperuser) && (
+                {(room.createdBy === player.id || superuser) && (
                   <button
                     type="button"
                     className="danger-button"

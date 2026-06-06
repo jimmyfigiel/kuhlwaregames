@@ -1,3 +1,4 @@
+
 import os
 import shutil
 import signal
@@ -12,1062 +13,635 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, scrolledtext, ttk
 
+APP_TITLE = "Generic Code Zip Installer"
 
-APP_TITLE = "Code Zip to src Installer"
+PRESETS = {
+    "Vite / Firebase Web App": {
+        "dest": "src",
+        "run": "npm run dev",
+        "build": "npm run build",
+        "publish": "npm run build && firebase deploy",
+        "url": "http://localhost:5173",
+    },
+    "Python Project": {
+        "dest": "",
+        "run": "python main.py",
+        "build": "pyinstaller --onefile --windowed main.py",
+        "publish": "",
+        "url": "",
+    },
+    "Custom Project": {
+        "dest": "",
+        "run": "",
+        "build": "",
+        "publish": "",
+        "url": "",
+    },
+}
 
+IGNORED_NAMES = {
+    "__MACOSX", ".DS_Store", "Thumbs.db", ".git", ".venv", "venv",
+    "__pycache__", "node_modules", "dist", "build", ".pytest_cache",
+}
 
-class ZipToSrcInstaller(tk.Tk):
+class GenericCodeZipInstaller(tk.Tk):
     def __init__(self):
         super().__init__()
-
         self.title(APP_TITLE)
-        self.geometry("1120x900")
-        self.minsize(900, 700)
+        self.geometry("1180x900")
+        self.minsize(940, 720)
 
+        self.preset_var = tk.StringVar(value="Vite / Firebase Web App")
         self.zip_path_var = tk.StringVar()
         self.project_root_var = tk.StringVar()
-        self.src_path_var = tk.StringVar()
+        self.destination_path_var = tk.StringVar()
+        self.run_command_var = tk.StringVar()
+        self.build_command_var = tk.StringVar()
+        self.publish_command_var = tk.StringVar()
+        self.url_var = tk.StringVar()
+        self.run_in_cmd_var = tk.BooleanVar(value=True)
+        self.git_message_var = tk.StringVar(value="Update project files")
 
-        self.dev_command_var = tk.StringVar(value="npm run dev")
-        self.dev_url_var = tk.StringVar(value="http://localhost:5173")
-        self.dev_separate_window_var = tk.BooleanVar(value=True)
-
-        self.publish_command_var = tk.StringVar(value="npm run build && firebase deploy")
-        self.git_message_var = tk.StringVar(value="Update Five Parsecs files")
-
-        self.status_var = tk.StringVar(value="Select a zip file and your project folders.")
-        self.detected_root_var = tk.StringVar(value="")
-        self.dev_status_var = tk.StringVar(value="Dev app is not running.")
+        self.status_var = tk.StringVar(value="Select a project type, zip file, and destination.")
+        self.detected_var = tk.StringVar(value="")
+        self.run_status_var = tk.StringVar(value="App is not running.")
         self.git_status_var = tk.StringVar(value="Git commands have not run yet.")
-        self.publish_status_var = tk.StringVar(value="Publish has not run yet.")
+        self.build_status_var = tk.StringVar(value="Build/publish has not run yet.")
 
         self.preview_rows = []
-        self.extracted_temp_dir = None
-        self.detected_source_root = None
-        self.dev_process = None
-        self.dev_output_thread = None
-        self.command_threads = []
+        self.temp_dir = None
+        self.source_root = None
+        self.run_process = None
+        self.run_thread = None
 
         self._build_ui()
+        self.apply_preset()
         self.protocol("WM_DELETE_WINDOW", self.on_close)
 
     def _build_ui(self):
         main = ttk.Frame(self, padding=12)
         main.pack(fill="both", expand=True)
 
-        title = ttk.Label(main, text=APP_TITLE, font=("Segoe UI", 16, "bold"))
-        title.pack(anchor="w", pady=(0, 10))
+        ttk.Label(main, text=APP_TITLE, font=("Segoe UI", 16, "bold")).pack(anchor="w", pady=(0, 10))
 
-        zip_frame = ttk.LabelFrame(main, text="1. Select downloaded zip file", padding=10)
-        zip_frame.pack(fill="x", pady=(0, 8))
+        row = ttk.LabelFrame(main, text="0. Project type", padding=10)
+        row.pack(fill="x", pady=(0, 8))
+        ttk.Label(row, text="Preset:").pack(side="left")
+        combo = ttk.Combobox(row, textvariable=self.preset_var, state="readonly", values=list(PRESETS.keys()), width=24)
+        combo.pack(side="left", padx=(6, 10))
+        combo.bind("<<ComboboxSelected>>", lambda e: self.apply_preset())
+        ttk.Label(row, text="Vite copies into src. Python and Custom copy into the selected destination.", foreground="#555").pack(side="left")
 
-        ttk.Entry(zip_frame, textvariable=self.zip_path_var).pack(
-            side="left", fill="x", expand=True, padx=(0, 8)
-        )
-        ttk.Button(zip_frame, text="Browse Zip...", command=self.browse_zip).pack(side="left")
-
-        project_frame = ttk.LabelFrame(main, text="2. Select project root", padding=10)
-        project_frame.pack(fill="x", pady=(0, 8))
-
-        ttk.Entry(project_frame, textvariable=self.project_root_var).pack(
-            side="left", fill="x", expand=True, padx=(0, 8)
-        )
-        ttk.Button(project_frame, text="Browse Project...", command=self.browse_project_root).pack(
-            side="left"
-        )
-
-        src_frame = ttk.LabelFrame(main, text="3. Project src folder", padding=10)
-        src_frame.pack(fill="x", pady=(0, 8))
-
-        ttk.Entry(src_frame, textvariable=self.src_path_var).pack(
-            side="left", fill="x", expand=True, padx=(0, 8)
-        )
-        ttk.Button(src_frame, text="Browse src...", command=self.browse_src).pack(side="left")
+        self._path_row(main, "1. Select downloaded code zip", self.zip_path_var, "Browse Zip...", self.browse_zip, file=True)
+        self._path_row(main, "2. Select project root", self.project_root_var, "Browse Project...", self.browse_project)
+        self._path_row(main, "3. Destination folder for copied files", self.destination_path_var, "Browse Destination...", self.browse_destination)
 
         actions = ttk.Frame(main)
         actions.pack(fill="x", pady=(0, 8))
-
         ttk.Button(actions, text="Preview Files", command=self.preview_zip).pack(side="left")
-        ttk.Button(actions, text="Install / Copy Files", command=self.install_files).pack(
-            side="left", padx=(8, 0)
-        )
+        ttk.Button(actions, text="Install / Copy Files", command=self.install_files).pack(side="left", padx=(8, 0))
         ttk.Button(actions, text="Clear", command=self.clear_preview).pack(side="left", padx=(8, 0))
+        ttk.Button(actions, text="Open Backups", command=self.open_backups).pack(side="left", padx=(8, 0))
 
-        dev_frame = ttk.LabelFrame(main, text="Dev App Controls", padding=10)
-        dev_frame.pack(fill="x", pady=(0, 8))
+        run_box = ttk.LabelFrame(main, text="Run / Dev Controls", padding=10)
+        run_box.pack(fill="x", pady=(0, 8))
+        cmd = ttk.Frame(run_box)
+        cmd.pack(fill="x", pady=(0, 6))
+        ttk.Label(cmd, text="Run command:").pack(side="left")
+        ttk.Entry(cmd, textvariable=self.run_command_var).pack(side="left", fill="x", expand=True, padx=(6, 12))
+        ttk.Label(cmd, text="URL:").pack(side="left")
+        ttk.Entry(cmd, textvariable=self.url_var, width=32).pack(side="left", padx=(6, 0))
+        ttk.Checkbutton(run_box, text="Run app in separate Command Prompt window", variable=self.run_in_cmd_var).pack(anchor="w", pady=(0, 6))
+        btns = ttk.Frame(run_box)
+        btns.pack(fill="x")
+        ttk.Button(btns, text="Start App", command=self.start_app).pack(side="left")
+        ttk.Button(btns, text="Stop App", command=self.stop_app).pack(side="left", padx=(8, 0))
+        ttk.Button(btns, text="Restart App", command=self.restart_app).pack(side="left", padx=(8, 0))
+        ttk.Button(btns, text="Open URL", command=self.open_url).pack(side="left", padx=(8, 0))
+        ttk.Button(btns, text="Kill Node on 5173", command=self.kill_node_5173).pack(side="left", padx=(8, 0))
+        ttk.Label(run_box, textvariable=self.run_status_var, foreground="#555").pack(anchor="w", pady=(6, 0))
 
-        command_row = ttk.Frame(dev_frame)
-        command_row.pack(fill="x", pady=(0, 6))
+        build_box = ttk.LabelFrame(main, text="Build / Publish Controls", padding=10)
+        build_box.pack(fill="x", pady=(0, 8))
+        b1 = ttk.Frame(build_box)
+        b1.pack(fill="x", pady=(0, 6))
+        ttk.Label(b1, text="Build command:").pack(side="left")
+        ttk.Entry(b1, textvariable=self.build_command_var).pack(side="left", fill="x", expand=True, padx=(6, 8))
+        ttk.Button(b1, text="Build", command=self.build_project).pack(side="left")
+        b2 = ttk.Frame(build_box)
+        b2.pack(fill="x", pady=(0, 6))
+        ttk.Label(b2, text="Publish command:").pack(side="left")
+        ttk.Entry(b2, textvariable=self.publish_command_var).pack(side="left", fill="x", expand=True, padx=(6, 8))
+        ttk.Button(b2, text="Publish", command=self.publish_project).pack(side="left")
+        ttk.Label(build_box, textvariable=self.build_status_var, foreground="#555").pack(anchor="w")
 
-        ttk.Label(command_row, text="Command:").pack(side="left")
-        ttk.Entry(command_row, textvariable=self.dev_command_var, width=30).pack(
-            side="left", padx=(6, 12)
-        )
+        git_box = ttk.LabelFrame(main, text="Git Controls", padding=10)
+        git_box.pack(fill="x", pady=(0, 8))
+        g1 = ttk.Frame(git_box)
+        g1.pack(fill="x", pady=(0, 6))
+        ttk.Label(g1, text="Commit message:").pack(side="left")
+        ttk.Entry(g1, textvariable=self.git_message_var).pack(side="left", fill="x", expand=True, padx=(6, 0))
+        g2 = ttk.Frame(git_box)
+        g2.pack(fill="x")
+        ttk.Button(g2, text="Git Status", command=self.git_status).pack(side="left")
+        ttk.Button(g2, text="Git Pull", command=self.git_pull).pack(side="left", padx=(8, 0))
+        ttk.Button(g2, text="Git Add All", command=self.git_add_all).pack(side="left", padx=(8, 0))
+        ttk.Button(g2, text="Git Commit", command=self.git_commit).pack(side="left", padx=(8, 0))
+        ttk.Button(g2, text="Git Push", command=self.git_push).pack(side="left", padx=(8, 0))
+        ttk.Button(g2, text="Add + Commit + Push", command=self.git_add_commit_push).pack(side="left", padx=(8, 0))
+        ttk.Label(git_box, textvariable=self.git_status_var, foreground="#555").pack(anchor="w", pady=(6, 0))
 
-        ttk.Label(command_row, text="URL:").pack(side="left")
-        ttk.Entry(command_row, textvariable=self.dev_url_var, width=30).pack(
-            side="left", padx=(6, 12)
-        )
+        ttk.Label(main, textvariable=self.detected_var, foreground="#555", wraplength=1080).pack(anchor="w", pady=(0, 8))
 
-        separate_row = ttk.Frame(dev_frame)
-        separate_row.pack(fill="x", pady=(0, 6))
-
-        ttk.Checkbutton(
-            separate_row,
-            text="Run dev app in separate Command Prompt window",
-            variable=self.dev_separate_window_var,
-        ).pack(side="left")
-
-        button_row = ttk.Frame(dev_frame)
-        button_row.pack(fill="x")
-
-        ttk.Button(button_row, text="Start Dev App", command=self.start_dev_app).pack(side="left")
-        ttk.Button(button_row, text="Stop Dev App", command=self.stop_dev_app).pack(
-            side="left", padx=(8, 0)
-        )
-        ttk.Button(button_row, text="Restart Dev App", command=self.restart_dev_app).pack(
-            side="left", padx=(8, 0)
-        )
-        ttk.Button(button_row, text="Open Browser", command=self.open_browser).pack(
-            side="left", padx=(8, 0)
-        )
-        ttk.Button(button_row, text="Kill Node on 5173", command=self.kill_port_5173).pack(
-            side="left", padx=(8, 0)
-        )
-
-        ttk.Label(dev_frame, textvariable=self.dev_status_var, foreground="#555555").pack(
-            anchor="w", pady=(6, 0)
-        )
-
-        publish_frame = ttk.LabelFrame(main, text="Publish Controls", padding=10)
-        publish_frame.pack(fill="x", pady=(0, 8))
-
-        publish_row = ttk.Frame(publish_frame)
-        publish_row.pack(fill="x", pady=(0, 6))
-
-        ttk.Label(publish_row, text="Publish command:").pack(side="left")
-        ttk.Entry(publish_row, textvariable=self.publish_command_var).pack(
-            side="left", fill="x", expand=True, padx=(6, 8)
-        )
-        ttk.Button(publish_row, text="Publish", command=self.publish_app).pack(side="left")
-        ttk.Button(publish_row, text="Build Only", command=self.build_only).pack(
-            side="left", padx=(8, 0)
-        )
-
-        ttk.Label(publish_frame, textvariable=self.publish_status_var, foreground="#555555").pack(
-            anchor="w"
-        )
-
-        git_frame = ttk.LabelFrame(main, text="Git Controls", padding=10)
-        git_frame.pack(fill="x", pady=(0, 8))
-
-        git_message_row = ttk.Frame(git_frame)
-        git_message_row.pack(fill="x", pady=(0, 6))
-
-        ttk.Label(git_message_row, text="Commit message:").pack(side="left")
-        ttk.Entry(git_message_row, textvariable=self.git_message_var).pack(
-            side="left", fill="x", expand=True, padx=(6, 0)
-        )
-
-        git_button_row = ttk.Frame(git_frame)
-        git_button_row.pack(fill="x")
-
-        ttk.Button(git_button_row, text="Git Status", command=self.git_status).pack(side="left")
-        ttk.Button(git_button_row, text="Git Pull", command=self.git_pull).pack(
-            side="left", padx=(8, 0)
-        )
-        ttk.Button(git_button_row, text="Git Add All", command=self.git_add_all).pack(
-            side="left", padx=(8, 0)
-        )
-        ttk.Button(git_button_row, text="Git Commit", command=self.git_commit).pack(
-            side="left", padx=(8, 0)
-        )
-        ttk.Button(git_button_row, text="Git Push", command=self.git_push).pack(
-            side="left", padx=(8, 0)
-        )
-        ttk.Button(
-            git_button_row,
-            text="Add + Commit + Push",
-            command=self.git_add_commit_push,
-        ).pack(side="left", padx=(8, 0))
-
-        ttk.Label(git_frame, textvariable=self.git_status_var, foreground="#555555").pack(
-            anchor="w", pady=(6, 0)
-        )
-
-        detected = ttk.Label(
-            main,
-            textvariable=self.detected_root_var,
-            foreground="#555555",
-            wraplength=1040,
-        )
-        detected.pack(anchor="w", pady=(0, 8))
-
-        lower_pane = ttk.PanedWindow(main, orient="vertical")
-        lower_pane.pack(fill="both", expand=True)
-
-        preview_frame = ttk.LabelFrame(lower_pane, text="Preview", padding=8)
-        lower_pane.add(preview_frame, weight=3)
-
-        columns = ("action", "relative_path", "source_path", "destination_path")
-        self.tree = ttk.Treeview(preview_frame, columns=columns, show="headings", height=12)
-
-        self.tree.heading("action", text="Action")
-        self.tree.heading("relative_path", text="Relative Path")
-        self.tree.heading("source_path", text="Zip Source")
-        self.tree.heading("destination_path", text="Destination")
-
-        self.tree.column("action", width=90, anchor="center")
-        self.tree.column("relative_path", width=280)
-        self.tree.column("source_path", width=330)
-        self.tree.column("destination_path", width=330)
-
-        y_scroll = ttk.Scrollbar(preview_frame, orient="vertical", command=self.tree.yview)
-        x_scroll = ttk.Scrollbar(preview_frame, orient="horizontal", command=self.tree.xview)
-        self.tree.configure(yscrollcommand=y_scroll.set, xscrollcommand=x_scroll.set)
-
+        panes = ttk.PanedWindow(main, orient="vertical")
+        panes.pack(fill="both", expand=True)
+        preview = ttk.LabelFrame(panes, text="Preview", padding=8)
+        panes.add(preview, weight=3)
+        columns = ("action", "relative", "source", "dest")
+        self.tree = ttk.Treeview(preview, columns=columns, show="headings", height=12)
+        for col, title, width in [("action", "Action", 90), ("relative", "Relative Path", 300), ("source", "Zip Source", 350), ("dest", "Destination", 350)]:
+            self.tree.heading(col, text=title)
+            self.tree.column(col, width=width, anchor="center" if col == "action" else "w")
+        y = ttk.Scrollbar(preview, orient="vertical", command=self.tree.yview)
+        x = ttk.Scrollbar(preview, orient="horizontal", command=self.tree.xview)
+        self.tree.configure(yscrollcommand=y.set, xscrollcommand=x.set)
         self.tree.grid(row=0, column=0, sticky="nsew")
-        y_scroll.grid(row=0, column=1, sticky="ns")
-        x_scroll.grid(row=1, column=0, sticky="ew")
+        y.grid(row=0, column=1, sticky="ns")
+        x.grid(row=1, column=0, sticky="ew")
+        preview.rowconfigure(0, weight=1)
+        preview.columnconfigure(0, weight=1)
 
-        preview_frame.rowconfigure(0, weight=1)
-        preview_frame.columnconfigure(0, weight=1)
-
-        output_frame = ttk.LabelFrame(lower_pane, text="Command Output", padding=8)
-        lower_pane.add(output_frame, weight=2)
-
-        self.output_box = scrolledtext.ScrolledText(
-            output_frame,
-            height=10,
-            wrap="word",
-            font=("Consolas", 10),
-        )
+        output = ttk.LabelFrame(panes, text="Command Output", padding=8)
+        panes.add(output, weight=2)
+        self.output_box = scrolledtext.ScrolledText(output, height=10, wrap="word", font=("Consolas", 10))
         self.output_box.pack(fill="both", expand=True)
+        ttk.Label(main, textvariable=self.status_var, relief="sunken", anchor="w").pack(fill="x", pady=(10, 0))
 
-        status = ttk.Label(main, textvariable=self.status_var, relief="sunken", anchor="w")
-        status.pack(fill="x", pady=(10, 0))
+    def _path_row(self, parent, title, variable, button_text, command, file=False):
+        box = ttk.LabelFrame(parent, text=title, padding=10)
+        box.pack(fill="x", pady=(0, 8))
+        ttk.Entry(box, textvariable=variable).pack(side="left", fill="x", expand=True, padx=(0, 8))
+        ttk.Button(box, text=button_text, command=command).pack(side="left")
 
-    def log_output(self, text):
+    def apply_preset(self):
+        preset = PRESETS[self.preset_var.get()]
+        self.run_command_var.set(preset["run"])
+        self.build_command_var.set(preset["build"])
+        self.publish_command_var.set(preset["publish"])
+        self.url_var.set(preset["url"])
+        root = self.project_root_var.get().strip()
+        if root:
+            self.set_destination_from_root(Path(root))
+        self.clear_preview()
+
+    def set_destination_from_root(self, root):
+        dest_name = PRESETS[self.preset_var.get()]["dest"]
+        self.destination_path_var.set(str(root / dest_name if dest_name else root))
+
+    def log(self, text):
         self.output_box.insert("end", text + "\n")
         self.output_box.see("end")
 
-    def log_output_threadsafe(self, text):
-        self.after(0, lambda: self.log_output(text))
+    def log_threadsafe(self, text):
+        self.after(0, lambda: self.log(text))
 
     def browse_zip(self):
-        path = filedialog.askopenfilename(
-            title="Select downloaded code zip",
-            filetypes=[("Zip files", "*.zip"), ("All files", "*.*")]
-        )
-
+        path = filedialog.askopenfilename(title="Select code zip", filetypes=[("Zip files", "*.zip"), ("All files", "*.*")])
         if path:
             self.zip_path_var.set(path)
             self.clear_preview()
 
-    def browse_project_root(self):
-        path = filedialog.askdirectory(title="Select your project root folder")
+    def browse_project(self):
+        path = filedialog.askdirectory(title="Select project root")
+        if path:
+            root = Path(path)
+            self.project_root_var.set(str(root))
+            self.set_destination_from_root(root)
+            self.clear_preview()
 
-        if not path:
-            return
-
-        project_root = Path(path)
-        self.project_root_var.set(str(project_root))
-
-        src_path = project_root / "src"
-        if src_path.exists() and src_path.is_dir():
-            self.src_path_var.set(str(src_path))
-
-        self.clear_preview()
-
-    def browse_src(self):
-        path = filedialog.askdirectory(title="Select your project src folder")
-
-        if not path:
-            return
-
-        selected = Path(path)
-
-        if selected.name != "src":
-            proceed = messagebox.askyesno(
-                "Folder is not named src",
-                f"You selected:\n\n{selected}\n\n"
-                "This folder is not named 'src'. Continue anyway?"
-            )
-            if not proceed:
-                return
-
-        self.src_path_var.set(str(selected))
-
-        if not self.project_root_var.get().strip():
-            self.project_root_var.set(str(selected.parent))
-
-        self.clear_preview()
+    def browse_destination(self):
+        path = filedialog.askdirectory(title="Select destination folder")
+        if path:
+            self.destination_path_var.set(path)
+            if not self.project_root_var.get().strip():
+                self.project_root_var.set(path)
+            self.clear_preview()
 
     def clear_preview(self):
         self.preview_rows = []
-        self.detected_source_root = None
-        self.detected_root_var.set("")
+        self.source_root = None
+        self.detected_var.set("")
+        for item in getattr(self, "tree", []).get_children() if hasattr(self, "tree") else []:
+            self.tree.delete(item)
+        self.cleanup_temp()
         self.status_var.set("Preview cleared.")
 
-        for item in self.tree.get_children():
-            self.tree.delete(item)
-
-        self.cleanup_temp_dir()
-
-    def cleanup_temp_dir(self):
-        if self.extracted_temp_dir and Path(self.extracted_temp_dir).exists():
+    def cleanup_temp(self):
+        if self.temp_dir and Path(self.temp_dir).exists():
             try:
-                shutil.rmtree(self.extracted_temp_dir)
+                shutil.rmtree(self.temp_dir)
             except Exception:
                 pass
+        self.temp_dir = None
 
-        self.extracted_temp_dir = None
-
-    def validate_inputs(self):
+    def validate_paths(self):
         zip_path = Path(self.zip_path_var.get().strip())
-        src_path = Path(self.src_path_var.get().strip())
-
-        if not zip_path.exists() or not zip_path.is_file():
-            messagebox.showerror("Missing zip file", "Please select a valid zip file.")
+        dest = Path(self.destination_path_var.get().strip())
+        if not zip_path.exists() or not zip_path.is_file() or zip_path.suffix.lower() != ".zip":
+            messagebox.showerror("Invalid zip", "Please select a valid .zip file.")
             return None, None
-
-        if zip_path.suffix.lower() != ".zip":
-            messagebox.showerror("Not a zip file", "The selected file is not a .zip file.")
+        if not dest.exists() or not dest.is_dir():
+            messagebox.showerror("Invalid destination", "Please select a valid destination folder.")
             return None, None
+        return zip_path, dest
 
-        if not src_path.exists() or not src_path.is_dir():
-            messagebox.showerror("Missing src folder", "Please select a valid project src folder.")
-            return None, None
-
-        return zip_path, src_path
-
-    def validate_project_root(self):
-        project_root_text = self.project_root_var.get().strip()
-
-        if not project_root_text:
-            src_path_text = self.src_path_var.get().strip()
-            if src_path_text:
-                project_root_text = str(Path(src_path_text).parent)
-                self.project_root_var.set(project_root_text)
-
-        project_root = Path(project_root_text)
-
-        if not project_root.exists() or not project_root.is_dir():
-            messagebox.showerror(
-                "Missing project root",
-                "Please select your project root folder, the folder that contains package.json."
-            )
+    def project_root(self):
+        text = self.project_root_var.get().strip() or self.destination_path_var.get().strip()
+        root = Path(text)
+        if not root.exists() or not root.is_dir():
+            messagebox.showerror("Invalid project root", "Please select a valid project root folder.")
             return None
-
-        return project_root
-
-    def validate_package_root(self):
-        project_root = self.validate_project_root()
-        if not project_root:
-            return None
-
-        package_json = project_root / "package.json"
-        if not package_json.exists():
-            proceed = messagebox.askyesno(
-                "package.json not found",
-                f"I do not see package.json in:\n\n{project_root}\n\n"
-                "Build/publish usually needs to be started from the project root.\n\n"
-                "Continue anyway?"
-            )
-            if not proceed:
-                return None
-
-        return project_root
-
-    def validate_git_root(self):
-        project_root = self.validate_project_root()
-        if not project_root:
-            return None
-
-        git_folder = project_root / ".git"
-        if not git_folder.exists():
-            proceed = messagebox.askyesno(
-                "Git repository not found",
-                f"I do not see a .git folder in:\n\n{project_root}\n\n"
-                "Continue anyway? Git may still work if this is a worktree or nested repo."
-            )
-            if not proceed:
-                return None
-
-        return project_root
+        return root
 
     def preview_zip(self):
-        zip_path, src_path = self.validate_inputs()
-
-        if not zip_path or not src_path:
+        zip_path, dest = self.validate_paths()
+        if not zip_path or not dest:
             return
-
         self.clear_preview()
-
         try:
-            self.extracted_temp_dir = tempfile.mkdtemp(prefix="code_zip_install_")
-            extract_dir = Path(self.extracted_temp_dir)
-
-            with zipfile.ZipFile(zip_path, "r") as zip_ref:
-                bad_file = zip_ref.testzip()
-                if bad_file:
-                    raise ValueError(f"Zip file appears damaged near: {bad_file}")
-
-                zip_ref.extractall(extract_dir)
-
-            self.detected_source_root = self.find_source_root(extract_dir)
-
-            if not self.detected_source_root:
-                messagebox.showerror(
-                    "No source files found",
-                    "I could not find a usable src folder or source file structure in the zip."
-                )
+            self.temp_dir = tempfile.mkdtemp(prefix="code_zip_install_")
+            extract_dir = Path(self.temp_dir)
+            with zipfile.ZipFile(zip_path, "r") as z:
+                bad = z.testzip()
+                if bad:
+                    raise ValueError(f"Zip appears damaged near: {bad}")
+                z.extractall(extract_dir)
+            self.source_root = self.find_source_root(extract_dir)
+            if not self.source_root:
+                messagebox.showerror("No source found", "Could not find source files in the zip.")
                 return
-
-            self.detected_root_var.set(
-                f"Detected source root inside zip: {self.detected_source_root}"
-            )
-
-            self.preview_rows = self.build_preview_rows(
-                source_root=self.detected_source_root,
-                destination_src=src_path,
-            )
-
-            self.populate_preview_tree()
-
-            self.status_var.set(
-                f"Preview ready. {len(self.preview_rows)} file(s) will be copied."
-            )
-
+            self.detected_var.set(f"Detected source root inside zip: {self.source_root}")
+            self.preview_rows = self.build_preview_rows(self.source_root, dest)
+            self.populate_preview()
+            self.status_var.set(f"Preview ready. {len(self.preview_rows)} file(s) will be copied.")
         except Exception as exc:
-            self.cleanup_temp_dir()
+            self.cleanup_temp()
             messagebox.showerror("Preview failed", str(exc))
             self.status_var.set("Preview failed.")
 
     def find_source_root(self, extract_dir):
         extract_dir = Path(extract_dir)
-
-        src_candidates = []
-
-        for root, dirs, files in os.walk(extract_dir):
-            root_path = Path(root)
-
-            if root_path.name == "src":
-                src_candidates.append(root_path)
-
-        if src_candidates:
-            src_candidates.sort(key=lambda path: len(path.parts))
-            return src_candidates[0]
-
-        if (extract_dir / "games").exists():
-            return extract_dir
-
-        children = [child for child in extract_dir.iterdir() if child.is_dir()]
-
-        if len(children) == 1:
-            single = children[0]
-
-            if (single / "games").exists():
-                return single
-
-            if (single / "src").exists():
-                return single / "src"
-
-        source_extensions = {".js", ".jsx", ".ts", ".tsx", ".css", ".json"}
-        for file_path in extract_dir.rglob("*"):
-            if file_path.is_file() and file_path.suffix.lower() in source_extensions:
+        preset = self.preset_var.get()
+        if preset == "Vite / Firebase Web App":
+            srcs = [Path(root) for root, dirs, files in os.walk(extract_dir) if Path(root).name == "src"]
+            if srcs:
+                srcs.sort(key=lambda p: len(p.parts))
+                return srcs[0]
+            if (extract_dir / "games").exists():
                 return extract_dir
-
+        if preset == "Python Project":
+            indicators = ["main.py", "app.py", "pyproject.toml", "requirements.txt", "setup.py", "Pipfile"]
+            if any((extract_dir / name).exists() for name in indicators) or any(extract_dir.glob("*.py")):
+                return extract_dir
+        children = [p for p in extract_dir.iterdir() if p.is_dir()]
+        files = [p for p in extract_dir.iterdir() if p.is_file()]
+        if len(children) == 1 and not files:
+            return children[0]
+        source_exts = {".py", ".js", ".jsx", ".ts", ".tsx", ".css", ".html", ".json", ".md", ".txt", ".toml", ".yaml", ".yml"}
+        if any(p.is_file() and p.suffix.lower() in source_exts for p in extract_dir.rglob("*")):
+            return extract_dir
         return None
 
-    def build_preview_rows(self, source_root, destination_src):
-        source_root = Path(source_root)
-        destination_src = Path(destination_src)
-
+    def build_preview_rows(self, source_root, dest):
         rows = []
-
-        ignored_names = {
-            "__MACOSX",
-            ".DS_Store",
-            "Thumbs.db",
-        }
-
-        for source_file in source_root.rglob("*"):
-            if not source_file.is_file():
+        for src in Path(source_root).rglob("*"):
+            if not src.is_file():
                 continue
-
-            if any(part in ignored_names for part in source_file.parts):
+            if any(part in IGNORED_NAMES for part in src.parts):
                 continue
-
-            relative_path = source_file.relative_to(source_root)
-            destination_file = destination_src / relative_path
-
-            if destination_file.exists():
-                action = "Overwrite"
-            else:
-                action = "Create"
-
-            rows.append(
-                {
-                    "action": action,
-                    "relative_path": str(relative_path).replace("\\", "/"),
-                    "source_path": str(source_file),
-                    "destination_path": str(destination_file),
-                    "source_file": source_file,
-                    "destination_file": destination_file,
-                }
-            )
-
-        rows.sort(key=lambda row: row["relative_path"].lower())
+            rel = src.relative_to(source_root)
+            dst = Path(dest) / rel
+            rows.append({
+                "action": "Overwrite" if dst.exists() else "Create",
+                "relative": str(rel).replace("\\", "/"),
+                "source": src,
+                "dest": dst,
+            })
+        rows.sort(key=lambda r: r["relative"].lower())
         return rows
 
-    def populate_preview_tree(self):
+    def populate_preview(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
-
         for row in self.preview_rows:
-            self.tree.insert(
-                "",
-                "end",
-                values=(
-                    row["action"],
-                    row["relative_path"],
-                    row["source_path"],
-                    row["destination_path"],
-                ),
-            )
+            self.tree.insert("", "end", values=(row["action"], row["relative"], str(row["source"]), str(row["dest"])))
 
     def install_files(self):
         if not self.preview_rows:
             self.preview_zip()
-
         if not self.preview_rows:
             return
-
-        overwrite_count = sum(1 for row in self.preview_rows if row["action"] == "Overwrite")
-        create_count = sum(1 for row in self.preview_rows if row["action"] == "Create")
-
-        proceed = messagebox.askyesno(
-            "Confirm install",
-            f"This will copy {len(self.preview_rows)} file(s) into your src folder.\n\n"
-            f"Create: {create_count}\n"
-            f"Overwrite: {overwrite_count}\n\n"
-            "Existing files will be backed up before they are overwritten.\n\n"
-            "Continue?"
-        )
-
-        if not proceed:
+        creates = sum(1 for r in self.preview_rows if r["action"] == "Create")
+        overwrites = sum(1 for r in self.preview_rows if r["action"] == "Overwrite")
+        if not messagebox.askyesno("Confirm install", f"Copy {len(self.preview_rows)} file(s)?\n\nCreate: {creates}\nOverwrite: {overwrites}\n\nOverwritten files will be backed up first."):
             return
-
+        backup_root = self.backup_root()
+        copied = backed = 0
         try:
-            backup_root = self.create_backup_root()
-
-            copied = 0
-            backed_up = 0
-
             for row in self.preview_rows:
-                source_file = Path(row["source_file"])
-                destination_file = Path(row["destination_file"])
-
-                destination_file.parent.mkdir(parents=True, exist_ok=True)
-
-                if destination_file.exists():
-                    self.backup_file(destination_file, backup_root)
-                    backed_up += 1
-
-                shutil.copy2(source_file, destination_file)
+                src = row["source"]
+                dst = row["dest"]
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                if dst.exists():
+                    self.backup_file(dst, backup_root)
+                    backed += 1
+                shutil.copy2(src, dst)
                 copied += 1
-
-            messagebox.showinfo(
-                "Install complete",
-                f"Copied {copied} file(s).\n"
-                f"Backed up {backed_up} overwritten file(s).\n\n"
-                f"Backup folder:\n{backup_root}"
-            )
-
-            self.status_var.set(
-                f"Install complete. Copied {copied} file(s). Backed up {backed_up} file(s)."
-            )
-
+            messagebox.showinfo("Install complete", f"Copied {copied} file(s).\nBacked up {backed} file(s).\n\nBackup folder:\n{backup_root}")
+            self.status_var.set(f"Install complete. Copied {copied}; backed up {backed}.")
         except Exception as exc:
             messagebox.showerror("Install failed", str(exc))
             self.status_var.set("Install failed.")
 
-    def create_backup_root(self):
-        src_path = Path(self.src_path_var.get().strip())
-        project_root = src_path.parent
+    def backup_root(self):
+        root = self.project_root() or Path(self.destination_path_var.get().strip())
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        path = root / "_code_zip_backups" / f"backup_{stamp}"
+        path.mkdir(parents=True, exist_ok=True)
+        return path
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        backup_root = project_root / "_src_backups" / f"backup_{timestamp}"
+    def backup_file(self, dst, backup_root):
+        dest_root = Path(self.destination_path_var.get().strip())
+        rel = dst.relative_to(dest_root)
+        backup = backup_root / rel
+        backup.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(dst, backup)
 
-        backup_root.mkdir(parents=True, exist_ok=True)
-        return backup_root
+    def open_backups(self):
+        root = self.project_root()
+        if not root:
+            return
+        path = root / "_code_zip_backups"
+        path.mkdir(parents=True, exist_ok=True)
+        if os.name == "nt":
+            os.startfile(path)
+        else:
+            subprocess.Popen(["xdg-open", str(path)])
 
-    def backup_file(self, destination_file, backup_root):
-        src_path = Path(self.src_path_var.get().strip())
-        relative_path = destination_file.relative_to(src_path)
-
-        backup_file = backup_root / relative_path
-        backup_file.parent.mkdir(parents=True, exist_ok=True)
-
-        shutil.copy2(destination_file, backup_file)
-
-    def run_command_capture(self, command, cwd, status_var=None):
-        self.log_output("")
-        self.log_output(f"> {command}")
-        self.log_output(f"cwd: {cwd}")
-
+    def run_capture(self, command, cwd, status_var=None):
+        self.log("")
+        self.log(f"> {command}")
+        self.log(f"cwd: {cwd}")
         try:
-            completed = subprocess.run(
-                command,
-                cwd=str(cwd),
-                shell=True,
-                capture_output=True,
-                text=True,
-            )
-
-            output = (completed.stdout or "").strip()
-            error = (completed.stderr or "").strip()
-
-            if output:
-                self.log_output(output)
-            if error:
-                self.log_output(error)
-
-            self.log_output(f"exit code: {completed.returncode}")
-
+            completed = subprocess.run(command, cwd=str(cwd), shell=True, capture_output=True, text=True)
+            out = (completed.stdout or "").strip()
+            err = (completed.stderr or "").strip()
+            if out:
+                self.log(out)
+            if err:
+                self.log(err)
+            self.log(f"exit code: {completed.returncode}")
             if status_var:
-                if completed.returncode == 0:
-                    status_var.set(f"Command completed: {command}")
-                else:
-                    status_var.set(f"Command failed: {command}")
-
-            return completed.returncode, output, error
-
+                status_var.set("Command completed." if completed.returncode == 0 else "Command failed.")
+            return completed.returncode, out, err
         except Exception as exc:
-            self.log_output(str(exc))
+            self.log(str(exc))
             if status_var:
                 status_var.set(f"Command error: {exc}")
             return 1, "", str(exc)
 
-    def run_command_streaming(self, command, cwd, status_var=None, done_message="Command finished."):
+    def run_stream(self, command, cwd, status_var=None, done="Command completed."):
         def worker():
-            self.log_output_threadsafe("")
-            self.log_output_threadsafe(f"> {command}")
-            self.log_output_threadsafe(f"cwd: {cwd}")
-
+            self.log_threadsafe("")
+            self.log_threadsafe(f"> {command}")
+            self.log_threadsafe(f"cwd: {cwd}")
             if status_var:
                 self.after(0, lambda: status_var.set(f"Running: {command}"))
-
             try:
-                process = subprocess.Popen(
-                    command,
-                    cwd=str(cwd),
-                    shell=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True,
-                    bufsize=1,
-                )
-
-                for line in process.stdout:
+                proc = subprocess.Popen(command, cwd=str(cwd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+                for line in proc.stdout:
                     clean = line.rstrip()
                     if clean:
-                        self.log_output_threadsafe(clean)
-
-                return_code = process.wait()
-                self.log_output_threadsafe(f"exit code: {return_code}")
-
+                        self.log_threadsafe(clean)
+                code = proc.wait()
+                self.log_threadsafe(f"exit code: {code}")
                 if status_var:
-                    if return_code == 0:
-                        self.after(0, lambda: status_var.set(done_message))
-                    else:
-                        self.after(0, lambda: status_var.set(f"Command failed: {command}"))
-
+                    self.after(0, lambda: status_var.set(done if code == 0 else f"Command failed: {command}"))
             except Exception as exc:
-                self.log_output_threadsafe(str(exc))
+                self.log_threadsafe(str(exc))
                 if status_var:
                     self.after(0, lambda: status_var.set(f"Command error: {exc}"))
+        threading.Thread(target=worker, daemon=True).start()
 
-        thread = threading.Thread(target=worker, daemon=True)
-        self.command_threads.append(thread)
-        thread.start()
+    def git_root(self):
+        root = self.project_root()
+        if not root:
+            return None
+        if not (root / ".git").exists():
+            if not messagebox.askyesno("No .git folder", f"No .git folder was found in:\n\n{root}\n\nContinue anyway?"):
+                return None
+        return root
 
     def git_status(self):
-        project_root = self.validate_git_root()
-        if not project_root:
-            return
-
-        self.run_command_capture("git status --short", project_root, self.git_status_var)
+        root = self.git_root()
+        if root:
+            self.run_capture("git status --short", root, self.git_status_var)
 
     def git_pull(self):
-        project_root = self.validate_git_root()
-        if not project_root:
-            return
-
-        proceed = messagebox.askyesno(
-            "Confirm git pull",
-            "Run git pull?\n\nThis may modify files in your project folder."
-        )
-        if not proceed:
-            return
-
-        self.run_command_capture("git pull", project_root, self.git_status_var)
+        root = self.git_root()
+        if root and messagebox.askyesno("Confirm git pull", "Run git pull?"):
+            self.run_capture("git pull", root, self.git_status_var)
 
     def git_add_all(self):
-        project_root = self.validate_git_root()
-        if not project_root:
-            return
-
-        self.run_command_capture("git add -A", project_root, self.git_status_var)
-        self.run_command_capture("git status --short", project_root, self.git_status_var)
+        root = self.git_root()
+        if root:
+            self.run_capture("git add -A", root, self.git_status_var)
+            self.run_capture("git status --short", root, self.git_status_var)
 
     def git_commit(self):
-        project_root = self.validate_git_root()
-        if not project_root:
+        root = self.git_root()
+        if not root:
             return
-
-        message = self.git_message_var.get().strip()
-        if not message:
-            messagebox.showerror("Missing commit message", "Please enter a commit message.")
+        msg = self.git_message_var.get().strip()
+        if not msg:
+            messagebox.showerror("Missing commit message", "Enter a commit message.")
             return
-
-        safe_message = message.replace('"', '\\"')
-        code, output, error = self.run_command_capture(
-            f'git commit -m "{safe_message}"',
-            project_root,
-            self.git_status_var,
-        )
-
-        if code != 0 and "nothing to commit" in (output + error).lower():
-            messagebox.showinfo("Nothing to commit", "Git says there is nothing to commit.")
+        safe = msg.replace('"', '\\"')
+        self.run_capture(f'git commit -m "{safe}"', root, self.git_status_var)
 
     def git_push(self):
-        project_root = self.validate_git_root()
-        if not project_root:
-            return
-
-        proceed = messagebox.askyesno(
-            "Confirm git push",
-            "Run git push?\n\nThis will publish your committed changes to the remote repository."
-        )
-        if not proceed:
-            return
-
-        self.run_command_capture("git push", project_root, self.git_status_var)
+        root = self.git_root()
+        if root and messagebox.askyesno("Confirm git push", "Run git push?"):
+            self.run_capture("git push", root, self.git_status_var)
 
     def git_add_commit_push(self):
-        project_root = self.validate_git_root()
-        if not project_root:
+        root = self.git_root()
+        if not root:
             return
-
-        message = self.git_message_var.get().strip()
-        if not message:
-            messagebox.showerror("Missing commit message", "Please enter a commit message.")
+        msg = self.git_message_var.get().strip()
+        if not msg:
+            messagebox.showerror("Missing commit message", "Enter a commit message.")
             return
-
-        proceed = messagebox.askyesno(
-            "Confirm Git Update",
-            "This will run:\n\n"
-            "git add -A\n"
-            f'git commit -m "{message}"\n'
-            "git push\n\n"
-            "Continue?"
-        )
-        if not proceed:
+        if not messagebox.askyesno("Confirm Git Update", f"Run git add, commit, and push?\n\nCommit message:\n{msg}"):
             return
-
-        self.run_command_capture("git add -A", project_root, self.git_status_var)
-
-        safe_message = message.replace('"', '\\"')
-        code, output, error = self.run_command_capture(
-            f'git commit -m "{safe_message}"',
-            project_root,
-            self.git_status_var,
-        )
-
-        combined = (output + "\n" + error).lower()
-
+        self.run_capture("git add -A", root, self.git_status_var)
+        safe = msg.replace('"', '\\"')
+        code, out, err = self.run_capture(f'git commit -m "{safe}"', root, self.git_status_var)
+        combined = (out + "\n" + err).lower()
         if code != 0 and "nothing to commit" not in combined:
-            messagebox.showerror(
-                "Commit failed",
-                "Git commit failed. Check the command output before pushing."
-            )
+            messagebox.showerror("Commit failed", "Commit failed. Check command output.")
             return
-
         if "nothing to commit" in combined:
-            messagebox.showinfo(
-                "Nothing to commit",
-                "Git says there was nothing to commit. Push will be skipped."
-            )
+            messagebox.showinfo("Nothing to commit", "Git says there is nothing to commit. Push skipped.")
             return
+        self.run_capture("git push", root, self.git_status_var)
 
-        self.run_command_capture("git push", project_root, self.git_status_var)
+    def build_project(self):
+        root = self.project_root()
+        cmd = self.build_command_var.get().strip()
+        if root and cmd:
+            self.run_stream(cmd, root, self.build_status_var, "Build completed.")
+        elif not cmd:
+            messagebox.showerror("Missing build command", "Enter a build command.")
 
-    def publish_app(self):
-        project_root = self.validate_package_root()
-        if not project_root:
+    def publish_project(self):
+        root = self.project_root()
+        cmd = self.publish_command_var.get().strip()
+        if not root:
             return
-
-        command = self.publish_command_var.get().strip()
-        if not command:
-            messagebox.showerror(
-                "Missing publish command",
-                "Enter a publish command, such as npm run build && firebase deploy."
-            )
+        if not cmd:
+            messagebox.showerror("Missing publish command", "Enter a publish command.")
             return
+        if messagebox.askyesno("Confirm Publish", f"Run this publish command?\n\n{cmd}"):
+            self.run_stream(cmd, root, self.build_status_var, "Publish completed.")
 
-        proceed = messagebox.askyesno(
-            "Confirm Publish",
-            "This will publish/deploy your app using:\n\n"
-            f"{command}\n\n"
-            "Run this only after testing the dev app.\n\n"
-            "Continue?"
-        )
-
-        if not proceed:
-            return
-
-        self.run_command_streaming(
-            command,
-            project_root,
-            self.publish_status_var,
-            done_message="Publish completed.",
-        )
-
-    def build_only(self):
-        project_root = self.validate_package_root()
-        if not project_root:
-            return
-
-        self.run_command_streaming(
-            "npm run build",
-            project_root,
-            self.publish_status_var,
-            done_message="Build completed.",
-        )
-
-    def start_dev_app(self):
-        if self.dev_process:
+    def start_app(self):
+        if self.run_process:
             try:
-                if self.dev_process.poll() is None:
-                    messagebox.showinfo("Dev app already running", "The dev app is already running.")
+                if self.run_process.poll() is None:
+                    messagebox.showinfo("Already running", "The app is already running.")
                     return
             except Exception:
-                self.dev_process = None
-                self.dev_status_var.set("Old dev app handle was invalid and has been cleared.")
-
-        project_root = self.validate_package_root()
-        if not project_root:
+                self.run_process = None
+        root = self.project_root()
+        cmd = self.run_command_var.get().strip()
+        if not root:
             return
-
-        command = self.dev_command_var.get().strip()
-        if not command:
-            messagebox.showerror("Missing command", "Enter a dev command, such as npm run dev.")
+        if not cmd:
+            messagebox.showerror("Missing run command", "Enter a run command.")
             return
-
         try:
-            if self.dev_separate_window_var.get() and os.name == "nt":
-                cmd_command = f'cmd /k "{command}"'
-
-                self.dev_process = subprocess.Popen(
-                    cmd_command,
-                    cwd=str(project_root),
-                    shell=True,
-                    creationflags=subprocess.CREATE_NEW_CONSOLE,
-                )
-
-                self.dev_status_var.set(
-                    f"Dev app launched in a separate Command Prompt window. PID {self.dev_process.pid}."
-                )
-                self.status_var.set("Dev app launched in separate Command Prompt.")
-                self.log_output("")
-                self.log_output(f"> {cmd_command}")
-                self.log_output(f"cwd: {project_root}")
-                self.log_output("Dev app is running in a separate Command Prompt window.")
-                self.log_output("To stop it: click in that window and press Ctrl+C.")
-                self.after(1500, self.open_browser_if_running)
+            if self.run_in_cmd_var.get() and os.name == "nt":
+                full = f'cmd /k "{cmd}"'
+                self.run_process = subprocess.Popen(full, cwd=str(root), shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
+                self.run_status_var.set(f"App launched in separate Command Prompt. PID {self.run_process.pid}.")
+                self.log("")
+                self.log(f"> {full}")
+                self.log(f"cwd: {root}")
+                self.after(1500, self.open_url_if_set)
                 return
-
-            self.dev_process = subprocess.Popen(
-                command,
-                cwd=str(project_root),
-                shell=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                bufsize=1,
-                creationflags=self.get_creation_flags(),
-            )
-
-            self.dev_status_var.set(f"Dev app starting with PID {self.dev_process.pid}...")
-            self.status_var.set("Dev app starting.")
-
-            self.dev_output_thread = threading.Thread(
-                target=self.read_dev_output,
-                daemon=True,
-            )
-            self.dev_output_thread.start()
-
-            self.after(1500, self.open_browser_if_running)
-
+            self.run_process = subprocess.Popen(cmd, cwd=str(root), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1, creationflags=self.creation_flags())
+            self.run_status_var.set(f"App starting with PID {self.run_process.pid}...")
+            self.run_thread = threading.Thread(target=self.read_run_output, daemon=True)
+            self.run_thread.start()
+            self.after(1500, self.open_url_if_set)
         except Exception as exc:
-            self.dev_process = None
-            messagebox.showerror("Could not start dev app", str(exc))
-            self.dev_status_var.set("Dev app failed to start.")
+            self.run_process = None
+            messagebox.showerror("Could not start app", str(exc))
 
-    def get_creation_flags(self):
-        if os.name == "nt":
-            return subprocess.CREATE_NEW_PROCESS_GROUP
-        return 0
+    def creation_flags(self):
+        return subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
 
-    def read_dev_output(self):
-        if not self.dev_process or not self.dev_process.stdout:
+    def read_run_output(self):
+        if not self.run_process or not self.run_process.stdout:
             return
+        for line in self.run_process.stdout:
+            clean = line.strip()
+            if clean:
+                self.after(0, lambda t=clean: self.update_run_status(t))
+        self.after(0, self.handle_run_end)
 
-        for line in self.dev_process.stdout:
-            clean_line = line.strip()
+    def update_run_status(self, text):
+        self.run_status_var.set(text)
+        self.log(text)
 
-            if not clean_line:
-                continue
-
-            self.after(0, lambda text=clean_line: self.update_dev_status_from_output(text))
-
-        self.after(0, self.handle_dev_process_ended)
-
-    def update_dev_status_from_output(self, text):
-        self.dev_status_var.set(text)
-        self.log_output(text)
-
-        lower = text.lower()
-        if "local:" in lower or "localhost:" in lower or "ready in" in lower:
-            self.status_var.set("Dev app is running.")
-
-    def handle_dev_process_ended(self):
+    def handle_run_end(self):
         try:
-            if self.dev_process and self.dev_process.poll() is not None:
-                code = self.dev_process.poll()
-                self.dev_status_var.set(f"Dev app stopped. Exit code: {code}")
-                self.status_var.set("Dev app stopped.")
+            if self.run_process and self.run_process.poll() is not None:
+                self.run_status_var.set(f"App stopped. Exit code: {self.run_process.poll()}")
         except Exception:
-            self.dev_process = None
-            self.dev_status_var.set("Dev app handle cleared.")
+            self.run_process = None
 
-    def stop_dev_app(self):
-        if not self.dev_process:
-            self.dev_status_var.set("Dev app is not running.")
+    def stop_app(self):
+        if not self.run_process:
+            self.run_status_var.set("App is not running.")
             return
-
         try:
-            if self.dev_process.poll() is not None:
-                self.dev_process = None
-                self.dev_status_var.set("Dev app is not running.")
+            if self.run_process.poll() is not None:
+                self.run_process = None
+                self.run_status_var.set("App is not running.")
                 return
         except Exception:
-            self.dev_process = None
-            self.dev_status_var.set("Invalid dev app handle cleared.")
+            self.run_process = None
+            self.run_status_var.set("Invalid app handle cleared.")
             return
-
         try:
             if os.name == "nt":
                 try:
-                    self.dev_process.send_signal(signal.CTRL_BREAK_EVENT)
+                    self.run_process.send_signal(signal.CTRL_BREAK_EVENT)
                     time.sleep(0.8)
                 except Exception:
                     pass
-
-                if self.dev_process and self.dev_process.poll() is None:
-                    self.dev_process.terminate()
-
-                time.sleep(0.8)
-
-                if self.dev_process and self.dev_process.poll() is None:
-                    self.dev_process.kill()
-            else:
-                self.dev_process.terminate()
-                time.sleep(0.8)
-
-                if self.dev_process.poll() is None:
-                    self.dev_process.kill()
-
-            self.dev_process = None
-            self.dev_status_var.set("Dev app stopped.")
-            self.status_var.set("Dev app stopped.")
-
+            self.run_process.terminate()
+            time.sleep(0.8)
+            if self.run_process.poll() is None:
+                self.run_process.kill()
+            self.run_process = None
+            self.run_status_var.set("App stopped.")
         except Exception as exc:
-            self.dev_process = None
-            self.dev_status_var.set("Dev app handle cleared after stop error.")
-            messagebox.showwarning(
-                "Dev app handle cleared",
-                f"The stored process handle was invalid or could not be stopped cleanly.\n\n{exc}\n\n"
-                "If the server is still running, close the Command Prompt window or use Kill Node on 5173."
-            )
+            self.run_process = None
+            messagebox.showwarning("App handle cleared", f"Could not stop cleanly.\n\n{exc}")
 
-    def restart_dev_app(self):
-        self.stop_dev_app()
-        self.after(1000, self.start_dev_app)
+    def restart_app(self):
+        self.stop_app()
+        self.after(1000, self.start_app)
 
-    def open_browser_if_running(self):
-        if self.dev_process:
-            try:
-                if self.dev_process.poll() is None:
-                    self.open_browser()
-            except Exception:
-                self.dev_process = None
+    def open_url_if_set(self):
+        if self.url_var.get().strip():
+            self.open_url()
 
-    def open_browser(self):
-        url = self.dev_url_var.get().strip() or "http://localhost:5173"
+    def open_url(self):
+        url = self.url_var.get().strip()
+        if not url:
+            messagebox.showinfo("No URL", "No URL is set for this project.")
+            return
         webbrowser.open(url)
 
-    def kill_port_5173(self):
-        proceed = messagebox.askyesno(
-            "Kill Node on port 5173",
-            "This will try to find and kill the process listening on port 5173.\n\n"
-            "Continue?"
-        )
-
-        if not proceed:
+    def kill_node_5173(self):
+        if not messagebox.askyesno("Kill Node on 5173", "Try to kill the process listening on port 5173?"):
             return
-
-        if os.name != "nt":
-            self.run_command_capture("lsof -ti:5173 | xargs kill -9", Path.cwd(), self.dev_status_var)
-            self.dev_process = None
-            return
-
-        command = (
-            'for /f "tokens=5" %a in (\'netstat -ano ^| findstr :5173 ^| findstr LISTENING\') '
-            'do taskkill /PID %a /F'
-        )
-
-        project_root = self.validate_project_root() or Path.cwd()
-        self.run_command_capture(command, project_root, self.dev_status_var)
-        self.dev_process = None
+        if os.name == "nt":
+            cmd = 'for /f "tokens=5" %a in (\'netstat -ano ^| findstr :5173 ^| findstr LISTENING\') do taskkill /PID %a /F'
+        else:
+            cmd = "lsof -ti:5173 | xargs kill -9"
+        self.run_capture(cmd, self.project_root() or Path.cwd(), self.run_status_var)
+        self.run_process = None
 
     def on_close(self):
-        if self.dev_process:
+        if self.run_process:
             try:
-                running = self.dev_process.poll() is None
+                running = self.run_process.poll() is None
             except Exception:
                 running = False
-                self.dev_process = None
-
-            if running:
-                proceed = messagebox.askyesno(
-                    "Dev app is still running",
-                    "The dev app is still running. Stop it before closing?"
-                )
-
-                if proceed:
-                    self.stop_dev_app()
-
-        self.cleanup_temp_dir()
+            if running and messagebox.askyesno("App is still running", "Stop it before closing?"):
+                self.stop_app()
+        self.cleanup_temp()
         self.destroy()
 
 
 def main():
-    app = ZipToSrcInstaller()
+    app = GenericCodeZipInstaller()
     app.mainloop()
-
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,233 @@
+.fp-game-dashboard {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 12px;
+  box-sizing: border-box;
+  color: #111827;
+}
+
+.fp-queue-manager {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+
+.fp-queue-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fp-eyebrow {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.fp-queue-title {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.fp-step-count {
+  min-width: 74px;
+  border-radius: 14px;
+  background: #f3f4f6;
+  padding: 8px;
+  text-align: center;
+}
+
+.fp-step-number {
+  display: block;
+  font-size: 1.4rem;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.fp-step-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.fp-current-command {
+  margin-top: 12px;
+}
+
+.fp-current-command p {
+  margin: 0 0 10px 0;
+  color: #374151;
+}
+
+.fp-primary-button {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: #111827;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.fp-primary-button:active {
+  transform: translateY(1px);
+}
+
+.fp-record-sheets {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fp-accordion-section {
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.fp-accordion-header {
+  width: 100%;
+  border: none;
+  background: #f9fafb;
+  color: #111827;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.fp-accordion-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.fp-accordion-body {
+  padding: 12px 14px 14px 14px;
+}
+
+.fp-field-row {
+  display: grid;
+  grid-template-columns: 42% 58%;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.fp-field-row:last-child {
+  border-bottom: none;
+}
+
+.fp-field-label {
+  color: #6b7280;
+  font-weight: 700;
+}
+
+.fp-field-value {
+  color: #111827;
+  word-break: break-word;
+}
+
+.fp-empty-value {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.fp-subsection {
+  margin-top: 14px;
+}
+
+.fp-subsection h3 {
+  margin: 0 0 6px 0;
+  font-size: 0.95rem;
+}
+
+.fp-subsection p {
+  margin: 0;
+}
+
+.fp-simple-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.fp-muted {
+  color: #6b7280;
+}
+
+.fp-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(17, 24, 39, 0.58);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.fp-modal-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+}
+
+.fp-modal-card h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.35rem;
+}
+
+.fp-modal-card p {
+  margin: 0 0 18px 0;
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+@media (min-width: 720px) {
+  .fp-game-dashboard {
+    padding: 18px;
+  }
+
+  .fp-primary-button {
+    width: auto;
+    min-width: 180px;
+  }
+
+  .fp-current-command {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .fp-current-command p {
+    margin-bottom: 0;
+  }
+}

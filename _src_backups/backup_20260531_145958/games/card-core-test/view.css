@@ -1,0 +1,147 @@
+/* Keep this test view left-aligned and responsive inside whatever
+   wrapper the main engine gives it. Avoid vw-based child widths, because
+   90vw plus a parent padding/margin can create horizontal page scrolling. */
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.card-core-test-view {
+  min-height: 100%;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 20px 0 20px 0;
+  color: #f9fafb;
+  overflow-x: hidden;
+}
+
+.test-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  width: 90%;
+  max-width: 100%;
+  margin: 0 0 16px 0;
+}
+
+.test-header h2 {
+  margin: 0 0 8px;
+}
+
+.test-header p {
+  margin: 0;
+  color: #d1d5db;
+}
+
+.view-controls {
+  min-width: 250px;
+  display: grid;
+  gap: 10px;
+}
+
+.scale-control {
+  min-width: 230px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #111827;
+  border: 1px solid #374151;
+  display: grid;
+  gap: 8px;
+}
+
+.scale-control span {
+  color: #d1d5db;
+  font-size: 14px;
+}
+
+.scale-control input {
+  width: 100%;
+}
+
+.pan-readout {
+  padding: 12px;
+  border-radius: 12px;
+  background: #111827;
+  border: 1px solid #374151;
+  display: grid;
+  gap: 8px;
+}
+
+.pan-readout span {
+  color: #d1d5db;
+  font-size: 14px;
+}
+
+.pan-readout button {
+  border: none;
+  border-radius: 8px;
+  padding: 9px 12px;
+  background: #4b5563;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.state-panel {
+  margin-top: 18px;
+  width: 90%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 16px;
+  border-radius: 12px;
+  background: #111827;
+  border: 1px solid #374151;
+  overflow-x: auto;
+}
+
+.state-panel pre {
+  margin: 8px 0 0;
+  overflow: auto;
+  color: #d1d5db;
+  font-size: 13px;
+}
+
+.viewer-control {
+  min-width: 230px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #111827;
+  border: 1px solid #374151;
+  display: grid;
+  gap: 8px;
+}
+
+.viewer-control span {
+  color: #d1d5db;
+  font-size: 14px;
+}
+
+.viewer-control select {
+  width: 100%;
+  border: 1px solid #4b5563;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #1f2937;
+  color: white;
+}
+
+@media (max-width: 700px) {
+  .test-header {
+    flex-direction: column;
+  }
+
+  .view-controls,
+  .scale-control,
+  .viewer-control {
+    width: 100%;
+    min-width: 0;
+  }
+}

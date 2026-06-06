@@ -1,0 +1,146 @@
+export function createArea({
+  id,
+  name,
+  x = 0,
+  y = 0,
+  width = 900,
+  height = 520,
+  visibility = "public",
+  ownerId = null,
+  objectIds = [],
+}) {
+  return {
+    id,
+    name,
+    x,
+    y,
+    width,
+    height,
+    visibility,
+    ownerId,
+    objectIds,
+  };
+}
+
+export function createCard({
+  id,
+  areaId,
+  frontImage,
+  backImage,
+  x = 0,
+  y = 0,
+  width = 180,
+  height = 250,
+  faceUp = true,
+  zIndex = 1,
+  cardAboveId = null,
+  cardBelowId = null,
+}) {
+  return {
+    id,
+    objectType: "card",
+    areaId,
+    frontImage,
+    backImage,
+    x,
+    y,
+    width,
+    height,
+    faceUp,
+    zIndex,
+    cardAboveId,
+    cardBelowId,
+  };
+}
+
+export function createCardContainer({
+  id,
+  areaId,
+  name = "Container",
+  kind = "discard",
+  ownerId = null,
+  cardIds = [],
+  x = 0,
+  y = 0,
+  width = 180,
+  height = 250,
+  zIndex = 1,
+  cardSpacing = 70,
+  maxCards = null,
+  layout = null,
+  visibility = null,
+  acceptsCards = undefined,
+  allowReorder = undefined,
+  showTopOnly = undefined,
+}) {
+  const presets = {
+    deck: {
+      layout: "stack",
+      visibility: "hidden",
+      acceptsCards: false,
+      allowReorder: false,
+      showTopOnly: true,
+      maxCards: null,
+    },
+    discard: {
+      layout: "stack",
+      visibility: "public",
+      acceptsCards: true,
+      allowReorder: false,
+      showTopOnly: true,
+      maxCards: null,
+    },
+    hand: {
+      layout: "horizontal-spread",
+      visibility: "owner",
+      acceptsCards: true,
+      allowReorder: true,
+      showTopOnly: false,
+      maxCards: null,
+    },
+    slot: {
+      layout: "single",
+      visibility: "public",
+      acceptsCards: true,
+      allowReorder: false,
+      showTopOnly: false,
+      maxCards: 1,
+    },
+    row: {
+      layout: "horizontal-spread",
+      visibility: "public",
+      acceptsCards: true,
+      allowReorder: true,
+      showTopOnly: false,
+      maxCards: null,
+    },
+  };
+
+  const preset = presets[kind] || presets.discard;
+
+  return {
+    id,
+    objectType: "container",
+    areaId,
+    name,
+    kind,
+    ownerId,
+    cardIds,
+    x,
+    y,
+    width,
+    height,
+    zIndex,
+    cardSpacing,
+    maxCards: maxCards ?? preset.maxCards,
+    layout: layout ?? preset.layout,
+    visibility: visibility ?? preset.visibility,
+    acceptsCards: acceptsCards ?? preset.acceptsCards,
+    allowReorder: allowReorder ?? preset.allowReorder,
+    showTopOnly: showTopOnly ?? preset.showTopOnly,
+  };
+}
+
+export function createDeck(options) {
+  return createCardContainer({ ...options, kind: options.kind || options.role || "deck" });
+}

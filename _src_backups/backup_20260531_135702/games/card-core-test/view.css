@@ -1,0 +1,101 @@
+.card-core-test-view {
+  min-height: 100%;
+  padding: 20px;
+  color: #f9fafb;
+}
+
+.test-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  width: 90vw;
+  max-width: 1200px;
+  margin-bottom: 16px;
+}
+
+.test-header h2 {
+  margin: 0 0 8px;
+}
+
+.test-header p {
+  margin: 0;
+  color: #d1d5db;
+}
+
+.view-controls {
+  min-width: 250px;
+  display: grid;
+  gap: 10px;
+}
+
+.scale-control {
+  min-width: 230px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #111827;
+  border: 1px solid #374151;
+  display: grid;
+  gap: 8px;
+}
+
+.scale-control span {
+  color: #d1d5db;
+  font-size: 14px;
+}
+
+.scale-control input {
+  width: 100%;
+}
+
+.pan-readout {
+  padding: 12px;
+  border-radius: 12px;
+  background: #111827;
+  border: 1px solid #374151;
+  display: grid;
+  gap: 8px;
+}
+
+.pan-readout span {
+  color: #d1d5db;
+  font-size: 14px;
+}
+
+.pan-readout button {
+  border: none;
+  border-radius: 8px;
+  padding: 9px 12px;
+  background: #4b5563;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.state-panel {
+  margin-top: 18px;
+  width: 90vw;
+  max-width: 1200px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #111827;
+  border: 1px solid #374151;
+}
+
+.state-panel pre {
+  margin: 8px 0 0;
+  overflow: auto;
+  color: #d1d5db;
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .test-header {
+    flex-direction: column;
+  }
+
+  .view-controls,
+  .scale-control {
+    width: 100%;
+  }
+}
