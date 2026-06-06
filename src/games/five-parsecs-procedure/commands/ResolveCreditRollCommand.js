@@ -49,6 +49,7 @@ export class ResolveCreditRollCommand extends BaseCommand {
     pendingEffectId = "",
     dice = "1D6",
     source = "",
+    modifier = 0,
     appRoll = null,
     status = "pending",
     pauseAfter = false,
@@ -66,6 +67,7 @@ export class ResolveCreditRollCommand extends BaseCommand {
     this.pendingEffectId = pendingEffectId;
     this.dice = dice || "1D6";
     this.source = source || "";
+    this.modifier = Number.isFinite(Number(modifier)) ? Number(modifier) : 0;
     this.appRoll = appRoll;
   }
 
@@ -105,7 +107,8 @@ export class ResolveCreditRollCommand extends BaseCommand {
       return;
     }
 
-    const roundedTotal = Math.floor(total);
+    const rolledTotal = Math.floor(total);
+    const roundedTotal = Math.max(0, rolledTotal + this.modifier);
 
     const commands = engineContext.commandFactory?.createCommandsForCreditRollResolution
       ? engineContext.commandFactory.createCommandsForCreditRollResolution({
@@ -114,6 +117,8 @@ export class ResolveCreditRollCommand extends BaseCommand {
           dice: this.dice,
           source: this.source,
           total: roundedTotal,
+          rolledTotal,
+          modifier: this.modifier,
           appRoll: input.appRoll || this.appRoll || null,
         })
       : [];
@@ -128,7 +133,7 @@ export class ResolveCreditRollCommand extends BaseCommand {
 
     engineContext.addLogEntry({
       type: "commandCompleted",
-      text: `Resolved credit roll ${this.dice}: +${roundedTotal} credits.`,
+      text: `Resolved credit roll ${this.dice}${this.modifier ? ` (${this.modifier})` : ""}: +${roundedTotal} credits.`,
       commandId: this.id,
     });
   }
@@ -139,6 +144,7 @@ export class ResolveCreditRollCommand extends BaseCommand {
       pendingEffectId: this.pendingEffectId,
       dice: this.dice,
       source: this.source,
+      modifier: this.modifier,
       appRoll: this.appRoll,
     });
   }

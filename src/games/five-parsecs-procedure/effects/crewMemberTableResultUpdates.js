@@ -52,6 +52,57 @@ function normalizeCount(value, defaultValue = 1) {
   return Math.max(0, Math.floor(numericValue));
 }
 
+function isCreationResultKind(resultKind) {
+  return ["background", "background1", "background2", "motivation", "motivation1", "motivation2", "class"].includes(
+    cleanResultKind(resultKind)
+  );
+}
+
+function getCreationReductionForResource({ resource, resultKind, crewMemberDetail }) {
+  if (!isCreationResultKind(resultKind)) {
+    return 0;
+  }
+
+  const flags = crewMemberDetail?.flags || {};
+  const resourceType = resource?.type || "";
+
+  if (resourceType === "credits") {
+    const generalReduction = Number(flags.reduceCreationCreditsAndStoryPointsBy || 0);
+    const creditReduction = Number(flags.reduceCreationCreditsBy || 0);
+
+    return Math.max(0, generalReduction + creditReduction);
+  }
+
+  if (resourceType === "storyPoint") {
+    return Math.max(0, Number(flags.reduceCreationCreditsAndStoryPointsBy || 0));
+  }
+
+  return 0;
+}
+
+function shouldSkipResource({ resource, resultKind, crewMemberDetail }) {
+  const flags = crewMemberDetail?.flags || {};
+  const resourceType = resource?.type || "";
+
+  if (
+    resourceType === "credits" &&
+    flags.ignoreBackgroundCreditGains &&
+    cleanResultKind(resultKind).startsWith("background")
+  ) {
+    return true;
+  }
+
+  if (
+    resourceType === "storyPoint" &&
+    flags.ignoreCreationStoryPointBonuses &&
+    isCreationResultKind(resultKind)
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
 function makeEffectId({ crewMemberId, resultKind, sourceLabel, effectType, index }) {
   return [
     crewMemberId || "crew",
@@ -96,9 +147,21 @@ function makePendingEffectFromResource({
   resultKind,
   sourcePath,
   sourceLabel,
+  crewMemberDetail = {},
 }) {
   const resourceType = resource?.type || "resource";
-  const count = normalizeCount(resource?.count, 1);
+
+  if (shouldSkipResource({ resource, resultKind, crewMemberDetail })) {
+    return null;
+  }
+
+  const reduction = getCreationReductionForResource({ resource, resultKind, crewMemberDetail });
+  const count = Math.max(0, normalizeCount(resource?.count, 1) - reduction);
+
+  if (["storyPoint", "rumor", "questRumor", "patron", "rival", "xp"].includes(resourceType) && count <= 0) {
+    return null;
+  }
+
   const base = makeBasePendingEffect({
     crewMemberId,
     crewMemberNumber,
@@ -118,7 +181,8 @@ function makePendingEffectFromResource({
         effectType: "creditRoll",
         resourceType: "credits",
         dice: resource.amount,
-        label: resource.label || `${resource.amount} credits`,
+        modifier: reduction > 0 ? -reduction : undefined,
+        label: resource.label || `${resource.amount}${reduction > 0 ? `-${reduction}` : ""} credits`,
       }),
     };
   }
@@ -381,6 +445,14 @@ function buildTableResultOperations({ result, resultKind, sourcePath }) {
     });
   }
 
+  if (result?.flags && typeof result.flags === "object") {
+    operations.push({
+      op: "merge",
+      path: "flags",
+      value: result.flags,
+    });
+  }
+
   return operations;
 }
 
@@ -390,6 +462,7 @@ function buildPendingEffectOperations({
   sourcePath,
   resultKind,
   result,
+  crewMemberDetail = {},
 }) {
   const sourceLabel = result?.label || result?.value || cleanResultKind(resultKind);
   const operationsByTarget = {
@@ -408,6 +481,7 @@ function buildPendingEffectOperations({
       resultKind,
       sourcePath,
       sourceLabel,
+      crewMemberDetail,
     });
 
     if (pending?.target && pending?.effect) {
@@ -417,6 +491,30 @@ function buildPendingEffectOperations({
         value: pending.effect,
       });
     }
+  });
+
+  (result?.pendingEffects || []).forEach((pendingEffect, index) => {
+    if (!pendingEffect || typeof pendingEffect !== "object") {
+      return;
+    }
+
+    operationsByTarget.crewMember.push({
+      op: "append",
+      path: "pendingEffects",
+      value: removeUndefinedValues({
+        ...makeBasePendingEffect({
+          crewMemberId,
+          crewMemberNumber,
+          result,
+          resultKind,
+          sourcePath,
+          sourceLabel,
+          effectType: pendingEffect.effectType || pendingEffect.type || "pendingEffect",
+          index: `custom-${index}`,
+        }),
+        ...pendingEffect,
+      }),
+    });
   });
 
   (result?.startingRolls || []).forEach((startingRoll, index) => {
@@ -450,6 +548,7 @@ export function buildCrewMemberTableResultUpdateCommands({
   sourcePath,
   resultKind,
   result,
+  crewMemberDetail = {},
 }) {
   const detailPath = `crewLog.crewDetails.${crewMemberId}`;
   const safeResultKind = cleanResultKind(resultKind);
@@ -460,6 +559,7 @@ export function buildCrewMemberTableResultUpdateCommands({
     sourcePath,
     resultKind: safeResultKind,
     result,
+    crewMemberDetail,
   });
 
   const commands = [

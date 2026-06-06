@@ -528,6 +528,12 @@ function CreditRollModal({ command, onConfirm }) {
             <span>App roll</span>
             <strong>{rolls.length > 0 ? rolls.join(" + ") : "Not rolled"}</strong>
           </div>
+          {Number(command.modifier || 0) !== 0 && (
+            <div className="fp-table-roll-line">
+              <span>Modifier</span>
+              <strong>{Number(command.modifier || 0)}</strong>
+            </div>
+          )}
         </div>
 
         {command.errorMessage && (
@@ -558,6 +564,12 @@ function CreditRollModal({ command, onConfirm }) {
           onChange={(event) => setTotal(event.target.value)}
           autoFocus
         />
+
+        {Number(command.modifier || 0) !== 0 && total !== "" && (
+          <p className="fp-muted">
+            Final credits added: {Math.max(0, Math.floor(Number(total) || 0) + Number(command.modifier || 0))}
+          </p>
+        )}
 
         <button className="fp-primary-button" type="submit">
           Add Credits
@@ -821,7 +833,13 @@ function formatInventoryItem(item) {
 
   const category = item.category ? `${item.category}: ` : "";
   const source = item.source ? ` — ${item.source}` : "";
-  return `${category}${item.name || "Unknown Item"}${source}`;
+  const weapon =
+    item.weapon && (item.weapon.range || item.weapon.shots || item.weapon.damage || item.weapon.traits?.length)
+      ? ` [Rng ${item.weapon.range || "—"}, Sh ${item.weapon.shots || "—"}, Dmg ${item.weapon.damage ?? "—"}${item.weapon.traits?.length ? `, ${item.weapon.traits.join(", ")}` : ""}]`
+      : "";
+  const effect = item.gear?.effect ? ` — ${item.gear.effect}` : "";
+
+  return `${category}${item.name || "Unknown Item"}${weapon}${effect}${source}`;
 }
 
 function CrewLogSheet({ crewLog }) {
@@ -848,6 +866,12 @@ function CrewLogSheet({ crewLog }) {
       return `${type} ${level}${source}`.trim();
     });
     const equipmentSummary = summarizeList(detail.equipment, formatInventoryItem);
+    const flagSummary = detail.flags && Object.keys(detail.flags).length > 0
+      ? Object.entries(detail.flags)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join("; ")
+      : "";
+
     const rows = [
       detail.characterType ? `Character Type: ${detail.characterType}` : null,
       detail.crewType?.label ? `Crew Type: ${detail.crewType.label}` : null,
@@ -863,6 +887,7 @@ function CrewLogSheet({ crewLog }) {
       detail.stats ? `Stats: ${formatStats(detail.stats)}` : null,
       saveSummary ? `Saves: ${saveSummary}` : null,
       equipmentSummary ? `Historic Gear: ${equipmentSummary}` : null,
+      flagSummary ? `Flags: ${flagSummary}` : null,
       resourceSummary ? `Resources: ${resourceSummary}` : null,
       startingRollSummary ? `Starting Rolls: ${startingRollSummary}` : null,
       pendingEffectSummary ? `Pending Effects: ${pendingEffectSummary}` : null,

@@ -1,6 +1,8 @@
 import { CommandFactory } from "../../../procedure-core/factory";
 import {
+  ApplyFixedTableResultCommand,
   BuildStartingCrewCommand,
+  BuildStartingStashCommand,
   CrewMemberNameCommand,
   FinalizeCrewMemberCommand,
   QueueCrewMemberTableResultUpdateCommandsCommand,
@@ -10,6 +12,16 @@ import {
 } from "../commands";
 import { buildCrewMemberTableResultUpdateCommands } from "../effects";
 import { EQUIPMENT_ROLL_TABLES_BY_ID } from "../data/tables";
+import {
+  WEAPONS_TABLE,
+  GUN_MODS_TABLE,
+  GUN_SIGHTS_TABLE,
+  CONSUMABLES_TABLE,
+  PROTECTION_TABLE,
+  IMPLANTS_TABLE,
+  UTILITY_DEVICES_TABLE,
+  ONBOARD_ITEMS_TABLE,
+} from "../data/equipment";
 
 
 function normalizeEquipmentTable(table) {
@@ -32,6 +44,57 @@ function normalizeEquipmentTable(table) {
   };
 }
 
+function normalizeLookupName(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[’']/g, "")
+    .replace(/[^a-z0-9]+/g, "")
+    .trim();
+}
+
+const EQUIPMENT_NAME_ALIASES = {
+  handgun: "hand gun",
+  duelingpistol: "duelling pistol",
+  brutalmeleeweapon: "brutal melee weapon",
+  marksmanrifle: "marksman’s rifle",
+};
+
+function findCatalogItemByName(tables, name) {
+  const wanted = normalizeLookupName(EQUIPMENT_NAME_ALIASES[normalizeLookupName(name)] || name);
+
+  return tables.flat().find((item) => normalizeLookupName(item.name) === wanted) || null;
+}
+
+function getCatalogItemForTableSelection({ tableId, name }) {
+  if (["lowTechWeapon", "militaryWeapon", "highTechWeapon"].includes(tableId)) {
+    return {
+      kind: "weapon",
+      item: findCatalogItemByName([WEAPONS_TABLE], name),
+    };
+  }
+
+  return {
+    kind: "gear",
+    item: findCatalogItemByName([
+      GUN_MODS_TABLE,
+      GUN_SIGHTS_TABLE,
+      CONSUMABLES_TABLE,
+      PROTECTION_TABLE,
+      IMPLANTS_TABLE,
+      UTILITY_DEVICES_TABLE,
+      ONBOARD_ITEMS_TABLE,
+    ], name),
+  };
+}
+
+function blankEquipmentDetails() {
+  return {
+    weapon: { range: "", shots: "", damage: "", traits: [], mods: [], sight: "" },
+    armor: { armorValue: "", save: "", traits: [] },
+    gear: { effect: "", uses: "", traits: [] },
+  };
+}
+
 function makeEquipmentRecord({
   selectedRow,
   tableId,
@@ -40,12 +103,40 @@ function makeEquipmentRecord({
   locationType = "character",
 }) {
   const name = selectedRow?.label || selectedRow?.name || selectedRow?.value || "Unknown Equipment";
-  const isWeapon = ["lowTechWeapon", "militaryWeapon", "highTechWeapon"].includes(tableId);
+  const catalog = getCatalogItemForTableSelection({ tableId, name });
+  const item = catalog?.item;
+  const isWeapon = catalog?.kind === "weapon";
+  const details = blankEquipmentDetails();
+
+  if (isWeapon && item) {
+    details.weapon = {
+      range: item.range,
+      shots: item.shots,
+      damage: item.damage,
+      traits: [...(item.traits || [])],
+      mods: [],
+      sight: "",
+    };
+  } else if (item) {
+    details.gear = {
+      effect: item.effect || "",
+      uses: item.singleUse ? 1 : "",
+      traits: [...(item.traits || []), item.type].filter(Boolean),
+    };
+
+    if (item.save || item.type) {
+      details.armor = {
+        armorValue: item.save || "",
+        save: item.save || "",
+        traits: [item.type].filter(Boolean),
+      };
+    }
+  }
 
   return {
     id: `equipment-${Date.now()}-${Math.floor(Math.random() * 1000000)}`,
     name,
-    category: isWeapon ? "weapon" : "gear",
+    category: isWeapon ? "weapon" : item?.save ? "protection" : "gear",
     locationType,
     crewMemberId,
     source: source || "",
@@ -55,6 +146,7 @@ function makeEquipmentRecord({
     origin: locationType === "character" ? "characterCreation" : "stash",
     notes: source ? `Created from ${source}` : "",
     createdAt: new Date().toISOString(),
+    ...details,
   };
 }
 
@@ -137,6 +229,22 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     });
   }
 
+  buildStartingStash({
+    id = "build-starting-stash",
+    title = "Build Starting Crew Stash",
+    crewCountPath = "crewLog.startingCrewCount",
+    pauseAfter = false,
+    visible = false,
+  } = {}) {
+    return new BuildStartingStashCommand({
+      id,
+      title,
+      crewCountPath,
+      pauseAfter,
+      visible,
+    });
+  }
+
   crewMemberName({
     id,
     crewMemberNumber = 1,
@@ -191,6 +299,7 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     sourcePath,
     resultKind,
     result,
+    crewMemberDetail = {},
   }) {
     return buildCrewMemberTableResultUpdateCommands({
       commandFactory: this,
@@ -199,6 +308,7 @@ export class FiveParsecsCommandFactory extends CommandFactory {
       sourcePath,
       resultKind,
       result,
+      crewMemberDetail,
     });
   }
 
@@ -305,6 +415,7 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     pendingEffectId,
     dice = "1D6",
     source = "",
+    modifier = 0,
     title = null,
     pauseAfter = false,
     visible = true,
@@ -315,6 +426,7 @@ export class FiveParsecsCommandFactory extends CommandFactory {
       pendingEffectId,
       dice,
       source,
+      modifier,
       pauseAfter,
       visible,
     });
@@ -326,6 +438,8 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     dice,
     source,
     total,
+    rolledTotal = null,
+    modifier = 0,
     appRoll = null,
   }) {
     return [
@@ -348,8 +462,10 @@ export class FiveParsecsCommandFactory extends CommandFactory {
               source,
               dice,
               total,
+              rolledTotal,
+              modifier,
               appRoll,
-              resolution: `Added ${total} credits.`,
+              resolution: `Added ${total} credits${modifier ? ` after modifier ${modifier}` : ""}.`,
               resolvedAt: new Date().toISOString(),
             },
           },
@@ -461,6 +577,7 @@ export class FiveParsecsCommandFactory extends CommandFactory {
             pendingEffectId: effect.id,
             dice: effect.dice || effect.amount || "1D6",
             source: effect.source || effect.label || "Credit Roll",
+            modifier: effect.modifier || 0,
             title: effect.label || `Roll ${effect.dice || effect.amount || "1D6"} Credits`,
             pauseAfter: false,
             visible: true,
@@ -588,8 +705,14 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     }
 
     switch (commandData.type) {
+      case "applyFixedTableResult":
+        return new ApplyFixedTableResultCommand(commandData);
+
       case "buildStartingCrew":
         return new BuildStartingCrewCommand(commandData);
+
+      case "buildStartingStash":
+        return new BuildStartingStashCommand(commandData);
 
       case "crewMemberName":
         return new CrewMemberNameCommand(commandData);

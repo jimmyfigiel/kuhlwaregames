@@ -155,6 +155,42 @@ function getRollLabel(rollType) {
   }
 }
 
+export function buildFixedCharacterCreationResultCommands({
+  crewMemberId,
+  crewMemberNumber,
+  fixedResults = [],
+}) {
+  if (!Array.isArray(fixedResults) || fixedResults.length === 0) {
+    return [];
+  }
+
+  return fixedResults
+    .map((fixedResult, index) => {
+      const rollType = fixedResult?.rollType;
+      const resultName = fixedResult?.resultName;
+
+      if (!rollType || !resultName) {
+        return null;
+      }
+
+      const resultKind = fixedResult.resultKind || rollType;
+
+      return {
+        id: `${crewMemberId}-fixed-${rollType}-${index}`,
+        type: "applyFixedTableResult",
+        title: `Crew Member ${crewMemberNumber}: Fixed ${rollType} — ${resultName}`,
+        crewMemberId,
+        crewMemberNumber,
+        rollType,
+        resultName,
+        resultKind,
+        pauseAfter: false,
+        visible: false,
+      };
+    })
+    .filter(Boolean);
+}
+
 export function buildCharacterCreationRollCommands({
   crewMemberId,
   crewMemberNumber,

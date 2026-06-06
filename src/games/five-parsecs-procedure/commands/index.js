@@ -6,3 +6,5 @@ export { default as QueueCrewMemberTableResultUpdateCommandsCommand } from "./Qu
 export { default as ResolvePendingEffectsCommand } from "./ResolvePendingEffectsCommand";
 export { QueueEquipmentTableResultUpdateCommandsCommand } from "./QueueEquipmentTableResultUpdateCommandsCommand.js";
 export { ResolveCreditRollCommand, default as ResolveCreditRollCommandDefault } from "./ResolveCreditRollCommand.js";
+export { default as ApplyFixedTableResultCommand } from "./ApplyFixedTableResultCommand";
+export { default as BuildStartingStashCommand } from "./BuildStartingStashCommand";

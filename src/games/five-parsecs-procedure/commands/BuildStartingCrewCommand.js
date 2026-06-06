@@ -1,6 +1,6 @@
 import BaseCommand from "../../../procedure-core/commands/BaseCommand";
 import CrewMemberNameCommand from "./CrewMemberNameCommand";
-import ResolvePendingEffectsCommand from "./ResolvePendingEffectsCommand";
+import BuildStartingStashCommand from "./BuildStartingStashCommand";
 import { removeUndefinedValues } from "../../../procedure-core/utils";
 
 export default class BuildStartingCrewCommand extends BaseCommand {
@@ -44,9 +44,10 @@ export default class BuildStartingCrewCommand extends BaseCommand {
     }
 
     crewMemberCommands.push(
-      new ResolvePendingEffectsCommand({
-        id: "resolve-pending-creation-effects",
-        title: "Resolve Pending Creation Effects",
+      new BuildStartingStashCommand({
+        id: "build-starting-stash",
+        title: "Build Starting Crew Stash",
+        crewCountPath: this.crewCountPath,
         pauseAfter: false,
         visible: false,
       })
