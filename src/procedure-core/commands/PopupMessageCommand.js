@@ -1,7 +1,7 @@
 import BaseCommand from "./BaseCommand";
 import { removeUndefinedValues } from "../utils";
 
-export default class PopupMessageCommand extends BaseCommand {
+export class PopupMessageCommand extends BaseCommand {
   constructor({
     id,
     title = "Message",
@@ -10,6 +10,7 @@ export default class PopupMessageCommand extends BaseCommand {
     status = "pending",
     pauseAfter = true,
     visible = true,
+    autoExecuteOnGameStart = false,
   }) {
     super({
       id,
@@ -18,6 +19,7 @@ export default class PopupMessageCommand extends BaseCommand {
       status,
       pauseAfter,
       visible,
+      autoExecuteOnGameStart,
     });
 
     this.message = message;
@@ -59,3 +61,5 @@ export default class PopupMessageCommand extends BaseCommand {
     });
   }
 }
+
+export default PopupMessageCommand;

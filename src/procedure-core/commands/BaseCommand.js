@@ -1,6 +1,6 @@
 import { removeUndefinedValues } from "../utils";
 
-export default class BaseCommand {
+export class BaseCommand {
   constructor({
     id,
     type,
@@ -8,6 +8,7 @@ export default class BaseCommand {
     status = "pending",
     pauseAfter = false,
     visible = true,
+    autoExecuteOnGameStart = false,
   }) {
     this.id = id;
     this.type = type;
@@ -15,6 +16,7 @@ export default class BaseCommand {
     this.status = status;
     this.pauseAfter = pauseAfter;
     this.visible = visible;
+    this.autoExecuteOnGameStart = autoExecuteOnGameStart === true;
   }
 
   execute(engineContext) {
@@ -37,6 +39,9 @@ export default class BaseCommand {
       status: this.status,
       pauseAfter: this.pauseAfter,
       visible: this.visible,
+      autoExecuteOnGameStart: this.autoExecuteOnGameStart,
     });
   }
 }
+
+export default BaseCommand;

@@ -1,13 +1,24 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MarkovNameGenerator } from "../../procedure-core/name-generator";
-import { pulpyFiveParsecsNames } from "./data/nameSets";
+import { CompoundNameGenerator, MarkovNameGenerator } from "../../procedure-core/name-generator";
+import {
+  FIVE_PARSECS_WORLD_NAME_PARTS,
+  fiveParsecsWorldNames,
+  pulpyFiveParsecsNames,
+} from "./data/nameSets";
 import "./view.css";
 
 const nameGenerator = new MarkovNameGenerator({
   five_parsecs_pulp: pulpyFiveParsecsNames,
+  five_parsecs_world: fiveParsecsWorldNames,
 });
 
+const worldNameGenerator = new CompoundNameGenerator(FIVE_PARSECS_WORLD_NAME_PARTS);
+
 function generateRandomName(nameSetId = "five_parsecs_pulp") {
+  if (nameSetId === "five_parsecs_world_parts") {
+    return worldNameGenerator.generate() || "";
+  }
+
   const generatedName = nameGenerator.generateName(nameSetId);
   return generatedName || "";
 }
@@ -290,7 +301,7 @@ function TextInputModal({ command, onSubmit }) {
         )}
 
         <label className="fp-input-label" htmlFor={`text-input-${command.id}`}>
-          Name
+          {command.label || "Name"}
         </label>
         <input
           id={`text-input-${command.id}`}
@@ -445,6 +456,118 @@ function TableRollModal({ command, onConfirm }) {
   );
 }
 
+
+function parseCreditDiceLabel(diceText) {
+  const cleanText = String(diceText || "1D6").trim().toUpperCase();
+  const match = cleanText.match(/^(\d*)D(\d+)$/);
+
+  if (!match) {
+    return {
+      count: 1,
+      sides: 6,
+      label: cleanText || "1D6",
+    };
+  }
+
+  const count = Number(match[1] || 1);
+  const sides = Number(match[2] || 6);
+
+  return {
+    count: Number.isFinite(count) && count > 0 ? Math.floor(count) : 1,
+    sides: Number.isFinite(sides) && sides > 0 ? Math.floor(sides) : 6,
+    label: cleanText,
+  };
+}
+
+function CreditRollModal({ command, onConfirm }) {
+  const dice = parseCreditDiceLabel(command.dice || "1D6");
+  const [total, setTotal] = useState(command.appRoll?.total ?? "");
+  const [rolls, setRolls] = useState(command.appRoll?.rolls || []);
+
+  function handleRollWithAppDice() {
+    const nextRolls = [];
+
+    for (let index = 0; index < dice.count; index += 1) {
+      nextRolls.push(rollDie(dice.sides));
+    }
+
+    setRolls(nextRolls);
+    setTotal(nextRolls.reduce((sum, roll) => sum + roll, 0));
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    onConfirm({
+      total,
+      appRoll: rolls.length > 0
+        ? {
+            dice,
+            rolls,
+            total: Number(total),
+          }
+        : null,
+    });
+  }
+
+  return (
+    <div className="fp-modal-backdrop">
+      <form className="fp-modal-card" role="dialog" aria-modal="true" onSubmit={handleSubmit}>
+        <h2>{command.title || "Roll Credits"}</h2>
+
+        <p>
+          Source: <strong>{command.source || "Creation effect"}</strong>
+        </p>
+
+        <div className="fp-table-roll-summary">
+          <div className="fp-table-roll-line">
+            <span>Dice</span>
+            <strong>{dice.label}</strong>
+          </div>
+          <div className="fp-table-roll-line">
+            <span>App roll</span>
+            <strong>{rolls.length > 0 ? rolls.join(" + ") : "Not rolled"}</strong>
+          </div>
+        </div>
+
+        {command.errorMessage && (
+          <p className="fp-error-message">{command.errorMessage}</p>
+        )}
+
+        <button
+          className="fp-secondary-button"
+          type="button"
+          onClick={handleRollWithAppDice}
+        >
+          Roll with App Dice
+        </button>
+
+        <p className="fp-table-help-text">
+          Roll physical dice and enter the total, or roll with the app and confirm the total.
+        </p>
+
+        <label className="fp-input-label" htmlFor={`credit-roll-${command.id}`}>
+          Credits to add
+        </label>
+        <input
+          id={`credit-roll-${command.id}`}
+          className="fp-number-input"
+          type="number"
+          min="0"
+          value={total}
+          onChange={(event) => setTotal(event.target.value)}
+          autoFocus
+        />
+
+        <button className="fp-primary-button" type="submit">
+          Add Credits
+        </button>
+      </form>
+    </div>
+  );
+}
+
+
 function QueueManager({ gameState, submitAction, showStackInspectorButton = false, onOpenStackInspector }) {
   const commandQueue = Array.isArray(gameState.commandQueue)
     ? gameState.commandQueue
@@ -472,6 +595,31 @@ function QueueManager({ gameState, submitAction, showStackInspectorButton = fals
   function handlePopupOk() {
     resolveActiveCommand();
   }
+
+  const autoExecutedCommandIdsRef = useRef(new Set());
+
+  useEffect(() => {
+    if (activeCommand || !currentPendingCommand?.autoExecuteOnGameStart) {
+      return;
+    }
+
+    if (autoExecutedCommandIdsRef.current.has(currentPendingCommand.id)) {
+      return;
+    }
+
+    autoExecutedCommandIdsRef.current.add(currentPendingCommand.id);
+
+    submitAction({
+      type: "EXECUTE_QUEUE",
+      stateSnapshot: gameState,
+    });
+  }, [
+    activeCommand,
+    currentPendingCommand?.autoExecuteOnGameStart,
+    currentPendingCommand?.id,
+    gameState,
+    submitAction,
+  ]);
 
   function handleNumberSubmit(value) {
     resolveActiveCommand({ value });
@@ -565,16 +713,25 @@ function QueueManager({ gameState, submitAction, showStackInspectorButton = fals
         />
       )}
 
-      {activeCommand && activeCommand.type === "crewMemberName" && (
-        <TextInputModal
-          key={activeCommand.id}
-          command={activeCommand}
-          onSubmit={handleTextSubmit}
-        />
-      )}
+      {activeCommand &&
+        (activeCommand.type === "crewMemberName" || activeCommand.type === "textInput") && (
+          <TextInputModal
+            key={activeCommand.id}
+            command={activeCommand}
+            onSubmit={handleTextSubmit}
+          />
+        )}
 
       {activeCommand && activeCommand.type === "tableRoll" && (
         <TableRollModal
+          key={activeCommand.id}
+          command={activeCommand}
+          onConfirm={resolveActiveCommand}
+        />
+      )}
+
+      {activeCommand && activeCommand.type === "resolveCreditRoll" && (
+        <CreditRollModal
           key={activeCommand.id}
           command={activeCommand}
           onConfirm={resolveActiveCommand}
@@ -647,6 +804,26 @@ function summarizeList(values, formatter) {
   return values.map(formatter).filter(Boolean).join("; ");
 }
 
+function formatPendingEffect(effect) {
+  if (!effect || typeof effect !== "object") {
+    return "";
+  }
+
+  const label = effect.label || effect.effectType || effect.type || "Effect";
+  const source = effect.source ? ` — ${effect.source}` : "";
+  return `${label}${source}`;
+}
+
+function formatInventoryItem(item) {
+  if (!item || typeof item !== "object") {
+    return "";
+  }
+
+  const category = item.category ? `${item.category}: ` : "";
+  const source = item.source ? ` — ${item.source}` : "";
+  return `${category}${item.name || "Unknown Item"}${source}`;
+}
+
 function CrewLogSheet({ crewLog }) {
   const members = Array.isArray(crewLog.crewMembers)
     ? crewLog.crewMembers
@@ -663,6 +840,14 @@ function CrewLogSheet({ crewLog }) {
     const startingRollSummary = summarizeList(detail.startingRolls, (roll) => {
       return roll.label || `${roll.count || 1} ${roll.type || "starting roll"}`;
     });
+    const pendingEffectSummary = summarizeList(detail.pendingEffects, formatPendingEffect);
+    const saveSummary = summarizeList(detail.saves, (save) => {
+      const type = save.type || "Save";
+      const level = save.level || "";
+      const source = save.source ? ` — ${save.source}` : "";
+      return `${type} ${level}${source}`.trim();
+    });
+    const equipmentSummary = summarizeList(detail.equipment, formatInventoryItem);
     const rows = [
       detail.characterType ? `Character Type: ${detail.characterType}` : null,
       detail.crewType?.label ? `Crew Type: ${detail.crewType.label}` : null,
@@ -676,8 +861,11 @@ function CrewLogSheet({ crewLog }) {
       detail.motivation2?.label ? `Motivation 2: ${detail.motivation2.label}` : null,
       detail.class?.label ? `Class: ${detail.class.label}` : null,
       detail.stats ? `Stats: ${formatStats(detail.stats)}` : null,
+      saveSummary ? `Saves: ${saveSummary}` : null,
+      equipmentSummary ? `Historic Gear: ${equipmentSummary}` : null,
       resourceSummary ? `Resources: ${resourceSummary}` : null,
       startingRollSummary ? `Starting Rolls: ${startingRollSummary}` : null,
+      pendingEffectSummary ? `Pending Effects: ${pendingEffectSummary}` : null,
       Array.isArray(detail.resultNotes) && detail.resultNotes.length > 0
         ? `Notes: ${detail.resultNotes.join("; ")}`
         : null,
@@ -699,6 +887,14 @@ function CrewLogSheet({ crewLog }) {
       <FieldRow label="Starting Crew Members" value={crewLog.startingCrewCount} />
       <FieldRow label="Credits" value={crewLog.credits} />
       <FieldRow label="Ship" value={crewLog.ship} />
+      <FieldRow
+        label="Pending Crew Effects"
+        value={summarizeList(crewLog.pendingEffects, formatPendingEffect)}
+      />
+      <FieldRow
+        label="Inventory / Stash"
+        value={summarizeList(crewLog.inventory, formatInventoryItem)}
+      />
 
       <div className="fp-subsection">
         <h3>Crew Members</h3>
@@ -746,15 +942,28 @@ function EncounterLogSheet({ encounterLog }) {
 }
 
 function WorldLogSheet({ worldLog }) {
-  const traits = Array.isArray(worldLog.worldTraits)
-    ? worldLog.worldTraits
-    : [];
+  const currentWorld =
+    worldLog.currentWorld && typeof worldLog.currentWorld === "object"
+      ? worldLog.currentWorld
+      : { name: worldLog.currentWorld || "" };
+  const traits = Array.isArray(currentWorld.traits)
+    ? currentWorld.traits
+    : Array.isArray(worldLog.worldTraits)
+      ? worldLog.worldTraits
+      : [];
+  const patrons = Array.isArray(worldLog.patrons) ? worldLog.patrons : [];
+  const rivals = Array.isArray(worldLog.rivals) ? worldLog.rivals : [];
+  const pendingWorldEffects = summarizeList(worldLog.pendingEffects, formatPendingEffect);
 
   return (
     <AccordionSection title="World Log">
-      <FieldRow label="Current World" value={worldLog.currentWorld} />
-      <FieldRow label="License" value={worldLog.license} />
-      <FieldRow label="Invasion" value={worldLog.invasion} />
+      <FieldRow label="Current World" value={currentWorld.name} />
+      <FieldRow label="License" value={currentWorld.license || worldLog.license} />
+      <FieldRow label="Invasion" value={currentWorld.invasion || worldLog.invasion} />
+      <FieldRow label="Story Points" value={worldLog.storyPoints} />
+      <FieldRow label="Rumors" value={worldLog.rumors} />
+      <FieldRow label="Quest Rumors" value={worldLog.questRumors} />
+      <FieldRow label="Pending World Effects" value={pendingWorldEffects} />
 
       <div className="fp-subsection">
         <h3>World Traits</h3>
@@ -771,8 +980,34 @@ function WorldLogSheet({ worldLog }) {
       </div>
 
       <div className="fp-subsection">
+        <h3>Patrons</h3>
+        {patrons.length > 0 ? (
+          <ul className="fp-simple-list">
+            {patrons.map((patron, index) => (
+              <li key={patron.id || patron.name || index}>{patron.name || patron}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="fp-muted">No patrons yet.</p>
+        )}
+      </div>
+
+      <div className="fp-subsection">
+        <h3>Rivals</h3>
+        {rivals.length > 0 ? (
+          <ul className="fp-simple-list">
+            {rivals.map((rival, index) => (
+              <li key={rival.id || rival.name || index}>{rival.name || rival}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="fp-muted">No rivals yet.</p>
+        )}
+      </div>
+
+      <div className="fp-subsection">
         <h3>Notes</h3>
-        <p>{worldLog.notes || <EmptyValue />}</p>
+        <p>{currentWorld.notes || worldLog.notes || <EmptyValue />}</p>
       </div>
     </AccordionSection>
   );

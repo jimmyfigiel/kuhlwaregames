@@ -1,5 +1,6 @@
 import BaseCommand from "../../../procedure-core/commands/BaseCommand";
 import CrewMemberNameCommand from "./CrewMemberNameCommand";
+import ResolvePendingEffectsCommand from "./ResolvePendingEffectsCommand";
 import { removeUndefinedValues } from "../../../procedure-core/utils";
 
 export default class BuildStartingCrewCommand extends BaseCommand {
@@ -41,6 +42,15 @@ export default class BuildStartingCrewCommand extends BaseCommand {
         })
       );
     }
+
+    crewMemberCommands.push(
+      new ResolvePendingEffectsCommand({
+        id: "resolve-pending-creation-effects",
+        title: "Resolve Pending Creation Effects",
+        pauseAfter: false,
+        visible: false,
+      })
+    );
 
     engineContext.pushCommandsToTop(crewMemberCommands);
 

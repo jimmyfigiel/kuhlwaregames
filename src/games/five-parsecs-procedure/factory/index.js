@@ -1,1 +1,4 @@
-export { default as FiveParsecsCommandFactory } from "./FiveParsecsCommandFactory";
+export {
+  FiveParsecsCommandFactory,
+  default as FiveParsecsCommandFactoryDefault,
+} from "./FiveParsecsCommandFactory";

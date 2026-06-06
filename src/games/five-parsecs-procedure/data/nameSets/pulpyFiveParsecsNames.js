@@ -1,4 +1,4 @@
-export const pulpyFiveParsecsNames = [
+export const PULPY_FIVE_PARSECS_NAMES = [
   "Ace Braddock",
   "Ada Starling",
   "Ajax Vorn",
@@ -543,4 +543,5 @@ export const pulpyFiveParsecsNames = [
   "Zeddo Vorn"
 ];
 
-export default pulpyFiveParsecsNames;
+export const pulpyFiveParsecsNames = PULPY_FIVE_PARSECS_NAMES;
+export default PULPY_FIVE_PARSECS_NAMES;

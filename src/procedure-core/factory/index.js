@@ -1,1 +1,1 @@
-export { default as CommandFactory } from "./CommandFactory";
+export { CommandFactory, default as CommandFactoryDefault } from "./CommandFactory";

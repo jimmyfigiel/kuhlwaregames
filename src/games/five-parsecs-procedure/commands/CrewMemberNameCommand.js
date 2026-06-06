@@ -90,6 +90,11 @@ export default class CrewMemberNameCommand extends BaseCommand {
           path: `${detailPath}.number`,
           value: this.crewMemberNumber,
         },
+        {
+          op: "setIfMissing",
+          path: `${detailPath}.saves`,
+          value: [],
+        },
       ],
       pauseAfter: false,
       visible: false,

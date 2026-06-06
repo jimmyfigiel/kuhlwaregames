@@ -1,23 +1,25 @@
 import BaseCommand from "./BaseCommand";
 import { removeUndefinedValues } from "../utils";
 
-export class NumberInputCommand extends BaseCommand {
+export class TextInputCommand extends BaseCommand {
   constructor({
     id,
-    title = "Number Input",
-    prompt = "Enter a number.",
-    defaultValue = 0,
-    min = null,
-    max = null,
+    title = "Text Input",
+    prompt = "Enter text.",
+    label = "Text",
+    defaultValue = "",
     saveTo = null,
     buttonText = "OK",
+    allowRandomName = false,
+    randomNameSet = "",
+    randomNameButtonText = "Generate",
     status = "pending",
     pauseAfter = true,
     visible = true,
   }) {
     super({
       id,
-      type: "numberInput",
+      type: "textInput",
       title,
       status,
       pauseAfter,
@@ -25,11 +27,13 @@ export class NumberInputCommand extends BaseCommand {
     });
 
     this.prompt = prompt;
+    this.label = label;
     this.defaultValue = defaultValue;
-    this.min = min;
-    this.max = max;
     this.saveTo = saveTo;
     this.buttonText = buttonText;
+    this.allowRandomName = allowRandomName;
+    this.randomNameSet = randomNameSet;
+    this.randomNameButtonText = randomNameButtonText;
   }
 
   execute(engineContext) {
@@ -48,43 +52,21 @@ export class NumberInputCommand extends BaseCommand {
 
   resolve(engineContext, input = {}) {
     const rawValue = input.value ?? this.defaultValue;
-    const parsedValue = Number(rawValue);
+    const value = String(rawValue || "").trim();
 
-    if (!Number.isFinite(parsedValue)) {
+    if (!value) {
       engineContext.setStatus("waitingForUser");
       engineContext.showActiveCommand({
         ...this,
         status: "waitingForUser",
-        errorMessage: "Please enter a valid number.",
-      });
-      engineContext.stopAfterCurrentCommand();
-      return;
-    }
-
-    if (this.min !== null && parsedValue < this.min) {
-      engineContext.setStatus("waitingForUser");
-      engineContext.showActiveCommand({
-        ...this,
-        status: "waitingForUser",
-        errorMessage: `Please enter a number of at least ${this.min}.`,
-      });
-      engineContext.stopAfterCurrentCommand();
-      return;
-    }
-
-    if (this.max !== null && parsedValue > this.max) {
-      engineContext.setStatus("waitingForUser");
-      engineContext.showActiveCommand({
-        ...this,
-        status: "waitingForUser",
-        errorMessage: `Please enter a number no greater than ${this.max}.`,
+        errorMessage: "Please enter a value.",
       });
       engineContext.stopAfterCurrentCommand();
       return;
     }
 
     if (this.saveTo) {
-      engineContext.setStateValue(this.saveTo, parsedValue);
+      engineContext.setStateValue(this.saveTo, value);
     }
 
     this.status = "complete";
@@ -93,7 +75,7 @@ export class NumberInputCommand extends BaseCommand {
 
     engineContext.addLogEntry({
       type: "commandCompleted",
-      text: `Completed command: ${this.title} (${parsedValue})`,
+      text: `Completed command: ${this.title} (${value})`,
       commandId: this.id,
     });
   }
@@ -102,14 +84,16 @@ export class NumberInputCommand extends BaseCommand {
     return removeUndefinedValues({
       ...super.toJSON(),
       prompt: this.prompt,
+      label: this.label,
       defaultValue: this.defaultValue,
-      min: this.min,
-      max: this.max,
       saveTo: this.saveTo,
       buttonText: this.buttonText,
+      allowRandomName: this.allowRandomName,
+      randomNameSet: this.randomNameSet,
+      randomNameButtonText: this.randomNameButtonText,
       errorMessage: this.errorMessage,
     });
   }
 }
 
-export default NumberInputCommand;
+export default TextInputCommand;

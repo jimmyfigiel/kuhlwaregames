@@ -1,18 +1,27 @@
 import {
   NumberInputCommand,
+  TextInputCommand,
   PopupMessageCommand,
   TableRollCommand,
   UpdateStateCommand,
 } from "../commands";
 
-export default class CommandFactory {
-  popupMessage({ id, title, message, buttonText = "OK", pauseAfter = true }) {
+export class CommandFactory {
+  popupMessage({
+    id,
+    title,
+    message,
+    buttonText = "OK",
+    pauseAfter = true,
+    autoExecuteOnGameStart = false,
+  }) {
     return new PopupMessageCommand({
       id,
       title,
       message,
       buttonText,
       pauseAfter,
+      autoExecuteOnGameStart,
     });
   }
 
@@ -36,6 +45,35 @@ export default class CommandFactory {
       max,
       saveTo,
       buttonText,
+      pauseAfter,
+    });
+  }
+
+
+  textInput({
+    id,
+    title,
+    prompt,
+    label = "Text",
+    defaultValue = "",
+    saveTo = null,
+    buttonText = "OK",
+    allowRandomName = false,
+    randomNameSet = "",
+    randomNameButtonText = "Generate",
+    pauseAfter = true,
+  }) {
+    return new TextInputCommand({
+      id,
+      title,
+      prompt,
+      label,
+      defaultValue,
+      saveTo,
+      buttonText,
+      allowRandomName,
+      randomNameSet,
+      randomNameButtonText,
       pauseAfter,
     });
   }
@@ -94,6 +132,9 @@ export default class CommandFactory {
       case "numberInput":
         return new NumberInputCommand(commandData);
 
+      case "textInput":
+        return new TextInputCommand(commandData);
+
       case "tableRoll":
         return new TableRollCommand(commandData);
 
@@ -105,3 +146,5 @@ export default class CommandFactory {
     }
   }
 }
+
+export default CommandFactory;

@@ -52,7 +52,7 @@ function normalizeTable(table) {
   });
 }
 
-export default class TableRollCommand extends BaseCommand {
+export class TableRollCommand extends BaseCommand {
   constructor({
     id,
     title = "Choose from Table",
@@ -206,3 +206,5 @@ export default class TableRollCommand extends BaseCommand {
     });
   }
 }
+
+export default TableRollCommand;

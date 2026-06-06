@@ -2,7 +2,7 @@
 // Curated science-fiction character-name seed set for Markov-style name generation.
 // This is not a ranked popularity dataset; it is intended as a genre-flavored training list.
 
-export const sciFiNames = [
+export const SCI_FI_NAMES = [
   "Luke Skywalker",
   "Leia Organa",
   "Han Solo",
@@ -505,4 +505,5 @@ export const sciFiNames = [
   "Mensah"
 ];
 
-export default sciFiNames;
+export const sciFiNames = SCI_FI_NAMES;
+export default SCI_FI_NAMES;

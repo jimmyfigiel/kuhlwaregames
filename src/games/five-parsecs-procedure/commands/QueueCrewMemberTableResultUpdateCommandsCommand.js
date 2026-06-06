@@ -1,5 +1,6 @@
 import BaseCommand from "../../../procedure-core/commands/BaseCommand";
 import { removeUndefinedValues } from "../../../procedure-core/utils";
+import ResolvePendingEffectsCommand from "./ResolvePendingEffectsCommand";
 
 export default class QueueCrewMemberTableResultUpdateCommandsCommand extends BaseCommand {
   constructor({
@@ -53,11 +54,24 @@ export default class QueueCrewMemberTableResultUpdateCommandsCommand extends Bas
       : [];
 
     if (commands.length > 0) {
-      engineContext.pushCommandsToTop(commands);
+      const commandsWithImmediateEffectResolution = [
+        ...commands,
+        new ResolvePendingEffectsCommand({
+          id: `${this.id}-resolve-immediate-effects`,
+          title: `Resolve Effects for Crew Member ${this.crewMemberNumber}`,
+          pauseAfter: false,
+          visible: false,
+        }),
+      ];
+
+      engineContext.pushCommandsToTop(commandsWithImmediateEffectResolution);
+      engineContext.setStatus("running");
+      engineContext.continue();
+    } else {
+      engineContext.setStatus("idle");
     }
 
     this.status = "complete";
-    engineContext.setStatus("idle");
 
     engineContext.addLogEntry({
       type: "commandCompleted",

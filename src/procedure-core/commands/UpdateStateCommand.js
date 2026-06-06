@@ -49,7 +49,7 @@ function shallowMerge(existingValue, nextValue) {
   };
 }
 
-export default class UpdateStateCommand extends BaseCommand {
+export class UpdateStateCommand extends BaseCommand {
   constructor({
     id,
     title = "Update State",
@@ -134,7 +134,14 @@ export default class UpdateStateCommand extends BaseCommand {
     });
 
     this.status = "complete";
-    engineContext.setStatus("idle");
+
+    if (this.pauseAfter) {
+      engineContext.setStatus("idle");
+      engineContext.stopAfterCurrentCommand();
+    } else {
+      engineContext.setStatus("running");
+      engineContext.continue();
+    }
 
     engineContext.addLogEntry({
       type: "commandCompleted",
@@ -151,3 +158,5 @@ export default class UpdateStateCommand extends BaseCommand {
     });
   }
 }
+
+export default UpdateStateCommand;

@@ -14,6 +14,22 @@ function buildInitialCommandQueue() {
         message: "Welcome to Five Parsecs from Home! Let's build a crew.",
         buttonText: "OK",
         pauseAfter: false,
+        autoExecuteOnGameStart: true,
+      })
+      .toJSON(),
+    factory
+      .textInput({
+        id: "create-beginning-world",
+        title: "Create Beginning World",
+        prompt: "Name the world where your crew begins.",
+        label: "World Name",
+        defaultValue: "",
+        saveTo: "worldLog.currentWorld.name",
+        buttonText: "OK",
+        allowRandomName: true,
+        randomNameSet: "five_parsecs_world_parts",
+        randomNameButtonText: "Generate World Name",
+        pauseAfter: false,
       })
       .toJSON(),
     factory
@@ -48,6 +64,7 @@ function createBlankState() {
     queueStatus: "idle",
     activeCommand: null,
     commandQueue: [],
+    equipmentRollSelections: {},
 
     crewLog: {
       title: "Crew Log",
@@ -55,8 +72,11 @@ function createBlankState() {
       startingCrewCount: null,
       credits: 0,
       ship: "",
+      inventory: [],
       crewMembers: [],
       crewDetails: {},
+      pendingEffects: [],
+      resolvedEffects: [],
       notes: "",
     },
 
@@ -72,7 +92,21 @@ function createBlankState() {
 
     worldLog: {
       title: "World Log",
-      currentWorld: "",
+      currentWorld: {
+        id: "beginning-world",
+        name: "",
+        traits: [],
+        license: "",
+        invasion: "",
+        notes: "",
+      },
+      patrons: [],
+      rivals: [],
+      rumors: 0,
+      questRumors: 0,
+      storyPoints: 0,
+      pendingEffects: [],
+      resolvedEffects: [],
       worldTraits: [],
       license: "",
       invasion: "",
