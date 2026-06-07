@@ -9,7 +9,7 @@ import {
 } from "./data/nameSets";
 import "./view.css";
 
-const GAME_VERSION = "five-parsecs-procedure-v1-51";
+const GAME_VERSION = "five-parsecs-procedure-v1-52";
 
 const nameGenerator = new MarkovNameGenerator({
   five_parsecs_pulp: pulpyFiveParsecsNames,
@@ -1188,25 +1188,224 @@ function formatFlagSummary(flags) {
 }
 
 
+
+function CardField({ label, value }) {
+  const hasValue = value || value === 0;
+
+  return (
+    <div className="fp-card-field">
+      <span className="fp-card-field-label">{label}</span>
+      <span className="fp-card-field-value">
+        {hasValue ? value : <EmptyValue />}
+      </span>
+    </div>
+  );
+}
+
+function DetailCard({ title, subtitle, badge, children, className = "" }) {
+  return (
+    <article className={`fp-detail-card ${className}`.trim()}>
+      <div className="fp-detail-card-header">
+        <div>
+          <h3>{title}</h3>
+          {subtitle && <p>{subtitle}</p>}
+        </div>
+        {badge && <span className="fp-detail-badge">{badge}</span>}
+      </div>
+      {children && <div className="fp-detail-card-body">{children}</div>}
+    </article>
+  );
+}
+
+function DetailSection({ title, children, emptyText = "None yet." }) {
+  const hasChildren = Boolean(children);
+
+  return (
+    <section className="fp-detail-section">
+      <h3>{title}</h3>
+      {hasChildren ? children : <p className="fp-muted">{emptyText}</p>}
+    </section>
+  );
+}
+
+function StatGrid({ stats, title = "Stats" }) {
+  if (!stats || typeof stats !== "object") {
+    return null;
+  }
+
+  const statRows = [
+    ["reactions", "Reactions"],
+    ["speed", "Speed"],
+    ["combatSkill", "Combat"],
+    ["toughness", "Toughness"],
+    ["savvy", "Savvy"],
+    ["luck", "Luck"],
+  ].filter(([key]) => stats[key] !== undefined && stats[key] !== null);
+
+  if (statRows.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="fp-stat-block">
+      <h4>{title}</h4>
+      <div className="fp-stat-grid">
+        {statRows.map(([key, label]) => (
+          <div className="fp-stat-cell" key={key}>
+            <span>{label}</span>
+            <strong>{stats[key]}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TagList({ values }) {
+  const list = Array.isArray(values)
+    ? values.filter((value) => value !== undefined && value !== null && value !== "")
+    : [];
+
+  if (list.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="fp-tag-list">
+      {list.map((value, index) => (
+        <span className="fp-tag" key={`${formatPlainValue(value)}-${index}`}>
+          {formatPlainValue(value)}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function RuleCardList({ groups }) {
+  const visibleGroups = groups
+    .map((group) => ({
+      ...group,
+      values: Array.isArray(group.values)
+        ? group.values.filter((value) => value !== undefined && value !== null && value !== "")
+        : [],
+    }))
+    .filter((group) => group.values.length > 0);
+
+  if (visibleGroups.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="fp-rule-card-list">
+      {visibleGroups.map((group) => (
+        <article className="fp-rule-card" key={group.title}>
+          <h4>{group.title}</h4>
+          <ul>
+            {group.values.map((value, index) => (
+              <li key={`${group.title}-${index}`}>{formatPlainValue(value)}</li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function ItemCard({ item, fallbackTitle = "Item" }) {
+  if (!item || typeof item !== "object") {
+    return null;
+  }
+
+  const traits = Array.isArray(item.traits) ? item.traits : [];
+  const title = item.name || item.label || item.title || fallbackTitle;
+  const subtitleParts = [item.category, item.type, item.source].filter(Boolean);
+
+  return (
+    <DetailCard
+      title={title}
+      subtitle={subtitleParts.join(" · ")}
+      badge={item.equipped ? "Equipped" : item.status}
+      className="fp-item-card"
+    >
+      <div className="fp-card-field-grid">
+        {item.range !== undefined && <CardField label="Range" value={item.range} />}
+        {item.shots !== undefined && <CardField label="Shots" value={item.shots} />}
+        {item.damage !== undefined && <CardField label="Damage" value={item.damage} />}
+        {item.hands !== undefined && <CardField label="Hands" value={item.hands} />}
+      </div>
+      <TagList values={traits} />
+      {(item.description || item.effect || item.notes) && (
+        <p className="fp-card-note">{item.description || item.effect || item.notes}</p>
+      )}
+    </DetailCard>
+  );
+}
+
+function TableResultCard({ label, result }) {
+  if (!result || typeof result !== "object") {
+    return null;
+  }
+
+  const title = result.label || result.name || result.value || label;
+  const rollRange = result.rollRange || getTableRollRange(result);
+
+  return (
+    <DetailCard title={title} subtitle={label} badge={rollRange !== "—" ? rollRange : null}>
+      {result.description && <p className="fp-card-note">{result.description}</p>}
+    </DetailCard>
+  );
+}
+
+function PendingEffectCard({ effect }) {
+  if (!effect || typeof effect !== "object") {
+    return null;
+  }
+
+  const title = effect.label || effect.effectType || effect.type || "Pending Effect";
+  const subtitle = effect.source || effect.target || "Pending";
+
+  return (
+    <DetailCard title={title} subtitle={subtitle} badge={effect.count || effect.amount || effect.dice}>
+      {effect.description && <p className="fp-card-note">{effect.description}</p>}
+    </DetailCard>
+  );
+}
+
 function CampaignSheet({ campaign }) {
   const safeCampaign = campaign && typeof campaign === "object" ? campaign : {};
 
   return (
     <AccordionSection title="Campaign" defaultOpen={false}>
-      <FieldRow label="Turn" value={safeCampaign.turnNumber ?? 0} />
-      <FieldRow label="Phase" value={safeCampaign.phase || "setup"} />
-      <FieldRow label="Status" value={safeCampaign.status || "setup"} />
-      <FieldRow label="Current Step" value={safeCampaign.currentStep || "initialSetup"} />
-      <FieldRow label="Crew Size" value={safeCampaign.crewSize || "Not set"} />
-      <FieldRow label="Deploy Limit" value={safeCampaign.deployLimit || "Not set"} />
-      <FieldRow label="Enemy Number Rule" value={safeCampaign.enemyNumberRuleLabel || "Not set"} />
-      <FieldRow label="Story Track" value={safeCampaign.storyTrackLabel || "No Story Track"} />
-      <FieldRow label="Victory Condition" value={safeCampaign.victoryConditionLabel || "No Victory Condition"} />
-      <FieldRow label="Difficulty" value={safeCampaign.difficultyModeLabel || "Normal"} />
-      <FieldRow label="Starting Story Points" value={safeCampaign.startingStoryPoints ?? 0} />
-      <FieldRow label="Story Point Rule" value={safeCampaign.storyPointRule || safeCampaign.startingStoryPointAdjustmentLabel || "Standard"} />
-      <FieldRow label="Setup Complete" value={safeCampaign.setupComplete ? "Yes" : "No"} />
-      <FieldRow label="Version" value={GAME_VERSION} />
+      <div className="fp-card-stack">
+        <DetailCard
+          title={`Campaign Turn ${safeCampaign.turnNumber ?? 0}`}
+          subtitle={`${safeCampaign.phase || "setup"} · ${safeCampaign.status || "setup"}`}
+          badge={safeCampaign.setupComplete ? "Setup Complete" : "Setup"}
+        >
+          <div className="fp-card-field-grid">
+            <CardField label="Current Step" value={safeCampaign.currentStep || "initialSetup"} />
+            <CardField label="Crew Size" value={safeCampaign.crewSize || "Not set"} />
+            <CardField label="Deploy Limit" value={safeCampaign.deployLimit || "Not set"} />
+            <CardField label="Enemy Numbers" value={safeCampaign.enemyNumberRuleLabel || "Not set"} />
+          </div>
+        </DetailCard>
+
+        <DetailCard title="Campaign Options" subtitle="Story, victory, and difficulty">
+          <div className="fp-card-field-grid">
+            <CardField label="Story Track" value={safeCampaign.storyTrackLabel || "No Story Track"} />
+            <CardField label="Victory" value={safeCampaign.victoryConditionLabel || "No Victory Condition"} />
+            <CardField label="Difficulty" value={safeCampaign.difficultyModeLabel || "Normal"} />
+            <CardField label="Version" value={GAME_VERSION} />
+          </div>
+        </DetailCard>
+
+        <DetailCard title="Story Points" subtitle={safeCampaign.storyPointRule || safeCampaign.startingStoryPointAdjustmentLabel || "Standard"}>
+          <div className="fp-card-field-grid">
+            <CardField label="Starting" value={safeCampaign.startingStoryPoints ?? 0} />
+            <CardField label="Current" value={safeCampaign.storyPoints ?? safeCampaign.startingStoryPoints ?? 0} />
+          </div>
+        </DetailCard>
+      </div>
     </AccordionSection>
   );
 }
@@ -1216,156 +1415,185 @@ function CrewLogSheet({ crewLog }) {
     ? crewLog.crewMembers
     : [];
   const crewDetails = crewLog.crewDetails || {};
+  const inventory = Array.isArray(crewLog.inventory) ? crewLog.inventory : [];
+  const pendingEffects = Array.isArray(crewLog.pendingEffects) ? crewLog.pendingEffects : [];
+  const starship = crewLog.starship && typeof crewLog.starship === "object" ? crewLog.starship : null;
 
-  function renderCrewDetail(member) {
+  function renderCrewDetail(member, index) {
     const detail = crewDetails[member.id] || {};
-    const resourceSummary = summarizeList(detail.resources, (resource) => {
-      const amount = resource.amount ?? resource.count ?? "";
-      const label = resource.label || resource.type || "Resource";
-      return amount ? `${amount} ${label}` : label;
-    });
-    const startingRollSummary = summarizeList(detail.startingRolls, (roll) => {
-      return roll.label || `${roll.count || 1} ${roll.type || "starting roll"}`;
-    });
-    const pendingEffectSummary = summarizeList(detail.pendingEffects, formatPendingEffect);
+    const equipment = Array.isArray(detail.equipment) ? detail.equipment : [];
+    const pendingMemberEffects = Array.isArray(detail.pendingEffects) ? detail.pendingEffects : [];
+    const creationResults = [
+      ["Crew Type", detail.crewType],
+      ["Primary Alien", detail.primaryAlien],
+      ["Strange Character", detail.strangeCharacter],
+      ["Background", detail.background],
+      ["Background 1", detail.background1],
+      ["Background 2", detail.background2],
+      ["Motivation", detail.motivation],
+      ["Motivation 1", detail.motivation1],
+      ["Motivation 2", detail.motivation2],
+      ["Class", detail.class],
+    ].filter(([, result]) => result);
+
+    const ruleGroups = [
+      { title: "Special Rules", values: detail.specialRules },
+      { title: "Restrictions", values: detail.restrictions },
+      { title: "Battle Rules", values: detail.battleRules },
+      { title: "Movement Rules", values: detail.movementRules },
+      { title: "Campaign Rules", values: detail.campaignRules },
+      { title: "Campaign Turn Rules", values: detail.campaignTurnRules },
+      { title: "Campaign Event Rules", values: detail.campaignEventRules },
+      { title: "Post-Battle Rules", values: detail.postBattleRules },
+      { title: "Injury Rules", values: detail.injuryRules },
+      { title: "Equipment Rules", values: detail.equipmentRules },
+      { title: "Advancement Rules", values: detail.advancementRules },
+      { title: "Task Rules", values: detail.campaignTaskRules },
+      { title: "Task Restrictions", values: detail.campaignTaskRestrictions },
+      { title: "Event Rules", values: detail.eventRules },
+      { title: "Creation Rules", values: detail.creationRules },
+      { title: "Notes", values: detail.resultNotes },
+    ];
+
+    const flagSummary = formatFlagSummary(detail.flags);
     const saveSummary = summarizeList(detail.saves, (save) => {
       const type = save.type || "Save";
       const level = save.level || "";
       const source = save.source ? ` — ${save.source}` : "";
       return `${type} ${level}${source}`.trim();
     });
-    const equipmentSummary = summarizeList(detail.equipment, formatInventoryItem);
-    const flagSummary = formatFlagSummary(detail.flags);
-    const specialRuleSummary = summarizeList(detail.specialRules, formatPlainValue);
-    const restrictionSummary = summarizeList(detail.restrictions, formatPlainValue);
-    const battleRuleSummary = summarizeList(detail.battleRules, formatPlainValue);
-    const movementRuleSummary = summarizeList(detail.movementRules, formatPlainValue);
-    const campaignRuleSummary = summarizeList(detail.campaignRules, formatPlainValue);
-    const campaignTurnRuleSummary = summarizeList(detail.campaignTurnRules, formatPlainValue);
-    const campaignEventRuleSummary = summarizeList(detail.campaignEventRules, formatPlainValue);
-    const postBattleRuleSummary = summarizeList(detail.postBattleRules, formatPlainValue);
-    const injuryRuleSummary = summarizeList(detail.injuryRules, formatPlainValue);
-    const equipmentRuleSummary = summarizeList(detail.equipmentRules, formatPlainValue);
-    const advancementRuleSummary = summarizeList(detail.advancementRules, formatPlainValue);
-    const taskRuleSummary = summarizeList(detail.campaignTaskRules, formatPlainValue);
-    const taskRestrictionSummary = summarizeList(detail.campaignTaskRestrictions, formatPlainValue);
-    const eventRuleSummary = summarizeList(detail.eventRules, formatPlainValue);
-    const creationRuleSummary = summarizeList(detail.creationRules, formatPlainValue);
-    const rows = [
-      detail.characterType ? `Character Type: ${detail.characterType}` : null,
-      detail.crewType?.label ? `Crew Type: ${detail.crewType.label}` : null,
-      detail.primaryAlien?.label ? `Primary Alien: ${detail.primaryAlien.label}` : null,
-      detail.strangeCharacter?.label ? `Strange Character: ${detail.strangeCharacter.label}` : null,
-      detail.background?.label ? `Background: ${detail.background.label}` : null,
-      detail.background1?.label ? `Background 1: ${detail.background1.label}` : null,
-      detail.background2?.label ? `Background 2: ${detail.background2.label}` : null,
-      detail.motivation?.label ? `Motivation: ${detail.motivation.label}` : null,
-      detail.motivation1?.label ? `Motivation 1: ${detail.motivation1.label}` : null,
-      detail.motivation2?.label ? `Motivation 2: ${detail.motivation2.label}` : null,
-      detail.class?.label ? `Class: ${detail.class.label}` : null,
-      detail.stats ? `Stats: ${formatStats(detail.stats)}` : null,
-      detail.maxStats ? `Max Stats: ${formatStats(detail.maxStats)}` : null,
-      flagSummary ? `Flags: ${flagSummary}` : null,
-      detail.implantLimit !== undefined && detail.implantLimit !== null ? `Implant Limit: ${detail.implantLimit}` : null,
-      detail.injuryTable ? `Injury Table: ${detail.injuryTable}` : null,
-      saveSummary ? `Saves: ${saveSummary}` : null,
-      specialRuleSummary ? `Special Rules: ${specialRuleSummary}` : null,
-      restrictionSummary ? `Restrictions: ${restrictionSummary}` : null,
-      battleRuleSummary ? `Battle Rules: ${battleRuleSummary}` : null,
-      movementRuleSummary ? `Movement Rules: ${movementRuleSummary}` : null,
-      campaignRuleSummary ? `Campaign Rules: ${campaignRuleSummary}` : null,
-      campaignTurnRuleSummary ? `Campaign Turn Rules: ${campaignTurnRuleSummary}` : null,
-      campaignEventRuleSummary ? `Campaign Event Rules: ${campaignEventRuleSummary}` : null,
-      postBattleRuleSummary ? `Post-Battle Rules: ${postBattleRuleSummary}` : null,
-      injuryRuleSummary ? `Injury Rules: ${injuryRuleSummary}` : null,
-      equipmentRuleSummary ? `Equipment Rules: ${equipmentRuleSummary}` : null,
-      advancementRuleSummary ? `Advancement Rules: ${advancementRuleSummary}` : null,
-      taskRuleSummary ? `Task Rules: ${taskRuleSummary}` : null,
-      taskRestrictionSummary ? `Task Restrictions: ${taskRestrictionSummary}` : null,
-      eventRuleSummary ? `Event Rules: ${eventRuleSummary}` : null,
-      creationRuleSummary ? `Creation Rules: ${creationRuleSummary}` : null,
-      equipmentSummary ? `Historic Gear: ${equipmentSummary}` : null,
-      resourceSummary ? `Resources: ${resourceSummary}` : null,
-      startingRollSummary ? `Starting Rolls: ${startingRollSummary}` : null,
-      pendingEffectSummary ? `Pending Effects: ${pendingEffectSummary}` : null,
-      Array.isArray(detail.resultNotes) && detail.resultNotes.length > 0
-        ? `Notes: ${detail.resultNotes.join("; ")}`
-        : null,
-      detail.creationComplete ? "Creation complete" : null,
-    ].filter(Boolean);
 
     return (
-      <div className="fp-crew-member-detail">
-        {rows.map((row) => (
-          <span key={row}>{row}</span>
-        ))}
-      </div>
+      <DetailCard
+        title={`${member.number || index + 1}. ${member.name || "Unnamed Crew Member"}`}
+        subtitle={[detail.characterType, detail.class?.label, detail.background?.label].filter(Boolean).join(" · ")}
+        badge={detail.creationComplete ? "Complete" : "Creating"}
+        className="fp-crew-member-card"
+      >
+        <StatGrid stats={detail.stats} />
+        <StatGrid stats={detail.maxStats} title="Maximums" />
+
+        <DetailSection title="Profile">
+          <div className="fp-card-field-grid">
+            <CardField label="Character Type" value={detail.characterType} />
+            <CardField label="Implant Limit" value={detail.implantLimit} />
+            <CardField label="Injury Table" value={detail.injuryTable} />
+            <CardField label="Saves" value={saveSummary} />
+            <CardField label="Flags" value={flagSummary} />
+          </div>
+        </DetailSection>
+
+        <DetailSection title="Weapons & Gear" emptyText="No personal equipment yet.">
+          {equipment.length > 0 ? (
+            <div className="fp-card-list">
+              {equipment.map((item, itemIndex) => (
+                <ItemCard item={item} key={item.id || item.name || itemIndex} />
+              ))}
+            </div>
+          ) : null}
+        </DetailSection>
+
+        <DetailSection title="Special Rules" emptyText="No special rules yet.">
+          <RuleCardList groups={ruleGroups} />
+        </DetailSection>
+
+        <DetailSection title="Creation Results" emptyText="No creation results yet.">
+          {creationResults.length > 0 ? (
+            <div className="fp-card-list fp-compact-card-list">
+              {creationResults.map(([label, result]) => (
+                <TableResultCard label={label} result={result} key={`${member.id}-${label}`} />
+              ))}
+            </div>
+          ) : null}
+        </DetailSection>
+
+        <DetailSection title="Pending Effects" emptyText="No pending effects.">
+          {pendingMemberEffects.length > 0 ? (
+            <div className="fp-card-list fp-compact-card-list">
+              {pendingMemberEffects.map((effect, effectIndex) => (
+                <PendingEffectCard effect={effect} key={effect.id || effectIndex} />
+              ))}
+            </div>
+          ) : null}
+        </DetailSection>
+      </DetailCard>
     );
   }
 
   return (
     <AccordionSection title="Crew">
-      <FieldRow label="Crew Name" value={crewLog.crewName} />
-      <FieldRow label="Starting Crew Members" value={crewLog.startingCrewCount} />
-      <FieldRow label="Credits" value={crewLog.credits} />
-      <FieldRow label="Ship" value={crewLog.ship} />
-      {crewLog.starship && typeof crewLog.starship === "object" && (
-        <>
-          <FieldRow label="Ship Type" value={crewLog.starship.shipType} />
-          <FieldRow label="Hull" value={`${crewLog.starship.hullDamage ?? 0} / ${crewLog.starship.hullThreshold ?? 0}`} />
-          <FieldRow label="Debt Owed" value={crewLog.starship.debtOwed} />
-          <FieldRow label="Ship Traits" value={Array.isArray(crewLog.starship.traits) && crewLog.starship.traits.length > 0 ? crewLog.starship.traits.join("; ") : "None"} />
-        </>
-      )}
-      <FieldRow
-        label="Pending Crew Effects"
-        value={summarizeList(crewLog.pendingEffects, formatPendingEffect)}
-      />
-      <FieldRow
-        label="Inventory / Stash"
-        value={summarizeList(crewLog.inventory, formatInventoryItem)}
-      />
+      <div className="fp-card-stack">
+        <DetailCard title={crewLog.crewName || "Crew"} subtitle="Crew overview">
+          <div className="fp-card-field-grid">
+            <CardField label="Starting Crew" value={crewLog.startingCrewCount} />
+            <CardField label="Credits" value={crewLog.credits ?? 0} />
+            <CardField label="Pending Effects" value={pendingEffects.length} />
+            <CardField label="Stash Items" value={inventory.length} />
+          </div>
+        </DetailCard>
 
-      <div className="fp-subsection">
-        <h3>Crew Members</h3>
-
-        {members.length > 0 ? (
-          <ul className="fp-simple-list fp-crew-list">
-            {members.map((member, index) => (
-              <li key={member.id || `${member.name}-${index}`}>
-                <div className="fp-crew-member-name">
-                  {member.number ? `${member.number}. ` : ""}
-                  {member.name}
-                </div>
-                {renderCrewDetail(member)}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="fp-muted">No crew members yet.</p>
+        {starship && (
+          <DetailCard
+            title={starship.name || crewLog.ship || "Starship"}
+            subtitle={starship.shipType || "Ship"}
+            badge={starship.hasShip ? "Crew Ship" : null}
+          >
+            <div className="fp-card-field-grid">
+              <CardField label="Hull" value={`${starship.hullDamage ?? 0} / ${starship.hullThreshold ?? 0}`} />
+              <CardField label="Debt Owed" value={starship.debtOwed} />
+              <CardField label="Financed" value={starship.financedAmount} />
+            </div>
+            <TagList values={starship.traits} />
+          </DetailCard>
         )}
-      </div>
 
-      <div className="fp-subsection">
-        <h3>Notes</h3>
-        <p>{crewLog.notes || <EmptyValue />}</p>
+        <DetailSection title="Crew Stash" emptyText="No stash equipment yet.">
+          {inventory.length > 0 ? (
+            <div className="fp-card-list">
+              {inventory.map((item, itemIndex) => (
+                <ItemCard item={item} key={item.id || item.name || itemIndex} />
+              ))}
+            </div>
+          ) : null}
+        </DetailSection>
+
+        <DetailSection title="Crew Members" emptyText="No crew members yet.">
+          {members.length > 0 ? (
+            <div className="fp-card-stack">
+              {members.map((member, index) => (
+                <div key={member.id || `${member.name}-${index}`}>{renderCrewDetail(member, index)}</div>
+              ))}
+            </div>
+          ) : null}
+        </DetailSection>
+
+        <DetailSection title="Notes">
+          <p>{crewLog.notes || <EmptyValue />}</p>
+        </DetailSection>
       </div>
     </AccordionSection>
   );
 }
 
 function EncounterLogSheet({ encounterLog }) {
+  const safeEncounter = encounterLog && typeof encounterLog === "object" ? encounterLog : {};
+
   return (
     <AccordionSection title="Encounter">
-      <FieldRow label="Patron" value={encounterLog.patron} />
-      <FieldRow label="Rival" value={encounterLog.rival} />
-      <FieldRow label="Objective" value={encounterLog.objective} />
-      <FieldRow label="Enemy" value={encounterLog.enemy} />
-      <FieldRow label="Result" value={encounterLog.result} />
+      <div className="fp-card-stack">
+        <DetailCard title="Current Encounter" subtitle="Battle and job tracking">
+          <div className="fp-card-field-grid">
+            <CardField label="Patron" value={safeEncounter.patron} />
+            <CardField label="Rival" value={safeEncounter.rival} />
+            <CardField label="Objective" value={safeEncounter.objective} />
+            <CardField label="Enemy" value={safeEncounter.enemy} />
+            <CardField label="Result" value={safeEncounter.result} />
+          </div>
+        </DetailCard>
 
-      <div className="fp-subsection">
-        <h3>Notes</h3>
-        <p>{encounterLog.notes || <EmptyValue />}</p>
+        <DetailSection title="Notes">
+          <p>{safeEncounter.notes || <EmptyValue />}</p>
+        </DetailSection>
       </div>
     </AccordionSection>
   );
@@ -1383,61 +1611,72 @@ function WorldLogSheet({ worldLog }) {
       : [];
   const patrons = Array.isArray(worldLog.patrons) ? worldLog.patrons : [];
   const rivals = Array.isArray(worldLog.rivals) ? worldLog.rivals : [];
-  const pendingWorldEffects = summarizeList(worldLog.pendingEffects, formatPendingEffect);
+  const pendingWorldEffects = Array.isArray(worldLog.pendingEffects) ? worldLog.pendingEffects : [];
 
   return (
     <AccordionSection title="World">
-      <FieldRow label="Current World" value={currentWorld.name} />
-      <FieldRow label="License" value={currentWorld.license || worldLog.license} />
-      <FieldRow label="Invasion" value={currentWorld.invasion || worldLog.invasion} />
-      <FieldRow label="Story Points" value={worldLog.storyPoints} />
-      <FieldRow label="Rumors" value={worldLog.rumors} />
-      <FieldRow label="Quest Rumors" value={worldLog.questRumors} />
-      <FieldRow label="Pending World Effects" value={pendingWorldEffects} />
+      <div className="fp-card-stack">
+        <DetailCard title={currentWorld.name || "Current World"} subtitle="World status">
+          <div className="fp-card-field-grid">
+            <CardField label="License" value={currentWorld.license || worldLog.license} />
+            <CardField label="Invasion" value={currentWorld.invasion || worldLog.invasion} />
+            <CardField label="Story Points" value={worldLog.storyPoints} />
+            <CardField label="Rumors" value={worldLog.rumors} />
+            <CardField label="Quest Rumors" value={worldLog.questRumors} />
+            <CardField label="Pending Effects" value={pendingWorldEffects.length} />
+          </div>
+          <TagList values={traits} />
+        </DetailCard>
 
-      <div className="fp-subsection">
-        <h3>World Traits</h3>
+        <DetailSection title="Patrons" emptyText="No patrons yet.">
+          {patrons.length > 0 ? (
+            <div className="fp-card-list fp-compact-card-list">
+              {patrons.map((patron, index) => {
+                const patronObject = typeof patron === "object" ? patron : { name: patron };
+                return (
+                  <DetailCard
+                    title={patronObject.name || "Unnamed Patron"}
+                    subtitle={patronObject.source || patronObject.type || "Patron"}
+                    badge={patronObject.status}
+                    key={patronObject.id || patronObject.name || index}
+                  />
+                );
+              })}
+            </div>
+          ) : null}
+        </DetailSection>
 
-        {traits.length > 0 ? (
-          <ul className="fp-simple-list">
-            {traits.map((trait) => (
-              <li key={trait}>{trait}</li>
-            ))}
-          </ul>
-        ) : (
-          <p className="fp-muted">No world traits yet.</p>
-        )}
-      </div>
+        <DetailSection title="Rivals" emptyText="No rivals yet.">
+          {rivals.length > 0 ? (
+            <div className="fp-card-list fp-compact-card-list">
+              {rivals.map((rival, index) => {
+                const rivalObject = typeof rival === "object" ? rival : { name: rival };
+                return (
+                  <DetailCard
+                    title={rivalObject.name || "Unnamed Rival"}
+                    subtitle={rivalObject.source || rivalObject.type || "Rival"}
+                    badge={rivalObject.status}
+                    key={rivalObject.id || rivalObject.name || index}
+                  />
+                );
+              })}
+            </div>
+          ) : null}
+        </DetailSection>
 
-      <div className="fp-subsection">
-        <h3>Patrons</h3>
-        {patrons.length > 0 ? (
-          <ul className="fp-simple-list">
-            {patrons.map((patron, index) => (
-              <li key={patron.id || patron.name || index}>{patron.name || patron}</li>
-            ))}
-          </ul>
-        ) : (
-          <p className="fp-muted">No patrons yet.</p>
-        )}
-      </div>
+        <DetailSection title="Pending World Effects" emptyText="No pending world effects.">
+          {pendingWorldEffects.length > 0 ? (
+            <div className="fp-card-list fp-compact-card-list">
+              {pendingWorldEffects.map((effect, index) => (
+                <PendingEffectCard effect={effect} key={effect.id || index} />
+              ))}
+            </div>
+          ) : null}
+        </DetailSection>
 
-      <div className="fp-subsection">
-        <h3>Rivals</h3>
-        {rivals.length > 0 ? (
-          <ul className="fp-simple-list">
-            {rivals.map((rival, index) => (
-              <li key={rival.id || rival.name || index}>{rival.name || rival}</li>
-            ))}
-          </ul>
-        ) : (
-          <p className="fp-muted">No rivals yet.</p>
-        )}
-      </div>
-
-      <div className="fp-subsection">
-        <h3>Notes</h3>
-        <p>{currentWorld.notes || worldLog.notes || <EmptyValue />}</p>
+        <DetailSection title="Notes">
+          <p>{currentWorld.notes || worldLog.notes || <EmptyValue />}</p>
+        </DetailSection>
       </div>
     </AccordionSection>
   );

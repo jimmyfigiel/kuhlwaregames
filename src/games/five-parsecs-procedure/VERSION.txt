@@ -1,3 +1,2 @@
-five-parsecs-procedure-v1-51
-Built from v1-50.
-Adds real Campaign Prep sequence without house rules.
+five-parsecs-procedure-v1-52
+Built from v1-51. Adds mobile card-style record views for Crew, Ship, Encounter, and World data.

@@ -767,3 +767,219 @@
   opacity: 0.55;
   cursor: not-allowed;
 }
+
+/* v1-52 mobile record cards */
+.fp-card-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.fp-card-list {
+  display: grid;
+  gap: 10px;
+}
+
+.fp-compact-card-list {
+  gap: 8px;
+}
+
+.fp-detail-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.fp-detail-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px;
+  background: #f9fafb;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.fp-detail-card-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: #111827;
+}
+
+.fp-detail-card-header p {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.fp-detail-badge {
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: #111827;
+  color: #ffffff;
+  padding: 5px 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  max-width: 42%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fp-detail-card-body {
+  padding: 12px;
+}
+
+.fp-card-field-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.fp-card-field {
+  border: 1px solid #f3f4f6;
+  border-radius: 10px;
+  padding: 9px 10px;
+  background: #ffffff;
+}
+
+.fp-card-field-label {
+  display: block;
+  color: #6b7280;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fp-card-field-value {
+  display: block;
+  margin-top: 3px;
+  color: #111827;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.fp-stat-block {
+  margin-bottom: 12px;
+}
+
+.fp-stat-block h4 {
+  margin: 0 0 6px;
+  color: #374151;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fp-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.fp-stat-cell {
+  border-radius: 10px;
+  background: #f3f4f6;
+  padding: 8px;
+  text-align: center;
+}
+
+.fp-stat-cell span {
+  display: block;
+  color: #6b7280;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.fp-stat-cell strong {
+  display: block;
+  margin-top: 3px;
+  color: #111827;
+  font-size: 1.15rem;
+}
+
+.fp-detail-section {
+  margin-top: 14px;
+}
+
+.fp-detail-section:first-child {
+  margin-top: 0;
+}
+
+.fp-detail-section > h3 {
+  margin: 0 0 8px;
+  color: #111827;
+  font-size: 0.95rem;
+}
+
+.fp-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.fp-tag {
+  border-radius: 999px;
+  background: #e5e7eb;
+  color: #111827;
+  padding: 5px 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.fp-rule-card-list {
+  display: grid;
+  gap: 8px;
+}
+
+.fp-rule-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fbfdff;
+}
+
+.fp-rule-card h4 {
+  margin: 0 0 6px;
+  color: #111827;
+  font-size: 0.85rem;
+}
+
+.fp-rule-card ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.fp-rule-card li {
+  margin: 4px 0;
+  color: #374151;
+}
+
+.fp-item-card .fp-detail-card-header {
+  background: #f8fafc;
+}
+
+.fp-card-note {
+  margin: 10px 0 0;
+  color: #374151;
+  line-height: 1.4;
+}
+
+.fp-crew-member-card > .fp-detail-card-header {
+  background: #eef2ff;
+}
+
+@media (min-width: 540px) {
+  .fp-card-field-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fp-stat-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
