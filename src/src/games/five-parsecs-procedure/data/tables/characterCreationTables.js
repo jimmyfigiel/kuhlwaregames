@@ -155,89 +155,6 @@ function getRollLabel(rollType) {
   }
 }
 
-
-function makeFixedResultIdPart(value) {
-  return String(value || "fixed")
-    .trim()
-    .replace(/[^a-zA-Z0-9_-]/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "") || "fixed";
-}
-
-function findTableEntryByName(rollType, resultName) {
-  const table = characterCreationTables[rollType];
-
-  if (!table || !Array.isArray(table.entries)) {
-    return null;
-  }
-
-  const cleanResultName = String(resultName || "").trim().toLowerCase();
-
-  if (!cleanResultName) {
-    return null;
-  }
-
-  return (
-    table.entries.find((entry) =>
-      String(entry.label || entry.value || "").trim().toLowerCase() === cleanResultName
-    ) || null
-  );
-}
-
-function makeFixedResultCommand({
-  crewMemberId,
-  crewMemberNumber,
-  rollType,
-  resultName,
-  fieldName = null,
-  source = "Character profile",
-}) {
-  const table = characterCreationTables[rollType];
-  const entry = findTableEntryByName(rollType, resultName);
-
-  if (!table || !entry) {
-    return null;
-  }
-
-  const cleanFieldName = fieldName || rollType;
-  const detailBasePath = `crewLog.crewDetails.${crewMemberId}`;
-  const saveTo = `${detailBasePath}.${cleanFieldName}`;
-  const idPart = makeFixedResultIdPart(`${cleanFieldName}-${resultName}`);
-  const fixedResult = {
-    ...entry,
-    tableId: table.id,
-    tableTitle: table.title,
-    fixedResult: true,
-    fixedResultSource: source,
-    description: entry.description
-      ? `${entry.description} · Fixed result from ${source}`
-      : `Fixed result from ${source}`,
-  };
-
-  return [
-    {
-      id: `${crewMemberId}-set-fixed-${idPart}`,
-      type: "updateState",
-      title: `Crew Member ${crewMemberNumber}: Set Fixed ${getRollLabel(rollType)} — ${entry.label}`,
-      operations: [
-        {
-          op: "set",
-          path: saveTo,
-          value: fixedResult,
-        },
-      ],
-      pauseAfter: false,
-      visible: false,
-    },
-    makeQueueCrewMemberTableResultUpdateCommandsCommand({
-      crewMemberId,
-      crewMemberNumber,
-      sourcePath: saveTo,
-      resultKind: cleanFieldName,
-    }),
-  ];
-}
-
 export function buildFixedCharacterCreationResultCommands({
   crewMemberId,
   crewMemberNumber,
@@ -248,16 +165,29 @@ export function buildFixedCharacterCreationResultCommands({
   }
 
   return fixedResults
-    .flatMap((fixedResult) =>
-      makeFixedResultCommand({
+    .map((fixedResult, index) => {
+      const rollType = fixedResult?.rollType;
+      const resultName = fixedResult?.resultName;
+
+      if (!rollType || !resultName) {
+        return null;
+      }
+
+      const resultKind = fixedResult.resultKind || rollType;
+
+      return {
+        id: `${crewMemberId}-fixed-${rollType}-${index}`,
+        type: "applyFixedTableResult",
+        title: `Crew Member ${crewMemberNumber}: Fixed ${rollType} — ${resultName}`,
         crewMemberId,
         crewMemberNumber,
-        rollType: fixedResult.rollType,
-        resultName: fixedResult.resultName,
-        fieldName: fixedResult.fieldName,
-        source: fixedResult.source,
-      }) || []
-    )
+        rollType,
+        resultName,
+        resultKind,
+        pauseAfter: false,
+        visible: false,
+      };
+    })
     .filter(Boolean);
 }
 

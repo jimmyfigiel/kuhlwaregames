@@ -11,53 +11,47 @@ function buildInitialCommandQueue() {
       .popupMessage({
         id: "welcome-to-five-parsecs",
         title: "Welcome",
-        message: "Welcome to Five Parsecs from Home! Let's build your campaign.",
+        message: "Welcome to Five Parsecs from Home! Let's build a crew.",
         buttonText: "OK",
         pauseAfter: false,
         autoExecuteOnGameStart: true,
       })
       .toJSON(),
     factory
-      .buildWorld({
-        id: "build-world",
-        title: "Build World",
-        pauseAfter: false,
-        visible: true,
-      })
-      .toJSON(),
-    factory
-      .buildCrew({
-        id: "build-crew",
-        title: "Build Crew",
-        pauseAfter: false,
-        visible: true,
-      })
-      .toJSON(),
-    factory
-      .popupMessage({
-        id: "build-ship-placeholder",
-        title: "Build Ship",
-        message: "Ship creation is the next major setup phase. This placeholder marks where the ship command sequence will run.",
-        buttonText: "Continue",
+      .textInput({
+        id: "create-beginning-world",
+        title: "Create Beginning World",
+        prompt: "Name the world where your crew begins.",
+        label: "World Name",
+        defaultValue: "",
+        saveTo: "worldLog.currentWorld.name",
+        buttonText: "OK",
+        allowRandomName: true,
+        randomNameSet: "five_parsecs_world_parts",
+        randomNameButtonText: "Generate World Name",
         pauseAfter: false,
       })
       .toJSON(),
     factory
-      .popupMessage({
-        id: "campaign-prep-placeholder",
-        title: "Campaign Prep",
-        message: "Campaign prep will review the crew, ship, world, resources, rivals, patrons, rumors, and unresolved setup effects before the first turn begins.",
-        buttonText: "Continue",
+      .numberInput({
+        id: "choose-starting-crew-count",
+        title: "Starting Crew Size",
+        prompt: "How many crew members do you want to start with?",
+        defaultValue: 6,
+        min: 1,
+        max: 20,
+        saveTo: "crewLog.startingCrewCount",
+        buttonText: "OK",
         pauseAfter: false,
       })
       .toJSON(),
     factory
-      .startTurn({
-        id: "start-turn-1",
-        title: "Start Campaign Turn 1",
-        turnNumber: 1,
+      .buildStartingCrew({
+        id: "build-starting-crew",
+        title: "Build Starting Crew",
+        crewCountPath: "crewLog.startingCrewCount",
         pauseAfter: false,
-        visible: true,
+        visible: false,
       })
       .toJSON(),
   ];
@@ -71,14 +65,6 @@ function createBlankState() {
     activeCommand: null,
     commandQueue: [],
     equipmentRollSelections: {},
-
-    campaign: {
-      turnNumber: 0,
-      phase: "setup",
-      status: "setup",
-      setupComplete: false,
-      currentStep: "initialSetup",
-    },
 
     crewLog: {
       title: "Crew Log",
@@ -176,10 +162,6 @@ export function initializeMissingGameState(existingState = {}) {
       ? safeExistingState.activeCommand
       : blankState.activeCommand,
     commandQueue,
-    campaign: {
-      ...blankState.campaign,
-      ...(safeExistingState.campaign || {}),
-    },
     crewLog: {
       ...blankState.crewLog,
       ...(safeExistingState.crewLog || {}),

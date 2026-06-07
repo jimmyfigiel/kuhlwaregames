@@ -49,8 +49,7 @@ export class ResolveCreditRollCommand extends BaseCommand {
     pendingEffectId = "",
     dice = "1D6",
     source = "",
-    adjustment = 0,
-    adjustmentLabel = "",
+    modifier = 0,
     appRoll = null,
     status = "pending",
     pauseAfter = false,
@@ -68,8 +67,7 @@ export class ResolveCreditRollCommand extends BaseCommand {
     this.pendingEffectId = pendingEffectId;
     this.dice = dice || "1D6";
     this.source = source || "";
-    this.adjustment = Number.isFinite(Number(adjustment)) ? Math.floor(Number(adjustment)) : 0;
-    this.adjustmentLabel = adjustmentLabel || "";
+    this.modifier = Number.isFinite(Number(modifier)) ? Number(modifier) : 0;
     this.appRoll = appRoll;
   }
 
@@ -109,8 +107,8 @@ export class ResolveCreditRollCommand extends BaseCommand {
       return;
     }
 
-    const roundedTotal = Math.floor(total);
-    const adjustedTotal = Math.max(0, roundedTotal + this.adjustment);
+    const rolledTotal = Math.floor(total);
+    const roundedTotal = Math.max(0, rolledTotal + this.modifier);
 
     const commands = engineContext.commandFactory?.createCommandsForCreditRollResolution
       ? engineContext.commandFactory.createCommandsForCreditRollResolution({
@@ -118,10 +116,9 @@ export class ResolveCreditRollCommand extends BaseCommand {
           pendingEffectId: this.pendingEffectId,
           dice: this.dice,
           source: this.source,
-          total: adjustedTotal,
-          rawTotal: roundedTotal,
-          adjustment: this.adjustment,
-          adjustmentLabel: this.adjustmentLabel,
+          total: roundedTotal,
+          rolledTotal,
+          modifier: this.modifier,
           appRoll: input.appRoll || this.appRoll || null,
         })
       : [];
@@ -136,9 +133,7 @@ export class ResolveCreditRollCommand extends BaseCommand {
 
     engineContext.addLogEntry({
       type: "commandCompleted",
-      text: this.adjustmentLabel
-        ? `Resolved credit roll ${this.dice}: rolled ${roundedTotal}, adjusted to +${adjustedTotal} credits.`
-        : `Resolved credit roll ${this.dice}: +${adjustedTotal} credits.`,
+      text: `Resolved credit roll ${this.dice}${this.modifier ? ` (${this.modifier})` : ""}: +${roundedTotal} credits.`,
       commandId: this.id,
     });
   }
@@ -149,8 +144,7 @@ export class ResolveCreditRollCommand extends BaseCommand {
       pendingEffectId: this.pendingEffectId,
       dice: this.dice,
       source: this.source,
-      adjustment: this.adjustment,
-      adjustmentLabel: this.adjustmentLabel,
+      modifier: this.modifier,
       appRoll: this.appRoll,
     });
   }

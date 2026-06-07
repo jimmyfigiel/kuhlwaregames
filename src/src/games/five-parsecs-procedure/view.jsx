@@ -7,8 +7,6 @@ import {
 } from "./data/nameSets";
 import "./view.css";
 
-const GAME_VERSION = "five-parsecs-procedure-v1-49";
-
 const nameGenerator = new MarkovNameGenerator({
   five_parsecs_pulp: pulpyFiveParsecsNames,
   five_parsecs_world: fiveParsecsWorldNames,
@@ -236,7 +234,7 @@ function sendStackInspectorPayload(inspectorWindow, payload) {
   }, "*");
 }
 
-function NumberInputPanel({ command, onSubmit }) {
+function NumberInputModal({ command, onSubmit }) {
   const [value, setValue] = useState(command.defaultValue ?? 0);
 
   function handleSubmit(event) {
@@ -245,7 +243,8 @@ function NumberInputPanel({ command, onSubmit }) {
   }
 
   return (
-    <form className="fp-command-card" onSubmit={handleSubmit}>
+    <div className="fp-modal-backdrop">
+      <form className="fp-modal-card" role="dialog" aria-modal="true" onSubmit={handleSubmit}>
         <h2>{command.title}</h2>
         <p>{command.prompt}</p>
 
@@ -270,11 +269,12 @@ function NumberInputPanel({ command, onSubmit }) {
         <button className="fp-primary-button" type="submit">
           {command.buttonText || "OK"}
         </button>
-    </form>
+      </form>
+    </div>
   );
 }
 
-function TextInputPanel({ command, onSubmit }) {
+function TextInputModal({ command, onSubmit }) {
   const [value, setValue] = useState(command.defaultValue ?? "");
 
   function handleGenerateName() {
@@ -291,7 +291,8 @@ function TextInputPanel({ command, onSubmit }) {
   }
 
   return (
-    <form className="fp-command-card" onSubmit={handleSubmit}>
+    <div className="fp-modal-backdrop">
+      <form className="fp-modal-card" role="dialog" aria-modal="true" onSubmit={handleSubmit}>
         <h2>{command.title}</h2>
         <p>{command.prompt}</p>
 
@@ -324,7 +325,8 @@ function TextInputPanel({ command, onSubmit }) {
         <button className="fp-primary-button" type="submit">
           {command.buttonText || "OK"}
         </button>
-    </form>
+      </form>
+    </div>
   );
 }
 
@@ -352,7 +354,7 @@ function findEntryForRoll(entries, roll) {
   return entries.find((entry) => roll >= entry.min && roll <= entry.max) || null;
 }
 
-function TableRollPanel({ command, onConfirm }) {
+function TableRollModal({ command, onConfirm }) {
   const table = command.table || {};
   const entries = Array.isArray(table.entries) ? table.entries : [];
   const [appRoll, setAppRoll] = useState(command.roll ?? null);
@@ -382,7 +384,8 @@ function TableRollPanel({ command, onConfirm }) {
   }
 
   return (
-    <div className="fp-command-card fp-table-command-card">
+    <div className="fp-modal-backdrop">
+      <div className="fp-modal-card fp-table-modal-card" role="dialog" aria-modal="true">
         <h2>{command.title}</h2>
 
         <div className="fp-table-roll-summary">
@@ -448,6 +451,7 @@ function TableRollPanel({ command, onConfirm }) {
             );
           })}
         </div>
+      </div>
     </div>
   );
 }
@@ -475,15 +479,10 @@ function parseCreditDiceLabel(diceText) {
   };
 }
 
-function CreditRollPanel({ command, onConfirm }) {
+function CreditRollModal({ command, onConfirm }) {
   const dice = parseCreditDiceLabel(command.dice || "1D6");
   const [total, setTotal] = useState(command.appRoll?.total ?? "");
   const [rolls, setRolls] = useState(command.appRoll?.rolls || []);
-  const adjustment = Number(command.adjustment || 0);
-  const numericTotal = Number(total);
-  const adjustedTotal = Number.isFinite(numericTotal)
-    ? Math.max(0, Math.floor(numericTotal) + adjustment)
-    : null;
 
   function handleRollWithAppDice() {
     const nextRolls = [];
@@ -512,7 +511,8 @@ function CreditRollPanel({ command, onConfirm }) {
   }
 
   return (
-    <form className="fp-command-card" onSubmit={handleSubmit}>
+    <div className="fp-modal-backdrop">
+      <form className="fp-modal-card" role="dialog" aria-modal="true" onSubmit={handleSubmit}>
         <h2>{command.title || "Roll Credits"}</h2>
 
         <p>
@@ -528,16 +528,10 @@ function CreditRollPanel({ command, onConfirm }) {
             <span>App roll</span>
             <strong>{rolls.length > 0 ? rolls.join(" + ") : "Not rolled"}</strong>
           </div>
-          {command.adjustmentLabel && (
+          {Number(command.modifier || 0) !== 0 && (
             <div className="fp-table-roll-line">
-              <span>Adjustment</span>
-              <strong>{command.adjustmentLabel}</strong>
-            </div>
-          )}
-          {adjustedTotal !== null && adjustment !== 0 && (
-            <div className="fp-table-roll-line">
-              <span>Final credits</span>
-              <strong>{adjustedTotal}</strong>
+              <span>Modifier</span>
+              <strong>{Number(command.modifier || 0)}</strong>
             </div>
           )}
         </div>
@@ -559,7 +553,7 @@ function CreditRollPanel({ command, onConfirm }) {
         </p>
 
         <label className="fp-input-label" htmlFor={`credit-roll-${command.id}`}>
-          Rolled credit total
+          Credits to add
         </label>
         <input
           id={`credit-roll-${command.id}`}
@@ -571,108 +565,17 @@ function CreditRollPanel({ command, onConfirm }) {
           autoFocus
         />
 
-        <button className="fp-primary-button" type="submit">
-          {adjustment !== 0 ? "Apply Adjusted Credits" : "Add Credits"}
-        </button>
-    </form>
-  );
-}
-
-
-function ActiveCommandPanel({
-  command,
-  onPopupOk,
-  onNumberSubmit,
-  onTextSubmit,
-  onTableConfirm,
-  onCreditConfirm,
-}) {
-  if (!command) {
-    return null;
-  }
-
-  const title = `Active Command: ${command.title || command.type || "Command"}`;
-
-  return (
-    <AccordionSection title={title} defaultOpen>
-      {command.type === "popupMessage" && (
-        <div className="fp-command-card">
-          <h2>{command.title}</h2>
-          <p>{command.message}</p>
-
-          <button className="fp-primary-button" onClick={onPopupOk}>
-            {command.buttonText || "OK"}
-          </button>
-        </div>
-      )}
-
-      {command.type === "startTurn" && (
-        <div className="fp-command-card">
-          <div className="fp-eyebrow">Campaign Turn</div>
-          <h2>{command.title}</h2>
-          <p>
-            {command.message ||
-              `Ready to start Campaign Turn ${command.turnNumber || ""}?`}
-          </p>
-
-          <button className="fp-primary-button" onClick={onPopupOk}>
-            {command.buttonText || "Start Turn"}
-          </button>
-        </div>
-      )}
-
-      {command.type === "numberInput" && (
-        <NumberInputPanel
-          key={command.id}
-          command={command}
-          onSubmit={onNumberSubmit}
-        />
-      )}
-
-      {(command.type === "crewMemberName" || command.type === "textInput") && (
-        <TextInputPanel
-          key={command.id}
-          command={command}
-          onSubmit={onTextSubmit}
-        />
-      )}
-
-      {command.type === "tableRoll" && (
-        <TableRollPanel
-          key={command.id}
-          command={command}
-          onConfirm={onTableConfirm}
-        />
-      )}
-
-      {command.type === "resolveCreditRoll" && (
-        <CreditRollPanel
-          key={command.id}
-          command={command}
-          onConfirm={onCreditConfirm}
-        />
-      )}
-
-      {![
-        "popupMessage",
-        "startTurn",
-        "numberInput",
-        "crewMemberName",
-        "textInput",
-        "tableRoll",
-        "resolveCreditRoll",
-      ].includes(command.type) && (
-        <div className="fp-command-card">
-          <h2>{command.title || "Active Command"}</h2>
+        {Number(command.modifier || 0) !== 0 && total !== "" && (
           <p className="fp-muted">
-            This active command type does not have a custom panel yet.
+            Final credits added: {Math.max(0, Math.floor(Number(total) || 0) + Number(command.modifier || 0))}
           </p>
-          <button className="fp-primary-button" onClick={onPopupOk}>
-            Continue
-          </button>
-        </div>
-      )}
-    </AccordionSection>
+        )}
+
+        <button className="fp-primary-button" type="submit">
+          Add Credits
+        </button>
+      </form>
+    </div>
   );
 }
 
@@ -685,25 +588,8 @@ function QueueManager({ gameState, submitAction, showStackInspectorButton = fals
   const activeCommand = gameState.activeCommand || null;
   const currentPendingCommand = commandQueue[0] || null;
   const stepsRemaining = commandQueue.length;
-  const queueTitle = activeCommand
-    ? activeCommand.title
-    : currentPendingCommand
-      ? currentPendingCommand.title
-      : "No Pending Commands";
-  const queueSummary = activeCommand
-    ? `Active: ${activeCommand.type || "command"}`
-    : currentPendingCommand
-      ? `Next: ${currentPendingCommand.type || "command"}`
-      : "No current step";
-  const [isQueueOpen, setIsQueueOpen] = useState(true);
 
-  useEffect(() => {
-    if (activeCommand) {
-      setIsQueueOpen(true);
-    }
-  }, [activeCommand?.id]);
-
-  function executeQueue() {
+  function handleExecute() {
     submitAction({
       type: "EXECUTE_QUEUE",
       stateSnapshot: gameState,
@@ -725,23 +611,24 @@ function QueueManager({ gameState, submitAction, showStackInspectorButton = fals
   const autoExecutedCommandIdsRef = useRef(new Set());
 
   useEffect(() => {
-    if (activeCommand || !currentPendingCommand) {
+    if (activeCommand || !currentPendingCommand?.autoExecuteOnGameStart) {
       return;
     }
 
-    const commandKey = currentPendingCommand.id || `${currentPendingCommand.type}-${stepsRemaining}`;
-
-    if (autoExecutedCommandIdsRef.current.has(commandKey)) {
+    if (autoExecutedCommandIdsRef.current.has(currentPendingCommand.id)) {
       return;
     }
 
-    autoExecutedCommandIdsRef.current.add(commandKey);
-    executeQueue();
+    autoExecutedCommandIdsRef.current.add(currentPendingCommand.id);
+
+    submitAction({
+      type: "EXECUTE_QUEUE",
+      stateSnapshot: gameState,
+    });
   }, [
     activeCommand,
+    currentPendingCommand?.autoExecuteOnGameStart,
     currentPendingCommand?.id,
-    currentPendingCommand?.type,
-    stepsRemaining,
     gameState,
     submitAction,
   ]);
@@ -754,79 +641,113 @@ function QueueManager({ gameState, submitAction, showStackInspectorButton = fals
     resolveActiveCommand({ value });
   }
 
+  const buttonDisabled = Boolean(activeCommand) || stepsRemaining === 0;
+
   return (
-    <section className="fp-accordion-section fp-queue-accordion-section">
-      <button
-        className="fp-accordion-header fp-queue-accordion-header"
-        type="button"
-        onClick={() => setIsQueueOpen((current) => !current)}
-        aria-expanded={isQueueOpen}
-      >
-        <span className="fp-queue-header-title">
-          <span>Current Step</span>
-          <span className="fp-queue-header-summary">
+    <section className="fp-queue-manager">
+      <div className="fp-queue-header">
+        <div>
+          <div className="fp-eyebrow">Queue Manager</div>
+          <h2 className="fp-queue-title">
             {activeCommand
-              ? `Active: ${queueTitle}`
+              ? activeCommand.title
               : currentPendingCommand
-                ? `Next: ${queueTitle}`
-                : "Empty"}
-          </span>
-        </span>
-        <span className="fp-accordion-indicator">{isQueueOpen ? "−" : "+"}</span>
-      </button>
-
-      {isQueueOpen && (
-        <div className="fp-accordion-body fp-queue-details-body">
-          <section className="fp-active-command-area">
-            {activeCommand ? (
-              <ActiveCommandPanel
-                command={activeCommand}
-                onPopupOk={handlePopupOk}
-                onNumberSubmit={handleNumberSubmit}
-                onTextSubmit={handleTextSubmit}
-                onTableConfirm={resolveActiveCommand}
-                onCreditConfirm={resolveActiveCommand}
-              />
-            ) : (
-              <div className="fp-command-card fp-empty-active-command-card">
-                <h2>No Active Command</h2>
-                <p>{currentPendingCommand ? "The next command will start automatically." : "The command queue is empty."}</p>
-              </div>
-            )}
-          </section>
-
-          <section className="fp-queue-meta-panel">
-            <div className="fp-step-count fp-queue-meta-count">
-              <span className="fp-step-number">{stepsRemaining}</span>
-              <span className="fp-step-label">
-                {stepsRemaining === 1 ? "step" : "steps"} left
-              </span>
-            </div>
-
-            <div className="fp-queue-meta-details">
-              <div>
-                <strong>{activeCommand ? "Active" : currentPendingCommand ? "Next" : "Status"}:</strong>{" "}
-                {activeCommand ? activeCommand.type : currentPendingCommand ? currentPendingCommand.type : "empty"}
-              </div>
-              <div>
-                <strong>Step status:</strong> {gameState.queueStatus || "idle"}
-              </div>
-              <div>
-                <strong>Version:</strong> {GAME_VERSION}
-              </div>
-            </div>
-
-            {showStackInspectorButton && (
-              <button
-                type="button"
-                className="fp-inspector-button fp-queue-meta-inspector"
-                onClick={onOpenStackInspector}
-              >
-                Stack Inspector
-              </button>
-            )}
-          </section>
+                ? currentPendingCommand.title
+                : "No Pending Commands"}
+          </h2>
         </div>
+
+        <div className="fp-step-tools">
+          <div className="fp-step-count">
+            <span className="fp-step-number">{stepsRemaining}</span>
+            <span className="fp-step-label">
+              {stepsRemaining === 1 ? "step" : "steps"} left
+            </span>
+          </div>
+
+          {showStackInspectorButton && (
+            <button
+              type="button"
+              className="fp-inspector-button"
+              onClick={onOpenStackInspector}
+            >
+              Stack Inspector
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="fp-current-command">
+        {activeCommand ? (
+          <p>
+            Active command: <strong>{activeCommand.type}</strong>
+          </p>
+        ) : currentPendingCommand ? (
+          <p>
+            Next command: <strong>{currentPendingCommand.type}</strong>
+          </p>
+        ) : (
+          <p>The command queue is empty.</p>
+        )}
+
+        <button
+          className="fp-primary-button"
+          onClick={handleExecute}
+          disabled={buttonDisabled}
+        >
+          Execute
+        </button>
+      </div>
+
+      <div className="fp-debug-line">
+        Pending: {stepsRemaining} · Active: {activeCommand ? "yes" : "no"} · Status:{" "}
+        {gameState.queueStatus || "idle"}
+      </div>
+
+      {activeCommand && activeCommand.type === "popupMessage" && (
+        <div className="fp-modal-backdrop">
+          <div className="fp-modal-card" role="dialog" aria-modal="true">
+            <h2>{activeCommand.title}</h2>
+            <p>{activeCommand.message}</p>
+
+            <button className="fp-primary-button" onClick={handlePopupOk}>
+              {activeCommand.buttonText || "OK"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {activeCommand && activeCommand.type === "numberInput" && (
+        <NumberInputModal
+          key={activeCommand.id}
+          command={activeCommand}
+          onSubmit={handleNumberSubmit}
+        />
+      )}
+
+      {activeCommand &&
+        (activeCommand.type === "crewMemberName" || activeCommand.type === "textInput") && (
+          <TextInputModal
+            key={activeCommand.id}
+            command={activeCommand}
+            onSubmit={handleTextSubmit}
+          />
+        )}
+
+      {activeCommand && activeCommand.type === "tableRoll" && (
+        <TableRollModal
+          key={activeCommand.id}
+          command={activeCommand}
+          onConfirm={resolveActiveCommand}
+        />
+      )}
+
+      {activeCommand && activeCommand.type === "resolveCreditRoll" && (
+        <CreditRollModal
+          key={activeCommand.id}
+          command={activeCommand}
+          onConfirm={resolveActiveCommand}
+        />
       )}
     </section>
   );
@@ -912,48 +833,13 @@ function formatInventoryItem(item) {
 
   const category = item.category ? `${item.category}: ` : "";
   const source = item.source ? ` — ${item.source}` : "";
-  return `${category}${item.name || "Unknown Item"}${source}`;
-}
+  const weapon =
+    item.weapon && (item.weapon.range || item.weapon.shots || item.weapon.damage || item.weapon.traits?.length)
+      ? ` [Rng ${item.weapon.range || "—"}, Sh ${item.weapon.shots || "—"}, Dmg ${item.weapon.damage ?? "—"}${item.weapon.traits?.length ? `, ${item.weapon.traits.join(", ")}` : ""}]`
+      : "";
+  const effect = item.gear?.effect ? ` — ${item.gear.effect}` : "";
 
-function formatPlainValue(value) {
-  if (value === undefined || value === null || value === "") {
-    return "";
-  }
-
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-    return String(value);
-  }
-
-  if (typeof value === "object") {
-    return value.label || value.name || value.title || JSON.stringify(value);
-  }
-
-  return String(value);
-}
-
-function formatFlagSummary(flags) {
-  if (!flags || typeof flags !== "object" || Array.isArray(flags)) {
-    return "";
-  }
-
-  return Object.entries(flags)
-    .map(([key, value]) => `${key}: ${formatPlainValue(value)}`)
-    .join("; ");
-}
-
-
-function CampaignSheet({ campaign }) {
-  const safeCampaign = campaign && typeof campaign === "object" ? campaign : {};
-
-  return (
-    <AccordionSection title="Campaign" defaultOpen={false}>
-      <FieldRow label="Turn" value={safeCampaign.turnNumber ?? 0} />
-      <FieldRow label="Phase" value={safeCampaign.phase || "setup"} />
-      <FieldRow label="Status" value={safeCampaign.status || "setup"} />
-      <FieldRow label="Current Step" value={safeCampaign.currentStep || "initialSetup"} />
-      <FieldRow label="Version" value={GAME_VERSION} />
-    </AccordionSection>
-  );
+  return `${category}${item.name || "Unknown Item"}${weapon}${effect}${source}`;
 }
 
 function CrewLogSheet({ crewLog }) {
@@ -980,22 +866,12 @@ function CrewLogSheet({ crewLog }) {
       return `${type} ${level}${source}`.trim();
     });
     const equipmentSummary = summarizeList(detail.equipment, formatInventoryItem);
-    const flagSummary = formatFlagSummary(detail.flags);
-    const specialRuleSummary = summarizeList(detail.specialRules, formatPlainValue);
-    const restrictionSummary = summarizeList(detail.restrictions, formatPlainValue);
-    const battleRuleSummary = summarizeList(detail.battleRules, formatPlainValue);
-    const movementRuleSummary = summarizeList(detail.movementRules, formatPlainValue);
-    const campaignRuleSummary = summarizeList(detail.campaignRules, formatPlainValue);
-    const campaignTurnRuleSummary = summarizeList(detail.campaignTurnRules, formatPlainValue);
-    const campaignEventRuleSummary = summarizeList(detail.campaignEventRules, formatPlainValue);
-    const postBattleRuleSummary = summarizeList(detail.postBattleRules, formatPlainValue);
-    const injuryRuleSummary = summarizeList(detail.injuryRules, formatPlainValue);
-    const equipmentRuleSummary = summarizeList(detail.equipmentRules, formatPlainValue);
-    const advancementRuleSummary = summarizeList(detail.advancementRules, formatPlainValue);
-    const taskRuleSummary = summarizeList(detail.campaignTaskRules, formatPlainValue);
-    const taskRestrictionSummary = summarizeList(detail.campaignTaskRestrictions, formatPlainValue);
-    const eventRuleSummary = summarizeList(detail.eventRules, formatPlainValue);
-    const creationRuleSummary = summarizeList(detail.creationRules, formatPlainValue);
+    const flagSummary = detail.flags && Object.keys(detail.flags).length > 0
+      ? Object.entries(detail.flags)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join("; ")
+      : "";
+
     const rows = [
       detail.characterType ? `Character Type: ${detail.characterType}` : null,
       detail.crewType?.label ? `Crew Type: ${detail.crewType.label}` : null,
@@ -1009,27 +885,9 @@ function CrewLogSheet({ crewLog }) {
       detail.motivation2?.label ? `Motivation 2: ${detail.motivation2.label}` : null,
       detail.class?.label ? `Class: ${detail.class.label}` : null,
       detail.stats ? `Stats: ${formatStats(detail.stats)}` : null,
-      detail.maxStats ? `Max Stats: ${formatStats(detail.maxStats)}` : null,
-      flagSummary ? `Flags: ${flagSummary}` : null,
-      detail.implantLimit !== undefined && detail.implantLimit !== null ? `Implant Limit: ${detail.implantLimit}` : null,
-      detail.injuryTable ? `Injury Table: ${detail.injuryTable}` : null,
       saveSummary ? `Saves: ${saveSummary}` : null,
-      specialRuleSummary ? `Special Rules: ${specialRuleSummary}` : null,
-      restrictionSummary ? `Restrictions: ${restrictionSummary}` : null,
-      battleRuleSummary ? `Battle Rules: ${battleRuleSummary}` : null,
-      movementRuleSummary ? `Movement Rules: ${movementRuleSummary}` : null,
-      campaignRuleSummary ? `Campaign Rules: ${campaignRuleSummary}` : null,
-      campaignTurnRuleSummary ? `Campaign Turn Rules: ${campaignTurnRuleSummary}` : null,
-      campaignEventRuleSummary ? `Campaign Event Rules: ${campaignEventRuleSummary}` : null,
-      postBattleRuleSummary ? `Post-Battle Rules: ${postBattleRuleSummary}` : null,
-      injuryRuleSummary ? `Injury Rules: ${injuryRuleSummary}` : null,
-      equipmentRuleSummary ? `Equipment Rules: ${equipmentRuleSummary}` : null,
-      advancementRuleSummary ? `Advancement Rules: ${advancementRuleSummary}` : null,
-      taskRuleSummary ? `Task Rules: ${taskRuleSummary}` : null,
-      taskRestrictionSummary ? `Task Restrictions: ${taskRestrictionSummary}` : null,
-      eventRuleSummary ? `Event Rules: ${eventRuleSummary}` : null,
-      creationRuleSummary ? `Creation Rules: ${creationRuleSummary}` : null,
       equipmentSummary ? `Historic Gear: ${equipmentSummary}` : null,
+      flagSummary ? `Flags: ${flagSummary}` : null,
       resourceSummary ? `Resources: ${resourceSummary}` : null,
       startingRollSummary ? `Starting Rolls: ${startingRollSummary}` : null,
       pendingEffectSummary ? `Pending Effects: ${pendingEffectSummary}` : null,
@@ -1049,7 +907,7 @@ function CrewLogSheet({ crewLog }) {
   }
 
   return (
-    <AccordionSection title="Crew">
+    <AccordionSection title="Crew Log" defaultOpen>
       <FieldRow label="Crew Name" value={crewLog.crewName} />
       <FieldRow label="Starting Crew Members" value={crewLog.startingCrewCount} />
       <FieldRow label="Credits" value={crewLog.credits} />
@@ -1093,7 +951,7 @@ function CrewLogSheet({ crewLog }) {
 
 function EncounterLogSheet({ encounterLog }) {
   return (
-    <AccordionSection title="Encounter">
+    <AccordionSection title="Encounter Log">
       <FieldRow label="Patron" value={encounterLog.patron} />
       <FieldRow label="Rival" value={encounterLog.rival} />
       <FieldRow label="Objective" value={encounterLog.objective} />
@@ -1123,7 +981,7 @@ function WorldLogSheet({ worldLog }) {
   const pendingWorldEffects = summarizeList(worldLog.pendingEffects, formatPendingEffect);
 
   return (
-    <AccordionSection title="World">
+    <AccordionSection title="World Log">
       <FieldRow label="Current World" value={currentWorld.name} />
       <FieldRow label="License" value={currentWorld.license || worldLog.license} />
       <FieldRow label="Invasion" value={currentWorld.invasion || worldLog.invasion} />
@@ -1191,7 +1049,6 @@ export default function FiveParsecsProcedureView({ gameState, submitAction, play
       commandQueue: Array.isArray(gameState?.commandQueue)
         ? gameState.commandQueue
         : [],
-      campaign: gameState?.campaign || {},
       crewLog: gameState?.crewLog || {},
       encounterLog: gameState?.encounterLog || {},
       worldLog: gameState?.worldLog || {},
@@ -1253,7 +1110,6 @@ export default function FiveParsecsProcedureView({ gameState, submitAction, play
       />
 
       <section className="fp-record-sheets">
-        <CampaignSheet campaign={safeGameState.campaign} />
         <CrewLogSheet crewLog={safeGameState.crewLog} />
         <EncounterLogSheet encounterLog={safeGameState.encounterLog} />
         <WorldLogSheet worldLog={safeGameState.worldLog} />

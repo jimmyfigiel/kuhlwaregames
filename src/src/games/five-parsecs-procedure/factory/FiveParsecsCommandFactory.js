@@ -1,13 +1,8 @@
 import { CommandFactory } from "../../../procedure-core/factory";
 import {
-  BuildWorldCommand,
-  BuildCrewCommand,
+  ApplyFixedTableResultCommand,
   BuildStartingCrewCommand,
-  StartTurnCommand,
-  TravelPhaseCommand,
-  WorldPhaseCommand,
-  TabletopBattlePhaseCommand,
-  PostBattlePhaseCommand,
+  BuildStartingStashCommand,
   CrewMemberNameCommand,
   FinalizeCrewMemberCommand,
   QueueCrewMemberTableResultUpdateCommandsCommand,
@@ -17,6 +12,16 @@ import {
 } from "../commands";
 import { buildCrewMemberTableResultUpdateCommands } from "../effects";
 import { EQUIPMENT_ROLL_TABLES_BY_ID } from "../data/tables";
+import {
+  WEAPONS_TABLE,
+  GUN_MODS_TABLE,
+  GUN_SIGHTS_TABLE,
+  CONSUMABLES_TABLE,
+  PROTECTION_TABLE,
+  IMPLANTS_TABLE,
+  UTILITY_DEVICES_TABLE,
+  ONBOARD_ITEMS_TABLE,
+} from "../data/equipment";
 
 
 function normalizeEquipmentTable(table) {
@@ -39,6 +44,57 @@ function normalizeEquipmentTable(table) {
   };
 }
 
+function normalizeLookupName(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[’']/g, "")
+    .replace(/[^a-z0-9]+/g, "")
+    .trim();
+}
+
+const EQUIPMENT_NAME_ALIASES = {
+  handgun: "hand gun",
+  duelingpistol: "duelling pistol",
+  brutalmeleeweapon: "brutal melee weapon",
+  marksmanrifle: "marksman’s rifle",
+};
+
+function findCatalogItemByName(tables, name) {
+  const wanted = normalizeLookupName(EQUIPMENT_NAME_ALIASES[normalizeLookupName(name)] || name);
+
+  return tables.flat().find((item) => normalizeLookupName(item.name) === wanted) || null;
+}
+
+function getCatalogItemForTableSelection({ tableId, name }) {
+  if (["lowTechWeapon", "militaryWeapon", "highTechWeapon"].includes(tableId)) {
+    return {
+      kind: "weapon",
+      item: findCatalogItemByName([WEAPONS_TABLE], name),
+    };
+  }
+
+  return {
+    kind: "gear",
+    item: findCatalogItemByName([
+      GUN_MODS_TABLE,
+      GUN_SIGHTS_TABLE,
+      CONSUMABLES_TABLE,
+      PROTECTION_TABLE,
+      IMPLANTS_TABLE,
+      UTILITY_DEVICES_TABLE,
+      ONBOARD_ITEMS_TABLE,
+    ], name),
+  };
+}
+
+function blankEquipmentDetails() {
+  return {
+    weapon: { range: "", shots: "", damage: "", traits: [], mods: [], sight: "" },
+    armor: { armorValue: "", save: "", traits: [] },
+    gear: { effect: "", uses: "", traits: [] },
+  };
+}
+
 function makeEquipmentRecord({
   selectedRow,
   tableId,
@@ -47,12 +103,40 @@ function makeEquipmentRecord({
   locationType = "character",
 }) {
   const name = selectedRow?.label || selectedRow?.name || selectedRow?.value || "Unknown Equipment";
-  const isWeapon = ["lowTechWeapon", "militaryWeapon", "highTechWeapon"].includes(tableId);
+  const catalog = getCatalogItemForTableSelection({ tableId, name });
+  const item = catalog?.item;
+  const isWeapon = catalog?.kind === "weapon";
+  const details = blankEquipmentDetails();
+
+  if (isWeapon && item) {
+    details.weapon = {
+      range: item.range,
+      shots: item.shots,
+      damage: item.damage,
+      traits: [...(item.traits || [])],
+      mods: [],
+      sight: "",
+    };
+  } else if (item) {
+    details.gear = {
+      effect: item.effect || "",
+      uses: item.singleUse ? 1 : "",
+      traits: [...(item.traits || []), item.type].filter(Boolean),
+    };
+
+    if (item.save || item.type) {
+      details.armor = {
+        armorValue: item.save || "",
+        save: item.save || "",
+        traits: [item.type].filter(Boolean),
+      };
+    }
+  }
 
   return {
     id: `equipment-${Date.now()}-${Math.floor(Math.random() * 1000000)}`,
     name,
-    category: isWeapon ? "weapon" : "gear",
+    category: isWeapon ? "weapon" : item?.save ? "protection" : "gear",
     locationType,
     crewMemberId,
     source: source || "",
@@ -62,6 +146,7 @@ function makeEquipmentRecord({
     origin: locationType === "character" ? "characterCreation" : "stash",
     notes: source ? `Created from ${source}` : "",
     createdAt: new Date().toISOString(),
+    ...details,
   };
 }
 
@@ -127,211 +212,7 @@ function makeWorldContactRecords({ type, count, source }) {
 }
 
 
-const CREATION_RESULT_KINDS = new Set([
-  "background",
-  "motivation",
-  "class",
-  "fixedBackground",
-  "fixedMotivation",
-  "fixedClass",
-]);
-
-function isCreationResultEffect(effect) {
-  return CREATION_RESULT_KINDS.has(String(effect?.resultKind || ""));
-}
-
-function getCrewMemberDetail(state, crewMemberId) {
-  if (!crewMemberId) {
-    return null;
-  }
-
-  return state?.crewLog?.crewDetails?.[crewMemberId] || null;
-}
-
-function getCrewMemberFlags(state, crewMemberId) {
-  const detail = getCrewMemberDetail(state, crewMemberId);
-  return detail?.flags && typeof detail.flags === "object" ? detail.flags : {};
-}
-
-function describeAdjustment(parts) {
-  return parts.filter(Boolean).join(" ");
-}
-
-function getCreditEffectAdjustment({ state, effect }) {
-  const flags = getCrewMemberFlags(state, effect?.crewMemberId);
-  const resultKind = String(effect?.resultKind || "");
-  const adjustmentParts = [];
-  let adjustment = 0;
-  let ignored = false;
-
-  if (flags.ignoreBackgroundCreditGains && resultKind === "background") {
-    ignored = true;
-    adjustmentParts.push("Ignored because this character ignores Background credit gains.");
-  }
-
-  if (!ignored && isCreationResultEffect(effect)) {
-    const bioUpgradeReduction = Number(flags.reduceCreationCreditsBy || 0);
-    const minorAlienReduction = Number(flags.reduceCreationCreditsAndStoryPointsBy || 0);
-
-    if (Number.isFinite(bioUpgradeReduction) && bioUpgradeReduction > 0) {
-      const reduction = Math.floor(bioUpgradeReduction);
-      adjustment -= reduction;
-      adjustmentParts.push(`Reduced by ${reduction} credit${reduction === 1 ? "" : "s"}.`);
-    }
-
-    if (Number.isFinite(minorAlienReduction) && minorAlienReduction > 0) {
-      const reduction = Math.floor(minorAlienReduction);
-      adjustment -= reduction;
-      adjustmentParts.push(`Reduced by ${reduction} credit${reduction === 1 ? "" : "s"}.`);
-    }
-  }
-
-  return {
-    ignored,
-    adjustment,
-    adjustmentLabel: describeAdjustment(adjustmentParts),
-  };
-}
-
-function getStoryPointEffectAdjustment({ state, effect, count }) {
-  const flags = getCrewMemberFlags(state, effect?.crewMemberId);
-  const adjustmentParts = [];
-  let adjustedCount = Math.max(0, Math.floor(Number(count) || 0));
-  let ignored = false;
-
-  if (flags.ignoreCreationStoryPointBonuses && isCreationResultEffect(effect)) {
-    ignored = true;
-    adjustedCount = 0;
-    adjustmentParts.push("Ignored because this character ignores creation story point bonuses.");
-  }
-
-  if (!ignored && flags.reduceCreationCreditsAndStoryPointsBy && isCreationResultEffect(effect)) {
-    const reduction = Math.floor(Number(flags.reduceCreationCreditsAndStoryPointsBy) || 0);
-
-    if (reduction > 0) {
-      adjustedCount = Math.max(0, adjustedCount - reduction);
-      adjustmentParts.push(`Reduced by ${reduction} story point${reduction === 1 ? "" : "s"}.`);
-    }
-  }
-
-  return {
-    ignored,
-    adjustedCount,
-    adjustmentLabel: describeAdjustment(adjustmentParts),
-  };
-}
-
-
 export class FiveParsecsCommandFactory extends CommandFactory {
-
-  buildWorld({
-    id = "build-world",
-    title = "Build World",
-    pauseAfter = false,
-    visible = true,
-  } = {}) {
-    return new BuildWorldCommand({
-      id,
-      title,
-      pauseAfter,
-      visible,
-    });
-  }
-
-  buildCrew({
-    id = "build-crew",
-    title = "Build Crew",
-    pauseAfter = false,
-    visible = true,
-  } = {}) {
-    return new BuildCrewCommand({
-      id,
-      title,
-      pauseAfter,
-      visible,
-    });
-  }
-
-  startTurn({
-    id = "start-turn",
-    title = "Start Turn",
-    turnNumber = null,
-    pauseAfter = false,
-    visible = true,
-  } = {}) {
-    return new StartTurnCommand({
-      id,
-      title,
-      turnNumber,
-      pauseAfter,
-      visible,
-    });
-  }
-
-  travelPhase({
-    id,
-    title = "Step 1: Travel",
-    turnNumber = null,
-    pauseAfter = false,
-    visible = true,
-  } = {}) {
-    return new TravelPhaseCommand({
-      id,
-      title,
-      turnNumber,
-      pauseAfter,
-      visible,
-    });
-  }
-
-  worldPhase({
-    id,
-    title = "Step 2: World",
-    turnNumber = null,
-    pauseAfter = false,
-    visible = true,
-  } = {}) {
-    return new WorldPhaseCommand({
-      id,
-      title,
-      turnNumber,
-      pauseAfter,
-      visible,
-    });
-  }
-
-  tabletopBattlePhase({
-    id,
-    title = "Step 3: Tabletop Battle",
-    turnNumber = null,
-    pauseAfter = false,
-    visible = true,
-  } = {}) {
-    return new TabletopBattlePhaseCommand({
-      id,
-      title,
-      turnNumber,
-      pauseAfter,
-      visible,
-    });
-  }
-
-  postBattlePhase({
-    id,
-    title = "Step 4: Post-Battle Sequence",
-    turnNumber = null,
-    pauseAfter = false,
-    visible = true,
-  } = {}) {
-    return new PostBattlePhaseCommand({
-      id,
-      title,
-      turnNumber,
-      pauseAfter,
-      visible,
-    });
-  }
-
   buildStartingCrew({
     id,
     title = "Build Starting Crew",
@@ -340,6 +221,22 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     visible = false,
   }) {
     return new BuildStartingCrewCommand({
+      id,
+      title,
+      crewCountPath,
+      pauseAfter,
+      visible,
+    });
+  }
+
+  buildStartingStash({
+    id = "build-starting-stash",
+    title = "Build Starting Crew Stash",
+    crewCountPath = "crewLog.startingCrewCount",
+    pauseAfter = false,
+    visible = false,
+  } = {}) {
+    return new BuildStartingStashCommand({
       id,
       title,
       crewCountPath,
@@ -402,6 +299,7 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     sourcePath,
     resultKind,
     result,
+    crewMemberDetail = {},
   }) {
     return buildCrewMemberTableResultUpdateCommands({
       commandFactory: this,
@@ -410,6 +308,7 @@ export class FiveParsecsCommandFactory extends CommandFactory {
       sourcePath,
       resultKind,
       result,
+      crewMemberDetail,
     });
   }
 
@@ -516,9 +415,8 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     pendingEffectId,
     dice = "1D6",
     source = "",
+    modifier = 0,
     title = null,
-    adjustment = 0,
-    adjustmentLabel = "",
     pauseAfter = false,
     visible = true,
   }) {
@@ -528,8 +426,7 @@ export class FiveParsecsCommandFactory extends CommandFactory {
       pendingEffectId,
       dice,
       source,
-      adjustment,
-      adjustmentLabel,
+      modifier,
       pauseAfter,
       visible,
     });
@@ -541,28 +438,19 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     dice,
     source,
     total,
-    rawTotal = null,
-    adjustment = 0,
-    adjustmentLabel = "",
+    rolledTotal = null,
+    modifier = 0,
     appRoll = null,
   }) {
-    const safeTotal = Math.max(0, Math.floor(Number(total) || 0));
-    const safeRawTotal = rawTotal === null || rawTotal === undefined
-      ? safeTotal
-      : Math.max(0, Math.floor(Number(rawTotal) || 0));
-    const resolution = adjustmentLabel
-      ? `Rolled ${safeRawTotal}; ${adjustmentLabel} Added ${safeTotal} credits.`
-      : `Added ${safeTotal} credits.`;
-
     return [
       this.updateState({
         id: `${pendingEffectId}-apply-credit-roll`,
-        title: `Add ${safeTotal} Credits`,
+        title: `Add ${total} Credits`,
         operations: [
           {
             op: "increment",
             path: "crewLog.credits",
-            amount: safeTotal,
+            amount: total,
           },
           {
             op: "append",
@@ -573,12 +461,11 @@ export class FiveParsecsCommandFactory extends CommandFactory {
               effectType: "creditRoll",
               source,
               dice,
-              rawTotal: safeRawTotal,
-              adjustment,
-              adjustmentLabel,
-              total: safeTotal,
+              total,
+              rolledTotal,
+              modifier,
               appRoll,
-              resolution,
+              resolution: `Added ${total} credits${modifier ? ` after modifier ${modifier}` : ""}.`,
               resolvedAt: new Date().toISOString(),
             },
           },
@@ -624,30 +511,10 @@ export class FiveParsecsCommandFactory extends CommandFactory {
       const safeCount = Number.isFinite(count) ? count : 1;
 
       switch (effect.effectType) {
-        case "addStoryPoints": {
-          const storyAdjustment = getStoryPointEffectAdjustment({
-            state,
-            effect,
-            count: safeCount,
-          });
-
-          if (storyAdjustment.adjustedCount > 0) {
-            updateOperations.push({
-              op: "increment",
-              path: "worldLog.storyPoints",
-              amount: storyAdjustment.adjustedCount,
-            });
-          }
-
-          const adjustmentText = storyAdjustment.adjustmentLabel
-            ? ` ${storyAdjustment.adjustmentLabel}`
-            : "";
-          addResolved(
-            effect,
-            `Added ${storyAdjustment.adjustedCount} story point${storyAdjustment.adjustedCount === 1 ? "" : "s"}.${adjustmentText}`
-          );
+        case "addStoryPoints":
+          updateOperations.push({ op: "increment", path: "worldLog.storyPoints", amount: safeCount });
+          addResolved(effect, `Added ${safeCount} story point${safeCount === 1 ? "" : "s"}.`);
           return;
-        }
 
         case "addRumors":
           updateOperations.push({ op: "increment", path: "worldLog.rumors", amount: safeCount });
@@ -705,24 +572,13 @@ export class FiveParsecsCommandFactory extends CommandFactory {
         }
 
         case "creditRoll": {
-          const creditAdjustment = getCreditEffectAdjustment({ state, effect });
-
-          if (creditAdjustment.ignored) {
-            addResolved(
-              effect,
-              creditAdjustment.adjustmentLabel || "Ignored this credit gain."
-            );
-            return;
-          }
-
           const command = factory.creditRoll({
             id: `${effect.id}-credit-roll`,
             pendingEffectId: effect.id,
             dice: effect.dice || effect.amount || "1D6",
             source: effect.source || effect.label || "Credit Roll",
+            modifier: effect.modifier || 0,
             title: effect.label || `Roll ${effect.dice || effect.amount || "1D6"} Credits`,
-            adjustment: creditAdjustment.adjustment,
-            adjustmentLabel: creditAdjustment.adjustmentLabel,
             pauseAfter: false,
             visible: true,
           });
@@ -849,29 +705,14 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     }
 
     switch (commandData.type) {
-      case "buildWorld":
-        return new BuildWorldCommand(commandData);
-
-      case "buildCrew":
-        return new BuildCrewCommand(commandData);
-
-      case "startTurn":
-        return new StartTurnCommand(commandData);
-
-      case "travelPhase":
-        return new TravelPhaseCommand(commandData);
-
-      case "worldPhase":
-        return new WorldPhaseCommand(commandData);
-
-      case "tabletopBattlePhase":
-        return new TabletopBattlePhaseCommand(commandData);
-
-      case "postBattlePhase":
-        return new PostBattlePhaseCommand(commandData);
+      case "applyFixedTableResult":
+        return new ApplyFixedTableResultCommand(commandData);
 
       case "buildStartingCrew":
         return new BuildStartingCrewCommand(commandData);
+
+      case "buildStartingStash":
+        return new BuildStartingStashCommand(commandData);
 
       case "crewMemberName":
         return new CrewMemberNameCommand(commandData);

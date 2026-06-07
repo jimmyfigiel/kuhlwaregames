@@ -1,0 +1,3 @@
+five-parsecs-procedure-v1-49
+
+UI update: renamed the Queue section to Current Step. Current Step is the only primary dashboard accordion open by default; Campaign, Crew, Encounter, and World start collapsed.

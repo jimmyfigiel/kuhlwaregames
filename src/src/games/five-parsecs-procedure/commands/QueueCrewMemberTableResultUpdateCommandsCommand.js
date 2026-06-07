@@ -50,6 +50,7 @@ export default class QueueCrewMemberTableResultUpdateCommandsCommand extends Bas
           sourcePath: this.sourcePath,
           resultKind: this.resultKind,
           result,
+          crewMemberDetail: engineContext.getStateValue(`crewLog.crewDetails.${this.crewMemberId}`) || {},
         })
       : [];
 
