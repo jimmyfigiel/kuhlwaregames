@@ -34,21 +34,19 @@ function buildInitialCommandQueue() {
       })
       .toJSON(),
     factory
-      .popupMessage({
-        id: "build-ship-placeholder",
+      .buildShip({
+        id: "build-ship",
         title: "Build Ship",
-        message: "Ship creation is the next major setup phase. This placeholder marks where the ship command sequence will run.",
-        buttonText: "Continue",
         pauseAfter: false,
+        visible: true,
       })
       .toJSON(),
     factory
-      .popupMessage({
-        id: "campaign-prep-placeholder",
+      .campaignPrep({
+        id: "campaign-prep",
         title: "Campaign Prep",
-        message: "Campaign prep will review the crew, ship, world, resources, rivals, patrons, rumors, and unresolved setup effects before the first turn begins.",
-        buttonText: "Continue",
         pauseAfter: false,
+        visible: true,
       })
       .toJSON(),
     factory
@@ -71,6 +69,7 @@ function createBlankState() {
     activeCommand: null,
     commandQueue: [],
     equipmentRollSelections: {},
+    shipSetup: {},
 
     campaign: {
       turnNumber: 0,
@@ -78,6 +77,24 @@ function createBlankState() {
       status: "setup",
       setupComplete: false,
       currentStep: "initialSetup",
+      crewSize: null,
+      deployLimit: null,
+      enemyNumberRule: "",
+      enemyNumberRuleLabel: "",
+      storyTrackEnabled: false,
+      storyTrackLabel: "No Story Track",
+      victoryCondition: "none",
+      victoryConditionLabel: "No Victory Condition",
+      difficultyMode: "normal",
+      difficultyModeLabel: "Normal",
+      startingStoryPointRoll: null,
+      startingStoryPointsRawTotal: null,
+      startingStoryPointAdjustment: 0,
+      startingStoryPointAdjustmentLabel: "",
+      startingStoryPoints: 0,
+      storyPoints: 0,
+      storyPointsDisabled: false,
+      storyPointRule: "",
     },
 
     crewLog: {
@@ -86,6 +103,8 @@ function createBlankState() {
       startingCrewCount: null,
       credits: 0,
       ship: "",
+      debt: 0,
+      starship: null,
       inventory: [],
       crewMembers: [],
       crewDetails: {},
@@ -176,6 +195,10 @@ export function initializeMissingGameState(existingState = {}) {
       ? safeExistingState.activeCommand
       : blankState.activeCommand,
     commandQueue,
+    shipSetup: {
+      ...blankState.shipSetup,
+      ...(safeExistingState.shipSetup || {}),
+    },
     campaign: {
       ...blankState.campaign,
       ...(safeExistingState.campaign || {}),

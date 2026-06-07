@@ -4,6 +4,7 @@ import {
   PopupMessageCommand,
   TableRollCommand,
   UpdateStateCommand,
+  ChoiceCommand,
 } from "../commands";
 
 export class CommandFactory {
@@ -78,6 +79,32 @@ export class CommandFactory {
     });
   }
 
+
+
+  choice({
+    id,
+    title,
+    prompt,
+    options = [],
+    saveTo = null,
+    saveLabelTo = null,
+    buttonText = "Continue",
+    pauseAfter = true,
+    visible = true,
+  }) {
+    return new ChoiceCommand({
+      id,
+      title,
+      prompt,
+      options,
+      saveTo,
+      saveLabelTo,
+      buttonText,
+      pauseAfter,
+      visible,
+    });
+  }
+
   updateState({
     id,
     title = "Update State",
@@ -140,6 +167,9 @@ export class CommandFactory {
 
       case "updateState":
         return new UpdateStateCommand(commandData);
+
+      case "choice":
+        return new ChoiceCommand(commandData);
 
       default:
         return null;

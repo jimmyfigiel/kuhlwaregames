@@ -2,12 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CompoundNameGenerator, MarkovNameGenerator } from "../../procedure-core/name-generator";
 import {
   FIVE_PARSECS_WORLD_NAME_PARTS,
+  SHIP_NAMES,
   fiveParsecsWorldNames,
   pulpyFiveParsecsNames,
+  randomShipName,
 } from "./data/nameSets";
 import "./view.css";
 
-const GAME_VERSION = "five-parsecs-procedure-v1-49";
+const GAME_VERSION = "five-parsecs-procedure-v1-51";
 
 const nameGenerator = new MarkovNameGenerator({
   five_parsecs_pulp: pulpyFiveParsecsNames,
@@ -19,6 +21,10 @@ const worldNameGenerator = new CompoundNameGenerator(FIVE_PARSECS_WORLD_NAME_PAR
 function generateRandomName(nameSetId = "five_parsecs_pulp") {
   if (nameSetId === "five_parsecs_world_parts") {
     return worldNameGenerator.generate() || "";
+  }
+
+  if (nameSetId === "five_parsecs_ship") {
+    return randomShipName ? randomShipName() : SHIP_NAMES[Math.floor(Math.random() * SHIP_NAMES.length)] || "The Wandering Star";
   }
 
   const generatedName = nameGenerator.generateName(nameSetId);
@@ -328,6 +334,56 @@ function TextInputPanel({ command, onSubmit }) {
   );
 }
 
+
+function ChoicePanel({ command, onSubmit }) {
+  const options = Array.isArray(command.options) ? command.options : [];
+  const [selectedValue, setSelectedValue] = useState(
+    options.find((option) => option.disabled !== true)?.value ?? ""
+  );
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    onSubmit(selectedValue);
+  }
+
+  return (
+    <form className="fp-command-card" onSubmit={handleSubmit}>
+      <h2>{command.title}</h2>
+      <p>{command.prompt}</p>
+
+      {command.errorMessage && (
+        <p className="fp-error-message">{command.errorMessage}</p>
+      )}
+
+      <div className="fp-choice-list">
+        {options.map((option) => (
+          <label
+            className={`fp-choice-option ${option.disabled ? "fp-choice-option-disabled" : ""}`}
+            key={option.id || String(option.value)}
+          >
+            <input
+              type="radio"
+              name={`choice-${command.id}`}
+              value={String(option.value)}
+              checked={String(selectedValue) === String(option.value)}
+              disabled={option.disabled === true}
+              onChange={() => setSelectedValue(option.value)}
+            />
+            <span>
+              <strong>{option.label}</strong>
+              {option.description && <em>{option.description}</em>}
+            </span>
+          </label>
+        ))}
+      </div>
+
+      <button className="fp-primary-button" type="submit">
+        {command.buttonText || "Continue"}
+      </button>
+    </form>
+  );
+}
+
 function getTableRollRange(entry) {
   if (!entry) {
     return "—";
@@ -579,13 +635,169 @@ function CreditRollPanel({ command, onConfirm }) {
 }
 
 
+
+
+function StartingStoryPointsPanel({ command, onConfirm }) {
+  const [roll, setRoll] = useState(command.roll ?? "");
+  const adjustment = Number(command.adjustment || 0);
+  const parsedRoll = Number(roll);
+  const rawTotal = Number.isFinite(parsedRoll) ? Math.floor(parsedRoll) + 1 : null;
+  const finalTotal = rawTotal === null ? null : Math.max(0, rawTotal + adjustment);
+
+  function handleRollWithAppDice() {
+    setRoll(rollDie(6));
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    onConfirm({ roll });
+  }
+
+  return (
+    <form className="fp-command-card" onSubmit={handleSubmit}>
+      <h2>{command.title || "Starting Story Points"}</h2>
+      <p>Roll 1D6 + 1 to determine starting story points.</p>
+
+      {command.adjustmentLabel && (
+        <p className="fp-muted">{command.adjustmentLabel}</p>
+      )}
+
+      <div className="fp-table-roll-summary">
+        <div className="fp-table-roll-line">
+          <span>D6 roll</span>
+          <strong>{roll || "Not rolled"}</strong>
+        </div>
+        <div className="fp-table-roll-line">
+          <span>Base total</span>
+          <strong>{rawTotal === null ? "—" : rawTotal}</strong>
+        </div>
+        <div className="fp-table-roll-line">
+          <span>Final story points</span>
+          <strong>{finalTotal === null ? "—" : finalTotal}</strong>
+        </div>
+      </div>
+
+      {command.errorMessage && (
+        <p className="fp-error-message">{command.errorMessage}</p>
+      )}
+
+      <button
+        className="fp-secondary-button"
+        type="button"
+        onClick={handleRollWithAppDice}
+      >
+        Roll with App Dice
+      </button>
+
+      <label className="fp-input-label" htmlFor={`story-point-roll-${command.id}`}>
+        D6 roll
+      </label>
+      <input
+        id={`story-point-roll-${command.id}`}
+        className="fp-number-input"
+        type="number"
+        min="1"
+        max="6"
+        value={roll}
+        onChange={(event) => setRoll(event.target.value)}
+        autoFocus
+      />
+
+      <button className="fp-primary-button" type="submit">
+        Save Story Points
+      </button>
+    </form>
+  );
+}
+
+function ShipDebtRollPanel({ command, onConfirm }) {
+  const selectedShip = command.selectedShip || {};
+  const debtBonus = Number(command.debtBonus || selectedShip.debtBonus || 0);
+  const [roll, setRoll] = useState(command.debtRoll ?? "");
+  const numericRoll = Number(roll);
+  const generatedDebt = Number.isFinite(numericRoll)
+    ? Math.max(0, Math.floor(numericRoll) + debtBonus)
+    : null;
+
+  function handleRollWithAppDice() {
+    setRoll(rollDie(6));
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    onConfirm({ roll });
+  }
+
+  return (
+    <form className="fp-command-card" onSubmit={handleSubmit}>
+        <h2>{command.title || "Resolve Ship Debt"}</h2>
+
+        <p>
+          Ship: <strong>{selectedShip.name || selectedShip.label || "Selected ship"}</strong>
+        </p>
+
+        <div className="fp-table-roll-summary">
+          <div className="fp-table-roll-line">
+            <span>Debt formula</span>
+            <strong>{command.debtFormula || selectedShip.debt || `1D6 + ${debtBonus}`}</strong>
+          </div>
+          <div className="fp-table-roll-line">
+            <span>Debt bonus</span>
+            <strong>{debtBonus}</strong>
+          </div>
+          <div className="fp-table-roll-line">
+            <span>Generated debt</span>
+            <strong>{generatedDebt === null ? "Not rolled" : generatedDebt}</strong>
+          </div>
+        </div>
+
+        {command.errorMessage && (
+          <p className="fp-error-message">{command.errorMessage}</p>
+        )}
+
+        <button
+          className="fp-secondary-button"
+          type="button"
+          onClick={handleRollWithAppDice}
+        >
+          Roll with App Dice
+        </button>
+
+        <p className="fp-table-help-text">
+          Roll a physical D6 and enter it, or roll with the app and confirm the result.
+        </p>
+
+        <label className="fp-input-label" htmlFor={`ship-debt-roll-${command.id}`}>
+          D6 roll
+        </label>
+        <input
+          id={`ship-debt-roll-${command.id}`}
+          className="fp-number-input"
+          type="number"
+          min="1"
+          max="6"
+          value={roll}
+          onChange={(event) => setRoll(event.target.value)}
+          autoFocus
+        />
+
+        <button className="fp-primary-button" type="submit">
+          Save Ship Debt
+        </button>
+    </form>
+  );
+}
+
 function ActiveCommandPanel({
   command,
   onPopupOk,
   onNumberSubmit,
   onTextSubmit,
+  onChoiceSubmit,
   onTableConfirm,
   onCreditConfirm,
+  onShipDebtConfirm,
+  onStartingStoryPointsConfirm,
 }) {
   if (!command) {
     return null;
@@ -637,6 +849,14 @@ function ActiveCommandPanel({
         />
       )}
 
+      {command.type === "choice" && (
+        <ChoicePanel
+          key={command.id}
+          command={command}
+          onSubmit={onChoiceSubmit}
+        />
+      )}
+
       {command.type === "tableRoll" && (
         <TableRollPanel
           key={command.id}
@@ -653,14 +873,33 @@ function ActiveCommandPanel({
         />
       )}
 
+      {command.type === "resolveStartingStoryPoints" && (
+        <StartingStoryPointsPanel
+          key={command.id}
+          command={command}
+          onConfirm={onStartingStoryPointsConfirm}
+        />
+      )}
+
+      {command.type === "resolveShipDebt" && (
+        <ShipDebtRollPanel
+          key={command.id}
+          command={command}
+          onConfirm={onShipDebtConfirm}
+        />
+      )}
+
       {![
         "popupMessage",
         "startTurn",
         "numberInput",
         "crewMemberName",
         "textInput",
+        "choice",
         "tableRoll",
         "resolveCreditRoll",
+        "resolveStartingStoryPoints",
+        "resolveShipDebt",
       ].includes(command.type) && (
         <div className="fp-command-card">
           <h2>{command.title || "Active Command"}</h2>
@@ -754,6 +993,10 @@ function QueueManager({ gameState, submitAction, showStackInspectorButton = fals
     resolveActiveCommand({ value });
   }
 
+  function handleChoiceSubmit(value) {
+    resolveActiveCommand({ value });
+  }
+
   return (
     <section className="fp-accordion-section fp-queue-accordion-section">
       <button
@@ -784,8 +1027,11 @@ function QueueManager({ gameState, submitAction, showStackInspectorButton = fals
                 onPopupOk={handlePopupOk}
                 onNumberSubmit={handleNumberSubmit}
                 onTextSubmit={handleTextSubmit}
+                onChoiceSubmit={handleChoiceSubmit}
                 onTableConfirm={resolveActiveCommand}
                 onCreditConfirm={resolveActiveCommand}
+                onShipDebtConfirm={resolveActiveCommand}
+                onStartingStoryPointsConfirm={resolveActiveCommand}
               />
             ) : (
               <div className="fp-command-card fp-empty-active-command-card">
@@ -951,6 +1197,15 @@ function CampaignSheet({ campaign }) {
       <FieldRow label="Phase" value={safeCampaign.phase || "setup"} />
       <FieldRow label="Status" value={safeCampaign.status || "setup"} />
       <FieldRow label="Current Step" value={safeCampaign.currentStep || "initialSetup"} />
+      <FieldRow label="Crew Size" value={safeCampaign.crewSize || "Not set"} />
+      <FieldRow label="Deploy Limit" value={safeCampaign.deployLimit || "Not set"} />
+      <FieldRow label="Enemy Number Rule" value={safeCampaign.enemyNumberRuleLabel || "Not set"} />
+      <FieldRow label="Story Track" value={safeCampaign.storyTrackLabel || "No Story Track"} />
+      <FieldRow label="Victory Condition" value={safeCampaign.victoryConditionLabel || "No Victory Condition"} />
+      <FieldRow label="Difficulty" value={safeCampaign.difficultyModeLabel || "Normal"} />
+      <FieldRow label="Starting Story Points" value={safeCampaign.startingStoryPoints ?? 0} />
+      <FieldRow label="Story Point Rule" value={safeCampaign.storyPointRule || safeCampaign.startingStoryPointAdjustmentLabel || "Standard"} />
+      <FieldRow label="Setup Complete" value={safeCampaign.setupComplete ? "Yes" : "No"} />
       <FieldRow label="Version" value={GAME_VERSION} />
     </AccordionSection>
   );
@@ -1054,6 +1309,14 @@ function CrewLogSheet({ crewLog }) {
       <FieldRow label="Starting Crew Members" value={crewLog.startingCrewCount} />
       <FieldRow label="Credits" value={crewLog.credits} />
       <FieldRow label="Ship" value={crewLog.ship} />
+      {crewLog.starship && typeof crewLog.starship === "object" && (
+        <>
+          <FieldRow label="Ship Type" value={crewLog.starship.shipType} />
+          <FieldRow label="Hull" value={`${crewLog.starship.hullDamage ?? 0} / ${crewLog.starship.hullThreshold ?? 0}`} />
+          <FieldRow label="Debt Owed" value={crewLog.starship.debtOwed} />
+          <FieldRow label="Ship Traits" value={Array.isArray(crewLog.starship.traits) && crewLog.starship.traits.length > 0 ? crewLog.starship.traits.join("; ") : "None"} />
+        </>
+      )}
       <FieldRow
         label="Pending Crew Effects"
         value={summarizeList(crewLog.pendingEffects, formatPendingEffect)}

@@ -2,6 +2,7 @@ import { CommandFactory } from "../../../procedure-core/factory";
 import {
   BuildWorldCommand,
   BuildCrewCommand,
+  BuildShipCommand,
   BuildStartingCrewCommand,
   StartTurnCommand,
   TravelPhaseCommand,
@@ -13,10 +14,15 @@ import {
   QueueCrewMemberTableResultUpdateCommandsCommand,
   QueueEquipmentTableResultUpdateCommandsCommand,
   ResolveCreditRollCommand,
+  ResolveShipDebtCommand,
   ResolvePendingEffectsCommand,
+  QueueShipTableResultUpdateCommandsCommand,
+  ApplyShipSetupCommand,
+  CampaignPrepCommand,
+  ResolveStartingStoryPointsCommand,
 } from "../commands";
 import { buildCrewMemberTableResultUpdateCommands } from "../effects";
-import { EQUIPMENT_ROLL_TABLES_BY_ID } from "../data/tables";
+import { EQUIPMENT_ROLL_TABLES_BY_ID, SHIP_TABLE_DEFINITION } from "../data/tables";
 
 
 function normalizeEquipmentTable(table) {
@@ -35,6 +41,27 @@ function normalizeEquipmentTable(table) {
       max: row.rollMax,
       label: row.name,
       value: row.name,
+    })),
+  };
+}
+
+
+function normalizeShipTable(table) {
+  if (!table) {
+    return null;
+  }
+
+  return {
+    id: table.id,
+    title: table.title,
+    dice: table.dice || "D100",
+    sides: table.sides || 100,
+    entries: (table.entries || []).map((row) => ({
+      ...row,
+      min: row.min ?? row.rollMin,
+      max: row.max ?? row.rollMax,
+      label: row.label || row.name || row.ship,
+      value: row.value || row.name || row.ship,
     })),
   };
 }
@@ -222,6 +249,61 @@ function getStoryPointEffectAdjustment({ state, effect, count }) {
 }
 
 
+
+const VICTORY_CONDITION_OPTIONS = [
+  { id: "none", label: "No Victory Condition", value: "none", description: "Play an open-ended campaign." },
+  { id: "turns-20", label: "Play 20 campaign turns", value: "turns-20" },
+  { id: "turns-50", label: "Play 50 campaign turns", value: "turns-50" },
+  { id: "turns-100", label: "Play 100 campaign turns", value: "turns-100" },
+  { id: "quests-3", label: "Complete 3 Quests", value: "quests-3" },
+  { id: "quests-5", label: "Complete 5 Quests", value: "quests-5" },
+  { id: "quests-10", label: "Complete 10 Quests", value: "quests-10" },
+  { id: "battle-wins-20", label: "Win 20 tabletop battles", value: "battle-wins-20" },
+  { id: "battle-wins-50", label: "Win 50 tabletop battles", value: "battle-wins-50" },
+  { id: "battle-wins-100", label: "Win 100 tabletop battles", value: "battle-wins-100" },
+  { id: "unique-kills-10", label: "Kill 10 Unique Individuals", value: "unique-kills-10" },
+  { id: "unique-kills-25", label: "Kill 25 Unique Individuals", value: "unique-kills-25" },
+  { id: "one-character-10-upgrades", label: "Upgrade a single character 10 times", value: "one-character-10-upgrades" },
+  { id: "three-characters-10-upgrades", label: "Upgrade 3 characters 10 times", value: "three-characters-10-upgrades" },
+  { id: "five-characters-10-upgrades", label: "Upgrade 5 characters 10 times", value: "five-characters-10-upgrades" },
+  { id: "challenging-turns-50", label: "Play 50 campaign turns in Challenging mode", value: "challenging-turns-50" },
+  { id: "hardcore-turns-50", label: "Play 50 campaign turns in Hardcore mode", value: "hardcore-turns-50" },
+  { id: "insanity-turns-50", label: "Play 50 campaign turns in Insanity mode", value: "insanity-turns-50" },
+];
+
+const DIFFICULTY_MODE_OPTIONS = [
+  {
+    id: "easy",
+    label: "Easy",
+    value: "easy",
+    description: "Easier battles and improved rewards. Only the 20-turn and 20-battle victory conditions can be completed.",
+  },
+  {
+    id: "normal",
+    label: "Normal",
+    value: "normal",
+    description: "No changes to game mechanics.",
+  },
+  {
+    id: "challenging",
+    label: "Challenging",
+    value: "challenging",
+    description: "Enemy-number dice that roll 1 or 2 count as 3.",
+  },
+  {
+    id: "hardcore",
+    label: "Hardcore",
+    value: "hardcore",
+    description: "Challenging plus tougher battle and campaign penalties. Starting story points are reduced by 1.",
+  },
+  {
+    id: "insanity",
+    label: "Insanity",
+    value: "insanity",
+    description: "Hardcore plus severe battle penalties. Story points and Stars of the Story are not available.",
+  },
+];
+
 export class FiveParsecsCommandFactory extends CommandFactory {
 
   buildWorld({
@@ -245,6 +327,20 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     visible = true,
   } = {}) {
     return new BuildCrewCommand({
+      id,
+      title,
+      pauseAfter,
+      visible,
+    });
+  }
+
+  buildShip({
+    id = "build-ship",
+    title = "Build Ship",
+    pauseAfter = false,
+    visible = true,
+  } = {}) {
+    return new BuildShipCommand({
       id,
       title,
       pauseAfter,
@@ -332,6 +428,44 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     });
   }
 
+
+
+  campaignPrep({
+    id = "campaign-prep",
+    title = "Campaign Prep",
+    pauseAfter = false,
+    visible = true,
+  } = {}) {
+    return new CampaignPrepCommand({
+      id,
+      title,
+      pauseAfter,
+      visible,
+    });
+  }
+
+  resolveStartingStoryPoints({
+    id = "resolve-starting-story-points",
+    title = "Starting Story Points",
+    pauseAfter = false,
+    visible = true,
+  } = {}) {
+    return new ResolveStartingStoryPointsCommand({
+      id,
+      title,
+      pauseAfter,
+      visible,
+    });
+  }
+
+  getVictoryConditionOptions() {
+    return VICTORY_CONDITION_OPTIONS;
+  }
+
+  getDifficultyModeOptions() {
+    return DIFFICULTY_MODE_OPTIONS;
+  }
+
   buildStartingCrew({
     id,
     title = "Build Starting Crew",
@@ -413,6 +547,74 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     });
   }
 
+
+
+  shipTableRoll({
+    id = "choose-starting-ship",
+    title = "Choose Starting Ship",
+    pauseAfter = false,
+    visible = true,
+  } = {}) {
+    const table = normalizeShipTable(SHIP_TABLE_DEFINITION);
+
+    return this.tableRoll({
+      id,
+      title,
+      table,
+      saveTo: "shipSetup.selectedShip",
+      buttonText: "Select Ship",
+      rollButtonText: "Roll with App Dice",
+      afterSelectionCommands: [
+        new QueueShipTableResultUpdateCommandsCommand({
+          id: "queue-starting-ship-result-updates",
+          title: "Apply Ship Result",
+          sourcePath: "shipSetup.selectedShip",
+          pauseAfter: false,
+          visible: false,
+        }),
+      ],
+      pauseAfter,
+      visible,
+    });
+  }
+
+  createCommandsForShipSelection({ selectedShip }) {
+    const shipLabel = selectedShip?.name || selectedShip?.label || "Starting Ship";
+
+    return [
+      new ResolveShipDebtCommand({
+        id: "resolve-starting-ship-debt",
+        title: `Resolve Debt: ${shipLabel}`,
+        sourcePath: "shipSetup.selectedShip",
+        saveRollTo: "shipSetup.debtRoll",
+        saveDebtTo: "shipSetup.generatedDebt",
+        pauseAfter: false,
+        visible: true,
+      }),
+      this.textInput({
+        id: "name-starting-ship",
+        title: "Name Your Ship",
+        prompt: "Name your crew's starship.",
+        label: "Ship Name",
+        defaultValue: shipLabel,
+        saveTo: "shipSetup.shipName",
+        buttonText: "OK",
+        allowRandomName: true,
+        randomNameSet: "five_parsecs_ship",
+        randomNameButtonText: "Generate Ship Name",
+        pauseAfter: false,
+      }),
+      new ApplyShipSetupCommand({
+        id: "apply-starting-ship",
+        title: "Apply Starting Ship",
+        sourcePath: "shipSetup.selectedShip",
+        debtPath: "shipSetup.generatedDebt",
+        namePath: "shipSetup.shipName",
+        pauseAfter: false,
+        visible: false,
+      }),
+    ];
+  }
 
 
   equipmentTableRoll({
@@ -855,6 +1057,9 @@ export class FiveParsecsCommandFactory extends CommandFactory {
       case "buildCrew":
         return new BuildCrewCommand(commandData);
 
+      case "buildShip":
+        return new BuildShipCommand(commandData);
+
       case "startTurn":
         return new StartTurnCommand(commandData);
 
@@ -885,11 +1090,26 @@ export class FiveParsecsCommandFactory extends CommandFactory {
       case "queueEquipmentTableResultUpdateCommands":
         return new QueueEquipmentTableResultUpdateCommandsCommand(commandData);
 
+      case "queueShipTableResultUpdateCommands":
+        return new QueueShipTableResultUpdateCommandsCommand(commandData);
+
       case "resolveCreditRoll":
         return new ResolveCreditRollCommand(commandData);
 
+      case "resolveShipDebt":
+        return new ResolveShipDebtCommand(commandData);
+
+      case "applyShipSetup":
+        return new ApplyShipSetupCommand(commandData);
+
       case "resolvePendingEffects":
         return new ResolvePendingEffectsCommand(commandData);
+
+      case "campaignPrep":
+        return new CampaignPrepCommand(commandData);
+
+      case "resolveStartingStoryPoints":
+        return new ResolveStartingStoryPointsCommand(commandData);
 
       default:
         console.warn(`Unknown command type: ${commandData.type}`);

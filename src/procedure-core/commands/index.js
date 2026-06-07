@@ -4,3 +4,5 @@ export { PopupMessageCommand, default as PopupMessageCommandDefault } from "./Po
 export { TableRollCommand, default as TableRollCommandDefault } from "./TableRollCommand";
 export { UpdateStateCommand, default as UpdateStateCommandDefault } from "./UpdateStateCommand";
 export { TextInputCommand, default as TextInputCommandDefault } from "./TextInputCommand";
+
+export { ChoiceCommand, default as ChoiceCommandDefault } from "./ChoiceCommand";

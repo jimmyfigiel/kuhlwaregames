@@ -15,3 +15,5 @@ export {
 } from "./worldNames.js";
 
 export { FIVE_PARSECS_WORLD_NAME_PARTS } from "./worldNameParts.js";
+
+export { SHIP_NAMES, randomShipName } from "./shipNames.js";
