@@ -6,6 +6,7 @@ import {
   BuildStartingCrewCommand,
   StartTurnCommand,
   TravelPhaseCommand,
+  DecideTravelCommand,
   WorldPhaseCommand,
   TabletopBattlePhaseCommand,
   PostBattlePhaseCommand,
@@ -374,6 +375,24 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     return new TravelPhaseCommand({
       id,
       title,
+      turnNumber,
+      pauseAfter,
+      visible,
+    });
+  }
+
+  decideTravel({
+    id,
+    title = "Travel: Stay or Travel?",
+    prompt = "Will the crew stay on the current world or travel to a new world?",
+    turnNumber = null,
+    pauseAfter = false,
+    visible = true,
+  } = {}) {
+    return new DecideTravelCommand({
+      id,
+      title,
+      prompt,
       turnNumber,
       pauseAfter,
       visible,
@@ -1065,6 +1084,9 @@ export class FiveParsecsCommandFactory extends CommandFactory {
 
       case "travelPhase":
         return new TravelPhaseCommand(commandData);
+
+      case "decideTravel":
+        return new DecideTravelCommand(commandData);
 
       case "worldPhase":
         return new WorldPhaseCommand(commandData);

@@ -9,7 +9,7 @@ import {
 } from "./data/nameSets";
 import "./view.css";
 
-const GAME_VERSION = "five-parsecs-procedure-v1-52";
+const GAME_VERSION = "five-parsecs-procedure-v1-53";
 
 const nameGenerator = new MarkovNameGenerator({
   five_parsecs_pulp: pulpyFiveParsecsNames,
@@ -849,7 +849,7 @@ function ActiveCommandPanel({
         />
       )}
 
-      {command.type === "choice" && (
+      {(command.type === "choice" || command.type === "decideTravel") && (
         <ChoicePanel
           key={command.id}
           command={command}
@@ -896,6 +896,7 @@ function ActiveCommandPanel({
         "crewMemberName",
         "textInput",
         "choice",
+        "decideTravel",
         "tableRoll",
         "resolveCreditRoll",
         "resolveStartingStoryPoints",

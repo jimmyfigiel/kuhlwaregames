@@ -52,7 +52,7 @@ export class TravelPhaseCommand extends BaseCommand {
         factory.popupMessage({
           id: `${this.id}-flee-invasion`,
           title: "Travel: Flee Invasion",
-          message: "Resolve Flee Invasion if the current world is being invaded. This step is present because the World Log indicates an active invasion.",
+          message: "Resolve Flee Invasion because the World Log indicates an active invasion. This is a placeholder step; the full flee-invasion roll will be added later.",
           buttonText: "Done",
           pauseAfter: false,
         })
@@ -60,12 +60,12 @@ export class TravelPhaseCommand extends BaseCommand {
     }
 
     commands.push(
-      factory.popupMessage({
+      factory.decideTravel({
         id: `${this.id}-decide-travel`,
-        title: "Travel: Decide Whether to Travel",
-        message: "Decide whether the crew will stay on the current world or travel. Later this will branch into starship travel events and new-world arrival steps when travel is chosen.",
-        buttonText: "Done",
+        title: "Travel: Stay or Travel?",
+        turnNumber: this.turnNumber,
         pauseAfter: false,
+        visible: true,
       })
     );
 
