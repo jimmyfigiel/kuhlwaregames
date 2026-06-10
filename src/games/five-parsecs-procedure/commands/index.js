@@ -12,6 +12,8 @@ export { ResolveCreditRollCommand, default as ResolveCreditRollCommandDefault } 
 export { default as StartTurnCommand } from "./StartTurnCommand";
 export { default as TravelPhaseCommand } from "./TravelPhaseCommand";
 export { default as DecideTravelCommand } from "./DecideTravelCommand";
+export { default as NewWorldArrivalCommand } from "./NewWorldArrivalCommand";
+export { default as ReturnToVisitedWorldCommand } from "./ReturnToVisitedWorldCommand";
 export { default as WorldPhaseCommand } from "./WorldPhaseCommand";
 export { default as TabletopBattlePhaseCommand } from "./TabletopBattlePhaseCommand";
 export { default as PostBattlePhaseCommand } from "./PostBattlePhaseCommand";
@@ -22,3 +24,5 @@ export { ResolveShipDebtCommand, default as ResolveShipDebtCommandDefault } from
 export { default as ApplyShipSetupCommand } from "./ApplyShipSetupCommand";
 export { default as CampaignPrepCommand } from "./CampaignPrepCommand";
 export { ResolveStartingStoryPointsCommand, default as ResolveStartingStoryPointsCommandDefault } from "./ResolveStartingStoryPointsCommand";
+
+export { ApplyStarshipTravelEventCommand } from "./ApplyStarshipTravelEventCommand";

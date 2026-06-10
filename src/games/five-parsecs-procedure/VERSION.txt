@@ -1,3 +1,3 @@
-five-parsecs-procedure-v1-53
-Built from v1-52.
-Adds Travel Phase branching skeleton: invasion check placeholder, stay/travel decision, travel-event placeholder, and new-world-arrival placeholder.
+five-parsecs-procedure v1.56
+
+Built from v1.55. Travel can now branch to stay on the current world, travel to a brand-new world, or travel back to a previously visited world. Returning to a previous world rolls the Starship Travel Events table, moves the old current world into Previous Worlds, restores the selected world as Current World, and records the return in Arrival History.

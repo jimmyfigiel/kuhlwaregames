@@ -6,15 +6,71 @@ const TRAVEL_OPTIONS = [
     id: "stay",
     label: "Stay on this world",
     value: "stay",
-    description: "Continue to the World phase without starship travel or new-world arrival steps.",
+    description: "Continue to the World phase without starship travel.",
   },
   {
-    id: "travel",
+    id: "newWorld",
     label: "Travel to a new world",
-    value: "travel",
-    description: "Add starship travel and new-world arrival steps before continuing.",
+    value: "newWorld",
+    description: "Roll a starship travel event, then create a new current world.",
   },
 ];
+
+function normalizeWorld(value) {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return {
+      id: value.id || "",
+      name: value.name || "",
+      departedAt: value.departedAt || "",
+      traits: Array.isArray(value.traits) ? value.traits : [],
+      invasion: value.invasion || "",
+      license: value.license || "",
+    };
+  }
+
+  return {
+    id: "",
+    name: String(value || ""),
+    departedAt: "",
+    traits: [],
+    invasion: "",
+    license: "",
+  };
+}
+
+function buildTravelOptions(state, baseOptions) {
+  const options = [...baseOptions];
+  const currentWorld = normalizeWorld(state?.worldLog?.currentWorld);
+  const currentWorldName = String(currentWorld.name || "").trim().toLowerCase();
+  const visitedWorlds = Array.isArray(state?.worldLog?.visitedWorlds)
+    ? state.worldLog.visitedWorlds
+    : [];
+
+  visitedWorlds
+    .map(normalizeWorld)
+    .filter((world) => String(world.name || "").trim())
+    .filter((world) => String(world.name || "").trim().toLowerCase() !== currentWorldName)
+    .forEach((world, index) => {
+      const traitCount = Array.isArray(world.traits) ? world.traits.length : 0;
+      const value = `return:${world.id || world.name || index}`;
+      const details = [
+        world.departedAt ? `Last left ${new Date(world.departedAt).toLocaleDateString()}` : "Previously visited world",
+        traitCount > 0 ? `${traitCount} trait${traitCount === 1 ? "" : "s"}` : "",
+        world.invasion ? `Invasion: ${world.invasion}` : "",
+        world.license ? `License: ${world.license}` : "",
+      ].filter(Boolean);
+
+      options.push({
+        id: value,
+        label: `Travel back to ${world.name}`,
+        value,
+        description: details.join(" · "),
+        worldId: world.id || world.name || String(index),
+      });
+    });
+
+  return options;
+}
 
 function normalizeTurnNumber(value) {
   const number = Number(value);
@@ -51,7 +107,13 @@ export class DecideTravelCommand extends BaseCommand {
   execute(engineContext) {
     this.status = "waitingForUser";
 
-    engineContext.showActiveCommand(this);
+    const options = buildTravelOptions(engineContext.state, this.options);
+
+    engineContext.showActiveCommand({
+      ...this,
+      status: "waitingForUser",
+      options,
+    });
     engineContext.setStatus("waitingForUser");
     engineContext.stopAfterCurrentCommand();
 
@@ -64,7 +126,8 @@ export class DecideTravelCommand extends BaseCommand {
 
   resolve(engineContext, input = {}) {
     const selectedValue = String(input.value || "").trim();
-    const selectedOption = this.options.find((option) => String(option.value) === selectedValue || option.id === selectedValue);
+    const availableOptions = buildTravelOptions(engineContext.state, this.options);
+    const selectedOption = availableOptions.find((option) => String(option.value) === selectedValue || option.id === selectedValue);
 
     if (!selectedOption || selectedOption.disabled) {
       this.status = "waitingForUser";
@@ -77,7 +140,10 @@ export class DecideTravelCommand extends BaseCommand {
 
     const factory = engineContext.commandFactory;
     const turnPrefix = this.turnNumber ? `turn-${this.turnNumber}` : "travel";
-    const selectedTravel = String(selectedOption.value) === "travel";
+    const selectedKind = String(selectedOption.value || "");
+    const selectedNewWorld = selectedKind === "newWorld" || selectedKind === "travel";
+    const selectedReturn = selectedKind.startsWith("return:");
+    const selectedTravel = selectedNewWorld || selectedReturn;
     const commands = [
       factory.updateState({
         id: `${this.id}-save-decision`,
@@ -94,21 +160,37 @@ export class DecideTravelCommand extends BaseCommand {
 
     if (selectedTravel) {
       commands.push(
-        factory.popupMessage({
+        factory.starshipTravelEventRoll({
           id: `${turnPrefix}-starship-travel-event`,
           title: "Travel: Starship Travel Event",
-          message: "Resolve the Starship Travel Event if one applies. This is a placeholder step; the event table will be added later.",
-          buttonText: "Done",
+          turnNumber: this.turnNumber,
           pauseAfter: false,
-        }),
-        factory.popupMessage({
-          id: `${turnPrefix}-new-world-arrival`,
-          title: "Travel: New World Arrival",
-          message: "Resolve new-world arrival steps. This placeholder will later handle new world traits, license checks, patrons, rivals, and arrival effects.",
-          buttonText: "Done",
-          pauseAfter: false,
+          visible: true,
         })
       );
+
+      if (selectedReturn) {
+        commands.push(
+          factory.returnToVisitedWorld({
+            id: `${turnPrefix}-return-to-visited-world`,
+            title: selectedOption.label,
+            targetWorldId: selectedKind.replace(/^return:/, ""),
+            turnNumber: this.turnNumber,
+            pauseAfter: false,
+            visible: false,
+          })
+        );
+      } else if (selectedNewWorld) {
+        commands.push(
+          factory.newWorldArrival({
+            id: `${turnPrefix}-new-world-arrival`,
+            title: "Travel: New World Arrival",
+            turnNumber: this.turnNumber,
+            pauseAfter: false,
+            visible: true,
+          })
+        );
+      }
     }
 
     engineContext.clearActiveCommand();
@@ -120,7 +202,7 @@ export class DecideTravelCommand extends BaseCommand {
     engineContext.addLogEntry({
       type: "commandCompleted",
       text: selectedTravel
-        ? "Crew chose to travel to a new world."
+        ? `Crew chose to ${selectedOption.label.toLowerCase()}.`
         : "Crew chose to stay on the current world.",
       commandId: this.id,
     });

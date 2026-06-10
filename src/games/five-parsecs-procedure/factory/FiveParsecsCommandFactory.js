@@ -7,6 +7,8 @@ import {
   StartTurnCommand,
   TravelPhaseCommand,
   DecideTravelCommand,
+  NewWorldArrivalCommand,
+  ReturnToVisitedWorldCommand,
   WorldPhaseCommand,
   TabletopBattlePhaseCommand,
   PostBattlePhaseCommand,
@@ -21,10 +23,38 @@ import {
   ApplyShipSetupCommand,
   CampaignPrepCommand,
   ResolveStartingStoryPointsCommand,
+  ApplyStarshipTravelEventCommand,
 } from "../commands";
 import { buildCrewMemberTableResultUpdateCommands } from "../effects";
-import { EQUIPMENT_ROLL_TABLES_BY_ID, SHIP_TABLE_DEFINITION } from "../data/tables";
+import { EQUIPMENT_ROLL_TABLES_BY_ID, SHIP_TABLE_DEFINITION, CAMPAIGN_TABLES } from "../data/tables";
 
+
+
+function normalizeCampaignTable(table) {
+  if (!table) {
+    return null;
+  }
+
+  const dice = String(table.dice || "D100").toUpperCase();
+  const sides = dice === "D10" ? 10 : dice === "D6" ? 6 : 100;
+
+  return {
+    id: table.id,
+    title: table.label || table.title || table.id || "Campaign Table",
+    dice,
+    sides,
+    note: table.description || "",
+    rulesPage: table.rulesPage || null,
+    entries: (table.rows || table.entries || []).map((row) => ({
+      ...row,
+      min: row.min ?? row.rollMin ?? row.roll,
+      max: row.max ?? row.rollMax ?? row.roll ?? row.min,
+      label: row.label || row.title || row.name || row.value,
+      value: row.value || row.title || row.name || row.label,
+      rulesPage: row.rulesPage || table.rulesPage || null,
+    })),
+  };
+}
 
 function normalizeEquipmentTable(table) {
   if (!table) {
@@ -394,6 +424,74 @@ export class FiveParsecsCommandFactory extends CommandFactory {
       title,
       prompt,
       turnNumber,
+      pauseAfter,
+      visible,
+    });
+  }
+
+  newWorldArrival({
+    id,
+    title = "Travel: New World Arrival",
+    prompt = "Name the world your crew arrives at.",
+    turnNumber = null,
+    pauseAfter = false,
+    visible = true,
+  } = {}) {
+    return new NewWorldArrivalCommand({
+      id,
+      title,
+      prompt,
+      turnNumber,
+      pauseAfter,
+      visible,
+    });
+  }
+
+  returnToVisitedWorld({
+    id,
+    title = "Travel: Return to Previous World",
+    targetWorldId = "",
+    turnNumber = null,
+    pauseAfter = false,
+    visible = false,
+  } = {}) {
+    return new ReturnToVisitedWorldCommand({
+      id,
+      title,
+      targetWorldId,
+      turnNumber,
+      pauseAfter,
+      visible,
+    });
+  }
+
+
+  starshipTravelEventRoll({
+    id = "starship-travel-event",
+    title = "Travel: Starship Travel Event",
+    turnNumber = null,
+    pauseAfter = false,
+    visible = true,
+  } = {}) {
+    const table = normalizeCampaignTable(CAMPAIGN_TABLES.starshipTravelEvents);
+
+    return this.tableRoll({
+      id,
+      title,
+      table,
+      saveTo: "campaign.lastStarshipTravelEvent",
+      buttonText: "Select Event",
+      rollButtonText: "Roll Starship Travel Event",
+      afterSelectionCommands: [
+        new ApplyStarshipTravelEventCommand({
+          id: `${id}-apply`,
+          title: "Record Starship Travel Event",
+          sourcePath: "campaign.lastStarshipTravelEvent",
+          turnNumber,
+          pauseAfter: false,
+          visible: false,
+        }),
+      ],
       pauseAfter,
       visible,
     });
@@ -1087,6 +1185,15 @@ export class FiveParsecsCommandFactory extends CommandFactory {
 
       case "decideTravel":
         return new DecideTravelCommand(commandData);
+
+      case "newWorldArrival":
+        return new NewWorldArrivalCommand(commandData);
+
+      case "returnToVisitedWorld":
+        return new ReturnToVisitedWorldCommand(commandData);
+
+      case "applyStarshipTravelEvent":
+        return new ApplyStarshipTravelEventCommand(commandData);
 
       case "worldPhase":
         return new WorldPhaseCommand(commandData);

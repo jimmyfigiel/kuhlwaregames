@@ -1,5 +1,5 @@
 // src/games/pokemon/view.jsx
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import "./pokemonStyles.css";
 import { getCurrentCommand } from "../../core/command/commandEngine";
 import {
@@ -7,15 +7,122 @@ import {
   getCardBackImage,
   getCardImage,
   getCardTypeLabel,
-  getDeckOptions,
   getEnergyTypeFromCard,
   getRealAttacks,
 } from "./pokemonData";
 import { hasEnoughEnergyForAttack, playerLabel } from "./pokemonCommands";
 
+const EMPTY_BENCH = [null, null, null, null, null];
+
+function emptyPlayer(playerId) {
+  return {
+    id: playerId,
+    name: playerLabel(playerId),
+    deck: [],
+    hand: [],
+    discard: [],
+    prizes: [],
+    active: null,
+    bench: [...EMPTY_BENCH],
+  };
+}
+
+function getPokemonStateFromProps(props) {
+  const candidates = [
+    props.gameState,
+    props.state,
+    props.room?.gameState,
+    props.room?.state,
+    props.room?.game?.state,
+    props.room,
+    props.game?.state,
+    props.game,
+  ];
+
+  for (const candidate of candidates) {
+    const found = findPokemonState(candidate);
+    if (found) return found;
+  }
+
+  return null;
+}
+
+function findPokemonState(candidate, depth = 0) {
+  if (!candidate || typeof candidate !== "object" || depth > 4) return null;
+
+  const looksLikePokemonState =
+    candidate.gameId === "pokemon" ||
+    Boolean(candidate.players) ||
+    Boolean(candidate.cardsById) ||
+    Boolean(candidate.commands);
+
+  if (looksLikePokemonState) return candidate;
+
+  return (
+    findPokemonState(candidate.gameState, depth + 1) ??
+    findPokemonState(candidate.state, depth + 1) ??
+    findPokemonState(candidate.game?.state, depth + 1) ??
+    findPokemonState(candidate.data?.gameState, depth + 1) ??
+    findPokemonState(candidate.data?.state, depth + 1)
+  );
+}
+
+function getSafeState(rawState) {
+  if (!rawState) return null;
+
+  const p1 = rawState.players?.p1 ?? emptyPlayer("p1");
+  const p2 = rawState.players?.p2 ?? emptyPlayer("p2");
+
+  return {
+    ...rawState,
+    players: {
+      ...rawState.players,
+      p1: normalizePlayer(p1, "p1"),
+      p2: normalizePlayer(p2, "p2"),
+    },
+    cardsById: rawState.cardsById ?? {},
+    commands: rawState.commands ?? { queue: [], history: [] },
+    turn: {
+      playerId: rawState.turn?.playerId === "p2" ? "p2" : "p1",
+      number: rawState.turn?.number ?? 0,
+      phase: rawState.turn?.phase ?? "SETUP",
+      hasDrawnThisTurn: Boolean(rawState.turn?.hasDrawnThisTurn),
+      energyAttachedThisTurn: Boolean(rawState.turn?.energyAttachedThisTurn),
+      attackUsedThisTurn: Boolean(rawState.turn?.attackUsedThisTurn),
+      ...rawState.turn,
+    },
+    options: rawState.options ?? {},
+    setupErrors: rawState.setupErrors ?? [],
+    messageLog: rawState.messageLog ?? [],
+    queueTrace: rawState.queueTrace ?? [],
+    commandContext: rawState.commandContext ?? {},
+  };
+}
+
+function normalizePlayer(player, playerId) {
+  return {
+    ...emptyPlayer(playerId),
+    ...player,
+    id: player.id ?? playerId,
+    name: player.name ?? playerLabel(playerId),
+    deck: Array.isArray(player.deck) ? player.deck : [],
+    hand: Array.isArray(player.hand) ? player.hand : [],
+    discard: Array.isArray(player.discard) ? player.discard : [],
+    prizes: Array.isArray(player.prizes) ? player.prizes : [],
+    bench: Array.isArray(player.bench) ? padBench(player.bench) : [...EMPTY_BENCH],
+  };
+}
+
+function padBench(bench) {
+  const next = [...bench];
+  while (next.length < 5) next.push(null);
+  return next.slice(0, 5);
+}
+
 export default function PokemonView(props) {
-  const state = props.gameState ?? props.state ?? props.room?.gameState;
-  const playerSlot = props.playerSlot ?? props.currentPlayerSlot ?? "p1";
+  const rawState = getPokemonStateFromProps(props);
+  const state = getSafeState(rawState);
+  const playerSlot = props.playerSlot ?? props.currentPlayerSlot ?? props.playerId ?? "p1";
   const submit = props.submitAction ?? props.dispatchAction ?? props.onAction;
   const [screen, setScreen] = useState("battle");
   const [handPlayerId, setHandPlayerId] = useState("p1");
@@ -23,14 +130,28 @@ export default function PokemonView(props) {
   const [selectedTargetId, setSelectedTargetId] = useState(null);
 
   const currentCommand = getCurrentCommand(state?.commands);
-  const currentPlayerId = state?.turn?.playerId ?? "p1";
+  const currentPlayerId = state?.turn?.playerId === "p2" ? "p2" : "p1";
 
   function send(action) {
     if (!submit) {
       console.warn("PokemonView needs a submitAction/dispatchAction/onAction prop.", action);
       return;
     }
-    submit(action);
+
+    const actionWithPlayerSlot = {
+      ...action,
+      playerSlot,
+    };
+
+    // Some game wrappers pass submitAction(action).
+    // Others pass submitAction(playerSlot, action).
+    // Use the function arity so the Pokémon view works with either wrapper.
+    if (submit.length >= 2) {
+      submit(playerSlot, actionWithPlayerSlot);
+    } else {
+      submit(actionWithPlayerSlot);
+    }
+
     setSelectedCardId(null);
     setSelectedTargetId(null);
   }
@@ -38,16 +159,28 @@ export default function PokemonView(props) {
   if (!state) {
     return (
       <div className="pokemon-shell">
-        <div className="pokemon-panel">
+        <div className="pokemon-panel pokemon-empty-state">
           <h2>Pokémon TCG</h2>
-          <p>No game state was provided to PokemonView.</p>
+          <p>No Pokémon game state was provided to PokemonView.</p>
+          <p>Initialize the Pokémon game state for this room.</p>
+          <div className="pokemon-action-buttons">
+            <button onClick={() => send({ type: "INIT_POKEMON_GAME" })}>Initialize Pokémon Game</button>
+          </div>
         </div>
       </div>
     );
   }
 
+  const isIncompleteState =
+    rawState?.gameId !== "pokemon" ||
+    !rawState?.players?.p1 ||
+    !rawState?.players?.p2 ||
+    !rawState?.cardsById ||
+    !rawState?.turn ||
+    !rawState?.commands;
+
   return (
-    <div className="pokemon-shell">
+    <div className="pokemon-shell" data-player-slot={playerSlot}>
       <header className="pokemon-topbar">
         <div>
           <h2>Pokémon TCG</h2>
@@ -59,6 +192,18 @@ export default function PokemonView(props) {
           <div className="pokemon-test-badge">Solo Test: control both players</div>
         )}
       </header>
+
+      {isIncompleteState && (
+        <div className="pokemon-warning pokemon-repair-box">
+          <strong>This room is missing part of the Pokémon state.</strong>
+          <p>Use Initialize for a fresh Pokémon match, or Repair if you think this room already has usable Pokémon data.</p>
+          <div className="pokemon-action-buttons">
+            <button onClick={() => send({ type: "INIT_POKEMON_GAME" })}>Initialize Pokémon Game</button>
+            <button onClick={() => send({ type: "REPAIR_POKEMON_STATE" })}>Repair Pokémon State</button>
+            <button onClick={() => send({ type: "RESET_POKEMON_GAME" })}>Reset Pokémon Game</button>
+          </div>
+        </div>
+      )}
 
       {state.setupErrors?.length > 0 && (
         <details className="pokemon-warning">
@@ -134,6 +279,8 @@ export default function PokemonView(props) {
           onKnockOut={() => send({ type: "KNOCK_OUT", cardId: selectedCardId })}
         />
       )}
+
+      {state.options?.controlMode === "solo-test" && <SoloTestMonitor state={state} />}
     </div>
   );
 }
@@ -148,6 +295,14 @@ function BattleScreen({
   onOpenCard,
   onAction,
 }) {
+  const commandType = currentCommand?.type;
+  const commandPlayerId = currentCommand?.playerId ?? currentPlayerId;
+  const isDrawCommand = commandType === "DRAW_FOR_TURN";
+  const isMainPhase = commandType === "MAIN_PHASE";
+  const isSetupCommand = commandType === "CHOOSE_ACTIVE_BASIC";
+  const isPrizeCommand = commandType === "TAKE_PRIZE";
+  const isPromoteCommand = commandType === "PROMOTE_ACTIVE";
+
   return (
     <>
       <PlayerBattleArea
@@ -162,35 +317,50 @@ function BattleScreen({
       <PlayerBattleArea state={state} playerId="p1" perspective="player" onOpenCard={onOpenCard} />
 
       <nav className="pokemon-command-menu">
-        <button onClick={() => onOpenHand(currentPlayerId)}>Hand</button>
+        <button onClick={() => onOpenHand(commandPlayerId)} disabled={isPrizeCommand || isPromoteCommand}>
+          Hand
+        </button>
         <button onClick={onOpenCheck}>Check</button>
         <button disabled>Retreat</button>
-        <button onClick={onOpenAttack}>Attack</button>
+        <button onClick={onOpenAttack} disabled={!isMainPhase}>
+          Attack
+        </button>
         <button disabled>Power</button>
-        <button onClick={() => onAction({ type: "END_TURN" })}>Done</button>
+        <button onClick={() => onAction({ type: "START_END_TURN" })} disabled={!isMainPhase}>
+          Done
+        </button>
       </nav>
 
-      {state.turn?.phase === "DRAW" && (
-        <button className="pokemon-full-button" onClick={() => onAction({ type: "DRAW_FOR_TURN" })}>
-          Draw for {playerLabel(currentPlayerId)}
+      {isDrawCommand && (
+        <button className="pokemon-full-button" onClick={() => onAction({ type: "COMPLETE_COMMAND" })}>
+          Draw for {playerLabel(commandPlayerId)}
         </button>
       )}
+
+      {isSetupCommand && (
+        <button className="pokemon-full-button" onClick={() => onOpenHand(commandPlayerId)}>
+          Open {playerLabel(commandPlayerId)} Hand to Choose Active
+        </button>
+      )}
+
+      {isPrizeCommand && <PrizeCommandPanel state={state} command={currentCommand} onAction={onAction} />}
+      {isPromoteCommand && <PromoteCommandPanel state={state} command={currentCommand} onAction={onAction} />}
     </>
   );
 }
 
 function PlayerBattleArea({ state, playerId, perspective, onOpenCard }) {
-  const player = state.players[playerId];
+  const player = state.players?.[playerId] ?? emptyPlayer(playerId);
   const activeCard = getCardViewModel(state, player.active);
-  const benchCards = (player.bench ?? []).map((cardId) => getCardViewModel(state, cardId));
+  const benchCards = (player.bench ?? EMPTY_BENCH).map((cardId) => getCardViewModel(state, cardId));
 
   return (
     <section className={`pokemon-battle-area ${perspective}`}>
       <div className="pokemon-area-header">
         <strong>{player.name ?? playerLabel(playerId)}</strong>
         <span>
-          Deck {player.deck.length} · Hand {player.hand.length} · Prizes {player.prizes.length} · Discard{" "}
-          {player.discard.length}
+          Deck {player.deck?.length ?? 0} · Hand {player.hand?.length ?? 0} · Prizes {player.prizes?.length ?? 0} · Discard{" "}
+          {player.discard?.length ?? 0}
         </span>
       </div>
 
@@ -273,21 +443,27 @@ function HandScreen({
   onOpenCard,
   onAction,
 }) {
-  const player = state.players[playerId];
+  const player = state.players?.[playerId] ?? emptyPlayer(playerId);
   const selected = getCardViewModel(state, selectedCardId);
-  const selectedDefinition = selected ? findCardDefinitionById(state.cardsById[selected.id].definitionId) : null;
+  const selectedDefinition = selected ? findCardDefinitionById(state.cardsById?.[selected.id]?.definitionId) : null;
   const currentCommand = getCurrentCommand(state.commands);
 
-  const inPlayTargets = [player.active, ...(player.bench ?? [])].filter(Boolean).map((id) => getCardViewModel(state, id));
+  const inPlayTargets = [player.active, ...(player.bench ?? [])]
+    .filter(Boolean)
+    .map((id) => getCardViewModel(state, id))
+    .filter(Boolean);
+
   const canChooseActive =
     currentCommand?.type === "CHOOSE_ACTIVE_BASIC" &&
     currentCommand.playerId === playerId &&
     selectedDefinition?.isBasicPokemon;
 
-  const canPlayBench = selectedDefinition?.isBasicPokemon && player.bench.some((slot) => !slot);
+  const isMainPhaseForThisPlayer = currentCommand?.type === "MAIN_PHASE" && currentCommand.playerId === playerId;
+  const canPlayBench =
+    isMainPhaseForThisPlayer && selectedDefinition?.isBasicPokemon && (player.bench ?? []).some((slot) => !slot);
   const canAttachEnergy =
+    isMainPhaseForThisPlayer &&
     selectedDefinition?.isEnergy &&
-    state.turn.playerId === playerId &&
     !state.turn.energyAttachedThisTurn &&
     selectedTargetId;
 
@@ -304,8 +480,10 @@ function HandScreen({
         </div>
 
         <div className="pokemon-hand-list">
-          {player.hand.map((cardId, index) => {
+          {(player.hand ?? []).map((cardId, index) => {
             const card = getCardViewModel(state, cardId);
+            if (!card) return null;
+
             return (
               <button
                 key={cardId}
@@ -346,12 +524,12 @@ function HandScreen({
 
           <div className="pokemon-action-buttons">
             {canChooseActive && (
-              <button onClick={() => onAction({ type: "CHOOSE_ACTIVE_BASIC", cardId: selected.id })}>
+              <button onClick={() => onAction({ type: "COMPLETE_COMMAND", cardId: selected.id })}>
                 Choose Active
               </button>
             )}
             {canPlayBench && (
-              <button onClick={() => onAction({ type: "PLAY_BASIC_TO_BENCH", playerId, cardId: selected.id })}>
+              <button onClick={() => onAction({ type: "START_PLAY_BASIC_TO_BENCH", playerId, cardId: selected.id })}>
                 Play to Bench
               </button>
             )}
@@ -359,7 +537,7 @@ function HandScreen({
               <button
                 onClick={() =>
                   onAction({
-                    type: "ATTACH_ENERGY",
+                    type: "START_ATTACH_ENERGY",
                     playerId,
                     energyCardId: selected.id,
                     targetCardId: selectedTargetId,
@@ -387,7 +565,7 @@ function CheckScreen({ state, onBack, onOpenCard, onOpenHand }) {
 
       <div className="pokemon-check-grid">
         {["p1", "p2"].map((playerId) => {
-          const player = state.players[playerId];
+          const player = state.players?.[playerId] ?? emptyPlayer(playerId);
           return (
             <div className="pokemon-check-player" key={playerId}>
               <h4>{player.name}</h4>
@@ -397,15 +575,19 @@ function CheckScreen({ state, onBack, onOpenCard, onOpenHand }) {
               <p>Discard: {player.discard.length}</p>
 
               <div className="pokemon-thumbnail-grid">
-                {[player.active, ...(player.bench ?? []), ...(player.discard ?? []).slice(-6)].filter(Boolean).map((cardId) => {
-                  const card = getCardViewModel(state, cardId);
-                  return (
-                    <button key={cardId} onClick={() => onOpenCard(cardId)}>
-                      <img src={card.image} alt={card.name} />
-                      <span>{card.name}</span>
-                    </button>
-                  );
-                })}
+                {[player.active, ...(player.bench ?? []), ...(player.discard ?? []).slice(-6)]
+                  .filter(Boolean)
+                  .map((cardId) => {
+                    const card = getCardViewModel(state, cardId);
+                    if (!card) return null;
+
+                    return (
+                      <button key={cardId} onClick={() => onOpenCard(cardId)}>
+                        <img src={card.image} alt={card.name} />
+                        <span>{card.name}</span>
+                      </button>
+                    );
+                  })}
               </div>
             </div>
           );
@@ -416,10 +598,12 @@ function CheckScreen({ state, onBack, onOpenCard, onOpenHand }) {
 }
 
 function AttackScreen({ state, onBack, onAction }) {
-  const playerId = state.turn.playerId;
-  const player = state.players[playerId];
+  const currentCommand = getCurrentCommand(state.commands);
+  const canAttackNow = currentCommand?.type === "MAIN_PHASE";
+  const playerId = currentCommand?.playerId ?? (state.turn?.playerId === "p2" ? "p2" : "p1");
+  const player = state.players?.[playerId] ?? emptyPlayer(playerId);
   const activeId = player.active;
-  const activeDefinition = activeId ? findCardDefinitionById(state.cardsById[activeId].definitionId) : null;
+  const activeDefinition = activeId ? findCardDefinitionById(state.cardsById?.[activeId]?.definitionId) : null;
   const attacks = getRealAttacks(activeDefinition);
 
   return (
@@ -447,8 +631,8 @@ function AttackScreen({ state, onBack, onAction }) {
               return (
                 <button
                   key={`${attack.name}-${index}`}
-                  disabled={!canPay || state.turn.attackUsedThisTurn}
-                  onClick={() => onAction({ type: "DECLARE_ATTACK", attackIndex: index })}
+                  disabled={!canAttackNow || !canPay || state.turn.attackUsedThisTurn}
+                  onClick={() => onAction({ type: "START_ATTACK", attackIndex: index })}
                 >
                   <strong>{attack.name}</strong>
                   <span>Cost: {(attack.cost ?? []).join(" ") || "None"}</span>
@@ -467,7 +651,7 @@ function AttackScreen({ state, onBack, onAction }) {
 
 function CardInspector({ state, cardId, onBack, onDamage, onKnockOut }) {
   const card = getCardViewModel(state, cardId);
-  const definition = card ? findCardDefinitionById(state.cardsById[card.id].definitionId) : null;
+  const definition = card ? findCardDefinitionById(state.cardsById?.[card.id]?.definitionId) : null;
   const attacks = getRealAttacks(definition);
 
   return (
@@ -518,8 +702,131 @@ function CardInspector({ state, cardId, onBack, onDamage, onKnockOut }) {
   );
 }
 
+function PrizeCommandPanel({ state, command, onAction }) {
+  const playerId = command?.playerId;
+  const player = state.players?.[playerId] ?? emptyPlayer(playerId ?? "p1");
+
+  return (
+    <section className="pokemon-inline-command-panel">
+      <strong>Choose a Prize card for {playerLabel(playerId)}</strong>
+      <div className="pokemon-prize-row">
+        {(player.prizes ?? []).map((cardId, index) => (
+          <button key={cardId} onClick={() => onAction({ type: "COMPLETE_COMMAND", prizeIndex: index })}>
+            <img src={getCardBackImage()} alt={`Prize ${index + 1}`} />
+            <span>Prize {index + 1}</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PromoteCommandPanel({ state, command, onAction }) {
+  const playerId = command?.playerId;
+  const player = state.players?.[playerId] ?? emptyPlayer(playerId ?? "p1");
+
+  return (
+    <section className="pokemon-inline-command-panel">
+      <strong>Promote a Benched Pokémon for {playerLabel(playerId)}</strong>
+      <div className="pokemon-thumbnail-grid">
+        {(player.bench ?? [])
+          .filter(Boolean)
+          .map((cardId) => {
+            const card = getCardViewModel(state, cardId);
+            if (!card) return null;
+            return (
+              <button key={cardId} onClick={() => onAction({ type: "COMPLETE_COMMAND", cardId })}>
+                <img src={card.image} alt={card.name} />
+                <span>{card.name}</span>
+              </button>
+            );
+          })}
+      </div>
+    </section>
+  );
+}
+
+function SoloTestMonitor({ state }) {
+  const currentCommand = getCurrentCommand(state.commands);
+  const p1 = state.players?.p1 ?? emptyPlayer("p1");
+  const p2 = state.players?.p2 ?? emptyPlayer("p2");
+
+  return (
+    <details className="pokemon-solo-monitor">
+      <summary>Solo Test Monitor — queue/state</summary>
+      <div className="pokemon-monitor-grid">
+        <MonitorCommand state={state} command={currentCommand} />
+        <MonitorPlayer state={state} player={p1} />
+        <MonitorPlayer state={state} player={p2} />
+      </div>
+      <div className="pokemon-monitor-log">
+        <strong>Recent messages</strong>
+        <ol>
+          {(state.messageLog ?? []).slice(-5).map((entry, index) => (
+            <li key={`${entry.at}-${index}`}>{entry.message}</li>
+          ))}
+        </ol>
+      </div>
+      <div className="pokemon-monitor-log">
+        <strong>Queue trace</strong>
+        <ol className="pokemon-trace-list">
+          {(state.queueTrace ?? []).slice(-8).reverse().map((entry) => (
+            <li key={entry.id}>
+              <code>{entry.actionType}</code> <span>{entry.status}</span>
+              {entry.error && <em> — {entry.error}</em>}
+              <small>
+                {entry.before?.currentCommand} → {entry.after?.currentCommand}
+              </small>
+              <small>
+                P1 hand {entry.before?.fingerprint?.p1?.hand ?? "?"}→{entry.after?.fingerprint?.p1?.hand ?? "?"}; 
+                P2 hand {entry.before?.fingerprint?.p2?.hand ?? "?"}→{entry.after?.fingerprint?.p2?.hand ?? "?"}
+              </small>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </details>
+  );
+}
+
+function MonitorCommand({ state, command }) {
+  return (
+    <div className="pokemon-monitor-card">
+      <h4>Command Queue</h4>
+      <p>Turn: {playerLabel(state.turn?.playerId)} · Phase: {state.turn?.phase}</p>
+      <p>Energy attached: {state.turn?.energyAttachedThisTurn ? "yes" : "no"}</p>
+      <p>Current: {command ? `${command.type} (${command.playerId ?? "game"})` : "none"}</p>
+      <ol>
+        {(state.commands?.queue ?? []).slice(0, 6).map((queued) => (
+          <li key={queued.id}>{queued.type} {queued.playerId ? `→ ${queued.playerId}` : ""}</li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+function MonitorPlayer({ state, player }) {
+  const active = getCardViewModel(state, player.active);
+  const handNames = (player.hand ?? [])
+    .slice(0, 7)
+    .map((cardId) => getCardViewModel(state, cardId)?.name)
+    .filter(Boolean);
+  const benchNames = (player.bench ?? [])
+    .map((cardId) => (cardId ? getCardViewModel(state, cardId)?.name ?? "Unknown" : "Empty"));
+
+  return (
+    <div className="pokemon-monitor-card">
+      <h4>{player.name}</h4>
+      <p>Deck {player.deck?.length ?? 0} · Hand {player.hand?.length ?? 0} · Prizes {player.prizes?.length ?? 0} · Discard {player.discard?.length ?? 0}</p>
+      <p>Active: {active?.name ?? "Empty"}</p>
+      <p>Bench: {benchNames.join(" | ")}</p>
+      <p>Hand top: {handNames.join(", ") || "Empty"}</p>
+    </div>
+  );
+}
+
 function MiniAttachmentStack({ state, cardId, onOpenCard = null }) {
-  const card = state.cardsById[cardId];
+  const card = state.cardsById?.[cardId];
   const attached = (card?.attached ?? []).map((id) => getCardViewModel(state, id)).filter(Boolean);
 
   if (!attached.length) {
@@ -543,7 +850,7 @@ function MiniAttachmentStack({ state, cardId, onOpenCard = null }) {
 }
 
 function getCardViewModel(state, cardId) {
-  if (!cardId) return null;
+  if (!cardId || !state?.cardsById) return null;
   const card = state.cardsById[cardId];
   if (!card) return null;
 

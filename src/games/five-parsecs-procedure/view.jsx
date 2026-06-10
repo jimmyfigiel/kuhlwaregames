@@ -9,7 +9,7 @@ import {
 } from "./data/nameSets";
 import "./view.css";
 
-const GAME_VERSION = "five-parsecs-procedure-v1-53";
+const GAME_VERSION = "five-parsecs-procedure-v1-54";
 
 const nameGenerator = new MarkovNameGenerator({
   five_parsecs_pulp: pulpyFiveParsecsNames,
@@ -841,7 +841,7 @@ function ActiveCommandPanel({
         />
       )}
 
-      {(command.type === "crewMemberName" || command.type === "textInput") && (
+      {(command.type === "crewMemberName" || command.type === "textInput" || command.type === "newWorldArrival") && (
         <TextInputPanel
           key={command.id}
           command={command}
@@ -895,6 +895,7 @@ function ActiveCommandPanel({
         "numberInput",
         "crewMemberName",
         "textInput",
+        "newWorldArrival",
         "choice",
         "decideTravel",
         "tableRoll",
@@ -1406,6 +1407,18 @@ function CampaignSheet({ campaign }) {
             <CardField label="Current" value={safeCampaign.storyPoints ?? safeCampaign.startingStoryPoints ?? 0} />
           </div>
         </DetailCard>
+
+        {safeCampaign.lastStarshipTravelEvent && (
+          <DetailCard
+            title={safeCampaign.lastStarshipTravelEvent.title || safeCampaign.lastStarshipTravelEvent.label || "Starship Travel Event"}
+            subtitle="Latest starship travel event"
+            badge={safeCampaign.lastStarshipTravelEvent.roll ? `Roll ${safeCampaign.lastStarshipTravelEvent.roll}` : null}
+          >
+            {safeCampaign.lastStarshipTravelEvent.description && (
+              <p className="fp-card-note">{safeCampaign.lastStarshipTravelEvent.description}</p>
+            )}
+          </DetailCard>
+        )}
       </div>
     </AccordionSection>
   );
@@ -1600,7 +1613,7 @@ function EncounterLogSheet({ encounterLog }) {
   );
 }
 
-function WorldLogSheet({ worldLog }) {
+function WorldLogSheet({ worldLog, campaign }) {
   const currentWorld =
     worldLog.currentWorld && typeof worldLog.currentWorld === "object"
       ? worldLog.currentWorld
@@ -1613,11 +1626,34 @@ function WorldLogSheet({ worldLog }) {
   const patrons = Array.isArray(worldLog.patrons) ? worldLog.patrons : [];
   const rivals = Array.isArray(worldLog.rivals) ? worldLog.rivals : [];
   const pendingWorldEffects = Array.isArray(worldLog.pendingEffects) ? worldLog.pendingEffects : [];
+  const visitedWorlds = Array.isArray(worldLog.visitedWorlds) ? worldLog.visitedWorlds : [];
+  const arrivalHistory = Array.isArray(worldLog.arrivalHistory) ? worldLog.arrivalHistory : [];
+  const travelEvents = Array.isArray(worldLog.travelEvents)
+    ? worldLog.travelEvents
+    : Array.isArray(campaign?.travelEvents)
+      ? campaign.travelEvents
+      : [];
+
+  const mostRecentPreviousWorld = visitedWorlds.length > 0
+    ? visitedWorlds[visitedWorlds.length - 1]
+    : null;
+  const mostRecentPreviousWorldName = typeof mostRecentPreviousWorld === "object"
+    ? mostRecentPreviousWorld.name
+    : mostRecentPreviousWorld;
 
   return (
     <AccordionSection title="World">
       <div className="fp-card-stack">
-        <DetailCard title={currentWorld.name || "Current World"} subtitle="World status">
+        <DetailCard title="World Travel Overview" subtitle="Current and previous worlds">
+          <div className="fp-card-field-grid">
+            <CardField label="Current World" value={currentWorld.name || "Not set"} />
+            <CardField label="Previous Worlds" value={visitedWorlds.length} />
+            <CardField label="Most Recent Previous" value={mostRecentPreviousWorldName || "None"} />
+            <CardField label="Travel Events" value={travelEvents.length} />
+          </div>
+        </DetailCard>
+
+        <DetailCard title={currentWorld.name || "Current World"} subtitle="Current World">
           <div className="fp-card-field-grid">
             <CardField label="License" value={currentWorld.license || worldLog.license} />
             <CardField label="Invasion" value={currentWorld.invasion || worldLog.invasion} />
@@ -1659,6 +1695,70 @@ function WorldLogSheet({ worldLog }) {
                     badge={rivalObject.status}
                     key={rivalObject.id || rivalObject.name || index}
                   />
+                );
+              })}
+            </div>
+          ) : null}
+        </DetailSection>
+
+        <DetailSection title="Previous Worlds" emptyText="No previous worlds yet.">
+          {visitedWorlds.length > 0 ? (
+            <div className="fp-card-list fp-compact-card-list">
+              {visitedWorlds.map((world, index) => {
+                const worldObject = typeof world === "object" ? world : { name: world };
+                const traitCount = Array.isArray(worldObject.traits) ? worldObject.traits.length : 0;
+                return (
+                  <DetailCard
+                    title={worldObject.name || "Unnamed World"}
+                    subtitle={worldObject.departedAt ? `Departed ${new Date(worldObject.departedAt).toLocaleDateString()}` : "Visited world"}
+                    badge={traitCount > 0 ? `${traitCount} trait${traitCount === 1 ? "" : "s"}` : null}
+                    key={worldObject.id || worldObject.name || index}
+                  >
+                    <div className="fp-card-field-grid">
+                      <CardField label="License" value={worldObject.license} />
+                      <CardField label="Invasion" value={worldObject.invasion} />
+                      <CardField label="Traits" value={traitCount} />
+                    </div>
+                  </DetailCard>
+                );
+              })}
+            </div>
+          ) : null}
+        </DetailSection>
+
+        <DetailSection title="Arrival History" emptyText="No arrival history yet.">
+          {arrivalHistory.length > 0 ? (
+            <div className="fp-card-list fp-compact-card-list">
+              {arrivalHistory.map((arrival, index) => {
+                const arrivalObject = typeof arrival === "object" ? arrival : { worldName: arrival };
+                return (
+                  <DetailCard
+                    title={arrivalObject.worldName || "Arrival"}
+                    subtitle={arrivalObject.notes || "Arrived at world"}
+                    badge={arrivalObject.turnNumber ? `Turn ${arrivalObject.turnNumber}` : null}
+                    key={arrivalObject.id || `${arrivalObject.worldName}-${index}`}
+                  />
+                );
+              })}
+            </div>
+          ) : null}
+        </DetailSection>
+
+
+        <DetailSection title="Starship Travel Events" emptyText="No starship travel events recorded yet.">
+          {travelEvents.length > 0 ? (
+            <div className="fp-card-list fp-compact-card-list">
+              {travelEvents.slice().reverse().map((event, index) => {
+                const eventObject = typeof event === "object" ? event : { title: event };
+                return (
+                  <DetailCard
+                    title={eventObject.title || eventObject.label || "Starship Travel Event"}
+                    subtitle={eventObject.worldName ? `Near ${eventObject.worldName}` : "Travel event"}
+                    badge={eventObject.roll ? `Roll ${eventObject.roll}` : null}
+                    key={eventObject.id || `${eventObject.title || eventObject.label}-${index}`}
+                  >
+                    {eventObject.description && <p className="fp-card-note">{eventObject.description}</p>}
+                  </DetailCard>
                 );
               })}
             </div>
@@ -1759,7 +1859,7 @@ export default function FiveParsecsProcedureView({ gameState, submitAction, play
         <CampaignSheet campaign={safeGameState.campaign} />
         <CrewLogSheet crewLog={safeGameState.crewLog} />
         <EncounterLogSheet encounterLog={safeGameState.encounterLog} />
-        <WorldLogSheet worldLog={safeGameState.worldLog} />
+        <WorldLogSheet worldLog={safeGameState.worldLog} campaign={safeGameState.campaign} />
       </section>
     </main>
   );
