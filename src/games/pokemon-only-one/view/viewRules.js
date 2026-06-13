@@ -126,6 +126,10 @@ export function shouldViewerSeePopup(model, popup, viewerSideId) {
     return false;
   }
 
+  if (popup.type === "COIN_FLIP") {
+    return true;
+  }
+
   if (popup.type === "CARD_ZOOM") {
     return canViewerSeeCardFace(model, viewerSideId, popup.cardId);
   }

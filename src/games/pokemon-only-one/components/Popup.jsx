@@ -20,6 +20,10 @@ export function Popup({ model, popup, actionBridge, playerSlot }) {
     return <ZonePopup model={model} zoneId={popup.zoneId} actionBridge={actionBridge} playerSlot={playerSlot} />;
   }
 
+  if (popup.type === "COIN_FLIP") {
+    return <CoinFlipPopup model={model} coinFlip={popup.coinFlip || model.setup?.coinFlip} actionBridge={actionBridge} />;
+  }
+
   return null;
 }
 
@@ -42,6 +46,49 @@ function CardZoomPopup({ model, cardId, actionBridge }) {
       >
         {card.imagePath ? <img src={card.imagePath} alt={card.name} /> : <CardBack />}
       </button>
+    </div>
+  );
+}
+
+function CoinFlipPopup({ model, coinFlip, actionBridge }) {
+  const resultSideId = coinFlip?.resultSideId || model.setup?.currentTurnSideId || null;
+  const viewerSideId = actionBridge.viewerSideId === "opponent" ? "opponent" : "player";
+  const viewerLabel = resultSideId === viewerSideId ? "You go first" : "Opponent goes first";
+  const faceLabel = coinFlip?.coinFace === "tails" ? "Tails" : "Heads";
+  const sideName = coinFlip?.resultSideName || model.playerSides?.[resultSideId]?.name || resultSideId || "Unknown side";
+
+  return (
+    <div className="poo-popup-backdrop" onClick={() => actionBridge.send({ type: "CLOSE_POPUP" })}>
+      <section
+        className="poo-coin-popup"
+        onClick={(event) => {
+          event.stopPropagation();
+        }}
+        aria-label="Coin flip result"
+      >
+        <div className="poo-zone-popup-header">
+          <div>
+            <h2>Coin Flip</h2>
+            <p>Heads = Player side · Tails = Opponent side</p>
+          </div>
+          <button type="button" onClick={() => actionBridge.send({ type: "CLOSE_POPUP" })}>
+            Close
+          </button>
+        </div>
+
+        <div className="poo-coin-stage" aria-hidden="true">
+          <div className={coinFlip?.coinFace === "tails" ? "poo-coin poo-coin-tails" : "poo-coin poo-coin-heads"}>
+            <span className="poo-coin-face poo-coin-face-front">H</span>
+            <span className="poo-coin-face poo-coin-face-back">T</span>
+          </div>
+        </div>
+
+        <div className="poo-coin-result" aria-live="polite">
+          <strong>{faceLabel}</strong>
+          <span>{sideName} wins the flip.</span>
+          <b>{viewerLabel}.</b>
+        </div>
+      </section>
     </div>
   );
 }

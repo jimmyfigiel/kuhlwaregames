@@ -24,6 +24,7 @@ export function upgradeModelForView(model) {
     return {
       ...model,
       settings: normalizeSettings(model.settings),
+      setup: normalizeSetup(model.setup),
       display: {
         screen: "BATTLE_SCREEN",
         ...(model.display || {}),
@@ -65,6 +66,7 @@ export function upgradeModelForView(model) {
     playerSides,
     zones,
     settings: normalizeSettings(model.settings),
+    setup: normalizeSetup(model.setup),
     display: {
       screen: "BATTLE_SCREEN",
       ...(model.display || {}),
@@ -95,6 +97,32 @@ export function formatLog(log) {
     .join("\n");
 }
 
+
+function normalizeSetup(setup = {}) {
+  return {
+    phase: setup.phase || "setup",
+    prizeCount: clampPrizeCount(setup.prizeCount),
+    currentTurnSideId: setup.currentTurnSideId || null,
+    sides: {
+      player: normalizeSetupSide(setup.sides?.player),
+      opponent: normalizeSetupSide(setup.sides?.opponent),
+    },
+    coinFlip: setup.coinFlip || null,
+  };
+}
+
+function normalizeSetupSide(side = {}) {
+  return {
+    ready: Boolean(side.ready),
+    openingHandDrawn: Boolean(side.openingHandDrawn),
+    prizesSet: Boolean(side.prizesSet),
+  };
+}
+
+function clampPrizeCount(value) {
+  const parsed = Number.parseInt(value, 10);
+  return Math.max(1, Math.min(6, Number.isFinite(parsed) ? parsed : 6));
+}
 
 function normalizeSettings(settings = {}) {
   const playMode = settings.playMode || (settings.onePlayerTestMode === false ? "twoPlayer" : "onePlayerTest");

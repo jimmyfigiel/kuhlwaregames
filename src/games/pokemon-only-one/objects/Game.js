@@ -16,6 +16,7 @@ export class Game {
     zones = {},
     cards = {},
     settings = { playMode: "onePlayerTest", onePlayerTestMode: true },
+    setup = createDefaultSetup(),
     display = new Display(),
     log = new GameLog(),
     debug = {},
@@ -27,6 +28,7 @@ export class Game {
     this.zones = zones;
     this.cards = cards;
     this.settings = normalizeSettings(settings);
+    this.setup = normalizeSetup(setup);
     this.display = display;
     this.log = log;
     this.debug = debug;
@@ -57,6 +59,7 @@ export class Game {
       zones,
       cards,
       settings: normalizeSettings(model?.settings),
+      setup: normalizeSetup(model?.setup),
       display: Display.fromModel(model?.display),
       log: GameLog.fromModel(model),
       debug: model?.debug || {},
@@ -144,6 +147,148 @@ export class Game {
   canActorSeeCardFace(playerSlot, cardId) {
     const zone = this.getZoneContainingCard(cardId);
     return this.canActorSeeZoneFaces(playerSlot, zone);
+  }
+
+
+  getSetupSide(sideId) {
+    const normalizedSideId = sideId === "opponent" ? "opponent" : "player";
+    this.setup = normalizeSetup(this.setup);
+    return this.setup.sides[normalizedSideId];
+  }
+
+  setPrizeCount(prizeCount) {
+    const parsed = Number.parseInt(prizeCount, 10);
+    const clamped = Math.max(1, Math.min(6, Number.isFinite(parsed) ? parsed : 6));
+
+    this.setup = normalizeSetup({
+      ...(this.setup || {}),
+      prizeCount: clamped,
+    });
+  }
+
+  hasAnyReadySide() {
+    this.setup = normalizeSetup(this.setup);
+    return Boolean(this.setup.sides.player.ready || this.setup.sides.opponent.ready);
+  }
+
+  drawOpeningHandForSide(sideId, cardCount = 7) {
+    const side = this.getPlayerSide(sideId);
+    const deckZone = this.getDeckZoneForSide(sideId);
+    const handZone = this.getHandZoneForSide(sideId);
+
+    if (!side || !deckZone || !handZone) {
+      this.log.add("COMMAND_ERROR", `Cannot draw opening hand for missing side ${sideId}.`, { sideId });
+      return 0;
+    }
+
+    let drawnCount = 0;
+    for (let index = 0; index < cardCount; index += 1) {
+      const cardId = deckZone.topCardId();
+      if (!cardId) {
+        break;
+      }
+      this.putCardInZone(cardId, handZone.id);
+      drawnCount += 1;
+    }
+
+    const setupSide = this.getSetupSide(sideId);
+    setupSide.openingHandDrawn = true;
+
+    this.log.add("OPENING_HAND_DRAWN", `${side.name} drew ${drawnCount} card${drawnCount === 1 ? "" : "s"} for opening hand.`, {
+      sideId,
+      drawnCount,
+      requestedCount: cardCount,
+      deckZoneId: deckZone.id,
+      handZoneId: handZone.id,
+    });
+
+    return drawnCount;
+  }
+
+  setPrizesForSide(sideId) {
+    const side = this.getPlayerSide(sideId);
+    const deckZone = this.getDeckZoneForSide(sideId);
+
+    if (!side || !deckZone) {
+      this.log.add("COMMAND_ERROR", `Cannot set prizes for missing side ${sideId}.`, { sideId });
+      return 0;
+    }
+
+    const prizeCount = normalizePrizeCount(this.setup?.prizeCount);
+    let placedCount = 0;
+
+    for (const [index, zoneId] of (side.prizeZoneIds || []).entries()) {
+      const prizeZone = this.getZone(zoneId);
+      if (!prizeZone) {
+        continue;
+      }
+
+      prizeZone.clearCards();
+
+      if (index >= prizeCount) {
+        continue;
+      }
+
+      const cardId = deckZone.topCardId();
+      if (!cardId) {
+        break;
+      }
+
+      this.putCardInZone(cardId, prizeZone.id);
+      placedCount += 1;
+    }
+
+    const setupSide = this.getSetupSide(sideId);
+    setupSide.prizesSet = true;
+
+    this.log.add("PRIZES_SET", `${side.name} set ${placedCount} prize card${placedCount === 1 ? "" : "s"}.`, {
+      sideId,
+      prizeCount,
+      placedCount,
+      deckZoneId: deckZone.id,
+      prizeZoneIds: side.prizeZoneIds,
+    });
+
+    return placedCount;
+  }
+
+  markSetupSideReady(sideId) {
+    const setupSide = this.getSetupSide(sideId);
+    setupSide.ready = true;
+  }
+
+  areBothSetupSidesReady() {
+    this.setup = normalizeSetup(this.setup);
+    return Boolean(this.setup.sides.player.ready && this.setup.sides.opponent.ready);
+  }
+
+  resolveSetupCoinFlip() {
+    this.setup = normalizeSetup(this.setup);
+
+    if (this.setup.coinFlip?.resultSideId) {
+      return this.setup.coinFlip;
+    }
+
+    const coinFace = Math.random() < 0.5 ? "heads" : "tails";
+    const resultSideId = coinFace === "heads" ? "player" : "opponent";
+    const resultSide = this.getPlayerSide(resultSideId);
+
+    this.setup = normalizeSetup({
+      ...this.setup,
+      phase: "turn",
+      currentTurnSideId: resultSideId,
+      coinFlip: {
+        coinFace,
+        resultSideId,
+        resultSideName: resultSide?.name || resultSideId,
+        resolvedAt: new Date().toISOString(),
+      },
+    });
+
+    this.display.openCoinFlip(this.setup.coinFlip);
+    this.log.add("COIN_FLIP_RESOLVED", `${resultSide?.name || resultSideId} wins the coin flip and goes first.`, this.setup.coinFlip);
+
+    return this.setup.coinFlip;
   }
 
   setArea(area) {
@@ -311,12 +456,49 @@ export class Game {
       zones,
       cards,
       settings: normalizeSettings(this.settings),
+      setup: normalizeSetup(this.setup),
       display: this.display.toModel(),
       log: logPieces.log,
       nextLogNumber: logPieces.nextLogNumber,
       debug: this.debug,
     };
   }
+}
+
+function normalizeSetup(setup = {}) {
+  const normalized = {
+    phase: setup?.phase || "setup",
+    prizeCount: normalizePrizeCount(setup?.prizeCount),
+    currentTurnSideId: setup?.currentTurnSideId || null,
+    sides: {
+      player: normalizeSetupSide(setup?.sides?.player),
+      opponent: normalizeSetupSide(setup?.sides?.opponent),
+    },
+    coinFlip: setup?.coinFlip || null,
+  };
+
+  if (normalized.coinFlip?.resultSideId && !normalized.currentTurnSideId) {
+    normalized.currentTurnSideId = normalized.coinFlip.resultSideId;
+  }
+
+  return normalized;
+}
+
+function normalizeSetupSide(side = {}) {
+  return {
+    ready: Boolean(side?.ready),
+    openingHandDrawn: Boolean(side?.openingHandDrawn),
+    prizesSet: Boolean(side?.prizesSet),
+  };
+}
+
+function normalizePrizeCount(value) {
+  const parsed = Number.parseInt(value, 10);
+  return Math.max(1, Math.min(6, Number.isFinite(parsed) ? parsed : 6));
+}
+
+function createDefaultSetup() {
+  return normalizeSetup({});
 }
 
 function normalizeSettings(settings = {}) {

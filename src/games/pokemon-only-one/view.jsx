@@ -6,6 +6,7 @@ import { BridgeDiagnostics } from "./components/BridgeDiagnostics.jsx";
 import { LogPanel } from "./components/LogPanel.jsx";
 import { Popup } from "./components/Popup.jsx";
 import { SelectionNotice } from "./components/SelectionNotice.jsx";
+import { SetupPanel } from "./components/SetupPanel.jsx";
 import { TestModeNotice } from "./components/TestModeNotice.jsx";
 import { createActionBridge } from "./view/actionBridge.js";
 import { resolveModel } from "./view/viewModel.js";
@@ -34,6 +35,7 @@ export default function PokemonOnlyOneView(props) {
   return (
     <div className="poo-shell">
       <BattleScreen model={model} actionBridge={actionBridge} />
+      <SetupPanel model={model} actionBridge={actionBridge} />
       <TestModeNotice model={model} actionBridge={actionBridge} />
       <SelectionNotice model={model} actionBridge={actionBridge} />
       {visiblePopup && <Popup model={model} popup={visiblePopup} actionBridge={actionBridge} playerSlot={actionBridge.playerSlot} />}

@@ -37,6 +37,10 @@ export class Display {
     this.popup = { type: "ZONE_POPUP", zoneId, ...details };
   }
 
+  openCoinFlip(coinFlip) {
+    this.popup = { type: "COIN_FLIP", coinFlip };
+  }
+
   closePopup() {
     this.popup = null;
   }

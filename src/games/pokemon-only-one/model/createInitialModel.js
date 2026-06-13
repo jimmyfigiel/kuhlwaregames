@@ -13,6 +13,16 @@ export function createEmptyModel() {
       playMode: "onePlayerTest",
       onePlayerTestMode: true,
     },
+    setup: {
+      phase: "setup",
+      prizeCount: 6,
+      currentTurnSideId: null,
+      sides: {
+        player: { ready: false, openingHandDrawn: false, prizesSet: false },
+        opponent: { ready: false, openingHandDrawn: false, prizesSet: false },
+      },
+      coinFlip: null,
+    },
     display: {
       screen: "BATTLE_SCREEN",
       popup: null,
