@@ -65,7 +65,7 @@ function readSubmittedAction(arg1, arg2, arg3, boundaryDebug = {}) {
   }
 
   // Backward-compatible shapes are kept here only so rules.js can describe what arrived.
-  // They are not used by the view. The view now expects props.onAction(action).
+  // They are not used by the view. The view calls props.submitAction(action), and GameLoader wraps it as { state, playerSlot, action }.
   if (typeof arg1 === "string" && isAction(arg2)) {
     return {
       action: flattenAction({ ...arg2, playerSlot: looksLikePlayerSlot(arg1) ? arg1 : arg2.playerSlot }),
@@ -149,7 +149,7 @@ function unwrapModel(value) {
 }
 
 function isPokemonModel(value) {
-  return Boolean(value && value.gameId === "pokemon-only-one" && value.area !== undefined && value.spaces && value.cards && value.display && Array.isArray(value.log));
+  return Boolean(value && value.gameId === "pokemon-only-one" && value.playerSides && (value.zones || value.spaces) && value.cards && value.display && Array.isArray(value.log));
 }
 
 function countPresentArguments(...values) {
