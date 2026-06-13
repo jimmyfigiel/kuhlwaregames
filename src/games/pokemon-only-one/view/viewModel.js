@@ -155,8 +155,11 @@ export function getZoneDisplayName(model, zoneOrId) {
 function normalizeSetup(setup = {}) {
   return {
     phase: setup.phase || "setup",
+    step: setup.step || (setup.phase === "turn" ? "turn" : "coinFlip"),
     prizeCount: clampPrizeCount(setup.prizeCount),
-    currentTurnSideId: setup.currentTurnSideId || null,
+    firstPlayerSideId: setup.firstPlayerSideId || null,
+    currentTurnSideId: setup.currentTurnSideId || setup.firstPlayerSideId || null,
+    pokemonRevealed: Boolean(setup.pokemonRevealed),
     sides: {
       player: normalizeSetupSide(setup.sides?.player),
       opponent: normalizeSetupSide(setup.sides?.opponent),
@@ -170,6 +173,10 @@ function normalizeSetupSide(side = {}) {
     ready: Boolean(side.ready),
     openingHandDrawn: Boolean(side.openingHandDrawn),
     prizesSet: Boolean(side.prizesSet),
+    mulliganCount: Number.isFinite(Number(side.mulliganCount)) ? Number(side.mulliganCount) : 0,
+    hasBasicInHand: Boolean(side.hasBasicInHand),
+    needsMulligan: Boolean(side.needsMulligan),
+    activePlaced: Boolean(side.activePlaced),
   };
 }
 

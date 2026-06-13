@@ -32,8 +32,11 @@ export class PlaceSelectedPokemonCommand {
       return;
     }
 
-    if (!game.isPokemonCard(card)) {
-      game.log.add("COMMAND_ERROR", `Only Pokémon cards can be placed as Active or Bench Pokémon.`, {
+    const setupPhase = game.setup?.phase === "setup";
+    const isLegalSetupPokemon = setupPhase ? game.isBasicPokemonCard(card) : game.isPokemonCard(card);
+
+    if (!isLegalSetupPokemon) {
+      game.log.add("COMMAND_ERROR", setupPhase ? `Only Basic Pokémon cards can be placed during setup.` : `Only Pokémon cards can be placed as Active or Bench Pokémon.`, {
         cardId: card.id,
         cardType: card.cardType,
         sourceZoneId: selection.sourceZoneId,
@@ -118,8 +121,13 @@ export class PlaceSelectedPokemonCommand {
     }
 
     game.putCardInZone(card.id, targetZone.id);
+    if (game.setup?.phase === "setup") {
+      targetZone.visibility = "owner";
+      targetZone.faceDown = true;
+      game.syncSetupPlacementFlags(targetZone.ownerId);
+    }
     game.display.clearSelection();
-    game.log.add("POKEMON_PLACED", `Placed ${card.name} from ${sourceZone.name} into ${targetZone.name}.`, {
+    game.log.add(game.setup?.phase === "setup" ? "SETUP_POKEMON_PLACED_FACE_DOWN" : "POKEMON_PLACED", game.setup?.phase === "setup" ? `Placed a Basic Pokémon from ${sourceZone.name} face down into ${targetZone.name}.` : `Placed ${card.name} from ${sourceZone.name} into ${targetZone.name}.`, {
       cardId: card.id,
       sourceZoneId: sourceZone.id,
       targetZoneId: targetZone.id,

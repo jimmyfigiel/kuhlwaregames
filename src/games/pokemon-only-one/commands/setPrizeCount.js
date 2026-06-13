@@ -7,8 +7,8 @@ export class SetPrizeCountCommand {
   }
 
   run(game) {
-    if (game.hasAnyReadySide()) {
-      game.log.add("COMMAND_ERROR", "Cannot change prize count after a side is ready.", {
+    if ((game.setup?.phase || "setup") !== "setup" || (game.setup?.step || "coinFlip") !== "coinFlip" || game.hasAnyReadySide()) {
+      game.log.add("COMMAND_ERROR", "Cannot change prize count after setup has started.", {
         requestedPrizeCount: this.prizeCount,
         setup: game.setup,
       });

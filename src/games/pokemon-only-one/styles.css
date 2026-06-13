@@ -917,6 +917,15 @@
   cursor: not-allowed;
 }
 
+
+.poo-setup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 .poo-setup-sides {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1113,7 +1122,16 @@
     justify-items: start;
   }
 
-  .poo-setup-sides {
+  
+.poo-setup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.poo-setup-sides {
     grid-template-columns: 1fr;
   }
 

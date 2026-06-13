@@ -14,7 +14,7 @@ export function ActivePokemon({ model, zoneId, actionBridge, side }) {
   return (
     <section className={`poo-active-slot poo-${side}-active`} aria-label={label} title={label}>
       {card ? (
-        <CardButton card={card} actionBridge={actionBridge} size="active" />
+        <CardButton model={model} card={card} actionBridge={actionBridge} size="active" />
       ) : canReceiveSelectedCard ? (
         <button
           type="button"
@@ -41,7 +41,7 @@ export function SmallZone({ model, zoneId, actionBridge }) {
   return (
     <section className="poo-small-zone" aria-label={label} title={label}>
       {card ? (
-        <CardButton card={card} actionBridge={actionBridge} size="small" />
+        <CardButton model={model} card={card} actionBridge={actionBridge} size="small" />
       ) : canReceiveSelectedCard ? (
         <button
           type="button"

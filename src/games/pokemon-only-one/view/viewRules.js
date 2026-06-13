@@ -47,7 +47,7 @@ export function canViewerControlZone(model, zone, viewerSideId) {
 }
 
 export function getCurrentTurnSideId(model) {
-  return model?.setup?.currentTurnSideId || model?.setup?.coinFlip?.resultSideId || null;
+  return model?.setup?.currentTurnSideId || model?.setup?.firstPlayerSideId || null;
 }
 
 export function isTurnPhase(model) {
@@ -76,7 +76,7 @@ export function canViewerModifySide(model, viewerSideId, sideId) {
   }
 
   if ((model?.setup?.phase || "setup") === "setup") {
-    return true;
+    return ["openingHands", "mulligan", "placePokemon", "readyToReveal"].includes(model?.setup?.step || "coinFlip");
   }
 
   return getCurrentTurnSideId(model) === sideId;
@@ -244,7 +244,7 @@ export function canPlaceSelectedPokemonInZone(model, zone, playerSlotOrBridge = 
 
   return (
     sourceZone.zoneKind === "hand" &&
-    isPokemonCard(selectedCard) &&
+    (model?.setup?.phase === "setup" ? isBasicPokemonCard(selectedCard) : isPokemonCard(selectedCard)) &&
     ["active", "bench"].includes(zone.zoneKind) &&
     zone.ownerId === sourceZone.ownerId &&
     (zone.cardIds || []).length === 0
@@ -253,6 +253,11 @@ export function canPlaceSelectedPokemonInZone(model, zone, playerSlotOrBridge = 
 
 export function isPokemonCard(card) {
   return typeof card?.cardType === "string" && card.cardType.toLowerCase().includes("pokémon");
+}
+
+export function isBasicPokemonCard(card) {
+  const cardType = String(card?.cardType || "").toLowerCase();
+  return cardType.includes("pokémon") && cardType.includes("basic");
 }
 
 export function getFirstCardInZone(model, zoneId) {

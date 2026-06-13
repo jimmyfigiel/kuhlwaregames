@@ -11,6 +11,7 @@ import {
   isTurnPhase,
   findFirstEmptyBenchZoneId,
   getActiveZoneIdForSide,
+  isBasicPokemonCard,
   isPokemonCard,
 } from "../view/viewRules.js";
 import { getSideDisplayName, getZoneDisplayName } from "../view/viewModel.js";
@@ -55,13 +56,14 @@ function CardZoomPopup({ model, cardId, actionBridge }) {
 }
 
 function CoinFlipPopup({ model, coinFlip, actionBridge }) {
-  const resultSideId = coinFlip?.resultSideId || model.setup?.currentTurnSideId || null;
+  const winnerSideId = coinFlip?.winnerSideId || coinFlip?.resultSideId || null;
+  const firstPlayerSideId = model.setup?.firstPlayerSideId || model.setup?.currentTurnSideId || null;
   const viewerSideId = actionBridge.viewerSideId === "opponent" ? "opponent" : "player";
-  const viewerLabel = resultSideId === viewerSideId ? "You go first" : `${getSideDisplayName(model, resultSideId)} goes first`;
   const faceLabel = coinFlip?.coinFace === "tails" ? "Tails" : "Heads";
-  const sideName = getSideDisplayName(model, resultSideId);
+  const winnerName = getSideDisplayName(model, winnerSideId);
   const headsName = getSideDisplayName(model, "player");
   const tailsName = getSideDisplayName(model, "opponent");
+  const canChoose = winnerSideId === viewerSideId || model.settings?.playMode === "onePlayerTest";
 
   return (
     <div className="poo-popup-backdrop" onClick={() => actionBridge.send({ type: "CLOSE_POPUP" })}>
@@ -91,8 +93,31 @@ function CoinFlipPopup({ model, coinFlip, actionBridge }) {
 
         <div className="poo-coin-result" aria-live="polite">
           <strong>{faceLabel}</strong>
-          <span>{sideName} wins the flip.</span>
-          <b>{viewerLabel}.</b>
+          <span>{winnerName} wins the flip.</span>
+          {firstPlayerSideId ? (
+            <b>{getSideDisplayName(model, firstPlayerSideId)} goes first.</b>
+          ) : canChoose ? (
+            <div className="poo-popup-card-actions">
+              <button
+                type="button"
+                className="poo-popup-card-action-button"
+                disabled={!actionBridge.ready}
+                onClick={() => actionBridge.send({ type: "CHOOSE_FIRST_PLAYER", firstPlayerSideId: "player" })}
+              >
+                {getSideDisplayName(model, "player")} goes first
+              </button>
+              <button
+                type="button"
+                className="poo-popup-card-action-button"
+                disabled={!actionBridge.ready}
+                onClick={() => actionBridge.send({ type: "CHOOSE_FIRST_PLAYER", firstPlayerSideId: "opponent" })}
+              >
+                {getSideDisplayName(model, "opponent")} goes first
+              </button>
+            </div>
+          ) : (
+            <b>Waiting for {winnerName} to choose who goes first.</b>
+          )}
         </div>
       </section>
     </div>
@@ -202,7 +227,8 @@ function HandCardTile({ model, zone, card, actionBridge, playerSlot }) {
   const viewerSideId = actionBridge.viewerSideId;
   const canControlZone = canViewerControlZone(model, zone, viewerSideId);
   const canModifyZone = canViewerModifyZone(model, viewerSideId, zone);
-  const canPlacePokemon = zone.zoneKind === "hand" && isPokemonCard(card) && canControlZone && canModifyZone;
+  const setupPhase = model.setup?.phase === "setup";
+  const canPlacePokemon = zone.zoneKind === "hand" && (setupPhase ? isBasicPokemonCard(card) : isPokemonCard(card)) && canControlZone && canModifyZone;
   const activeZoneId = canPlacePokemon ? getActiveZoneIdForSide(model, zone.ownerId) : null;
   const activeZone = activeZoneId ? model.zones?.[activeZoneId] || null : null;
   const canPlaceActive = Boolean(activeZone && (activeZone.cardIds || []).length === 0);

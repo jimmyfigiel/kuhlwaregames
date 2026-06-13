@@ -116,7 +116,7 @@ export class Game {
 
   getCurrentTurnSideId() {
     this.setup = normalizeSetup(this.setup);
-    return this.setup.currentTurnSideId || this.setup.coinFlip?.resultSideId || null;
+    return this.setup.currentTurnSideId || this.setup.firstPlayerSideId || null;
   }
 
   isTurnPhase() {
@@ -137,7 +137,8 @@ export class Game {
     }
 
     if ((this.setup?.phase || "setup") === "setup") {
-      return true;
+      const setupStep = this.setup?.step || "coinFlip";
+      return ["openingHands", "mulligan", "placePokemon", "readyToReveal"].includes(setupStep);
     }
 
     return this.getCurrentTurnSideId() === sideId;
@@ -231,6 +232,8 @@ export class Game {
 
     const setupSide = this.getSetupSide(sideId);
     setupSide.openingHandDrawn = true;
+    setupSide.hasBasicInHand = this.hasBasicPokemonInHand(sideId);
+    setupSide.needsMulligan = !setupSide.hasBasicInHand;
 
     this.log.add("OPENING_HAND_DRAWN", `${side.name} drew ${drawnCount} card${drawnCount === 1 ? "" : "s"} for opening hand.`, {
       sideId,
@@ -238,7 +241,13 @@ export class Game {
       requestedCount: cardCount,
       deckZoneId: deckZone.id,
       handZoneId: handZone.id,
+      hasBasicInHand: setupSide.hasBasicInHand,
+      needsMulligan: setupSide.needsMulligan,
     });
+
+    if (setupSide.needsMulligan) {
+      this.log.add("MULLIGAN_REQUIRED", `${side.name} has no Basic Pokémon and must mulligan.`, { sideId });
+    }
 
     return drawnCount;
   }
@@ -300,33 +309,177 @@ export class Game {
     return Boolean(this.setup.sides.player.ready && this.setup.sides.opponent.ready);
   }
 
-  resolveSetupCoinFlip() {
+  flipSetupCoin() {
     this.setup = normalizeSetup(this.setup);
 
-    if (this.setup.coinFlip?.resultSideId) {
+    if (this.setup.coinFlip?.winnerSideId) {
       return this.setup.coinFlip;
     }
 
     const coinFace = Math.random() < 0.5 ? "heads" : "tails";
-    const resultSideId = coinFace === "heads" ? "player" : "opponent";
-    const resultSide = this.getPlayerSide(resultSideId);
+    const winnerSideId = coinFace === "heads" ? "player" : "opponent";
+    const winnerSide = this.getPlayerSide(winnerSideId);
 
     this.setup = normalizeSetup({
       ...this.setup,
-      phase: "turn",
-      currentTurnSideId: resultSideId,
+      phase: "setup",
+      step: "chooseFirstPlayer",
       coinFlip: {
         coinFace,
-        resultSideId,
-        resultSideName: resultSide?.name || resultSideId,
+        winnerSideId,
+        winnerSideName: winnerSide?.name || winnerSideId,
         resolvedAt: new Date().toISOString(),
       },
     });
 
     this.display.openCoinFlip(this.setup.coinFlip);
-    this.log.add("COIN_FLIP_RESOLVED", `${resultSide?.name || resultSideId} wins the coin flip and goes first.`, this.setup.coinFlip);
+    this.log.add("COIN_FLIP_RESOLVED", `${winnerSide?.name || winnerSideId} wins the coin flip and chooses who goes first.`, this.setup.coinFlip);
 
     return this.setup.coinFlip;
+  }
+
+  chooseFirstPlayer(firstPlayerSideId) {
+    this.setup = normalizeSetup(this.setup);
+    const normalizedSideId = firstPlayerSideId === "opponent" ? "opponent" : "player";
+    const side = this.getPlayerSide(normalizedSideId);
+
+    if (!this.setup.coinFlip?.winnerSideId) {
+      this.log.add("COMMAND_ERROR", "Cannot choose first player before the coin flip.", { firstPlayerSideId: normalizedSideId });
+      return;
+    }
+
+    this.setup = normalizeSetup({
+      ...this.setup,
+      firstPlayerSideId: normalizedSideId,
+      currentTurnSideId: normalizedSideId,
+      step: "openingHands",
+    });
+
+    this.log.add("FIRST_PLAYER_CHOSEN", `${side?.name || normalizedSideId} will go first.`, { firstPlayerSideId: normalizedSideId });
+
+    ["player", "opponent"].forEach((sideId) => {
+      const setupSide = this.getSetupSide(sideId);
+      if (!setupSide.openingHandDrawn) {
+        this.drawOpeningHandForSide(sideId, 7);
+      }
+    });
+
+    this.advanceSetupAfterOpeningHands();
+  }
+
+  advanceSetupAfterOpeningHands() {
+    this.setup = normalizeSetup(this.setup);
+    const anyNeedsMulligan = this.setup.sides.player.needsMulligan || this.setup.sides.opponent.needsMulligan;
+    const bothDrawn = this.setup.sides.player.openingHandDrawn && this.setup.sides.opponent.openingHandDrawn;
+
+    if (!bothDrawn) {
+      this.setup.step = "openingHands";
+      return;
+    }
+
+    if (anyNeedsMulligan) {
+      this.setup.step = "mulligan";
+      return;
+    }
+
+    this.prepareFaceDownSetupZones();
+    this.setup.step = "placePokemon";
+  }
+
+  prepareFaceDownSetupZones() {
+    ["player", "opponent"].forEach((sideId) => {
+      const side = this.getPlayerSide(sideId);
+      if (!side) {
+        return;
+      }
+
+      [side.activeZoneId, ...(side.benchZoneIds || [])].forEach((zoneId) => {
+        const zone = this.getZone(zoneId);
+        if (zone) {
+          zone.visibility = "owner";
+          zone.faceDown = true;
+        }
+      });
+    });
+  }
+
+  revealSetupPokemonAndStartTurn() {
+    this.setup = normalizeSetup(this.setup);
+
+    ["player", "opponent"].forEach((sideId) => {
+      const side = this.getPlayerSide(sideId);
+      if (!side) {
+        return;
+      }
+
+      [side.activeZoneId, ...(side.benchZoneIds || [])].forEach((zoneId) => {
+        const zone = this.getZone(zoneId);
+        if (zone) {
+          zone.visibility = "public";
+          zone.faceDown = false;
+        }
+      });
+    });
+
+    const firstPlayerSideId = this.setup.firstPlayerSideId || this.setup.currentTurnSideId || "player";
+    const firstSide = this.getPlayerSide(firstPlayerSideId);
+
+    this.setup = normalizeSetup({
+      ...this.setup,
+      phase: "turn",
+      step: "turn",
+      pokemonRevealed: true,
+      currentTurnSideId: firstPlayerSideId,
+    });
+
+    this.log.add("SETUP_COMPLETE", `Both players reveal their Pokémon. ${firstSide?.name || firstPlayerSideId} starts the game.`, {
+      firstPlayerSideId,
+    });
+  }
+
+  hasBasicPokemonInHand(sideId) {
+    const handZone = this.getHandZoneForSide(sideId);
+    if (!handZone) {
+      return false;
+    }
+
+    return handZone.cardIds.some((cardId) => this.isBasicPokemonCard(cardId));
+  }
+
+  mulliganSetupSide(sideId) {
+    const side = this.getPlayerSide(sideId);
+    const handZone = this.getHandZoneForSide(sideId);
+    const deckZone = this.getDeckZoneForSide(sideId);
+
+    if (!side || !handZone || !deckZone) {
+      this.log.add("COMMAND_ERROR", `Cannot mulligan missing setup side ${sideId}.`, { sideId });
+      return;
+    }
+
+    const returnedCardIds = [...handZone.cardIds];
+    returnedCardIds.forEach((cardId) => this.putCardInZone(cardId, deckZone.id));
+    shuffleZone(deckZone);
+
+    const setupSide = this.getSetupSide(sideId);
+    setupSide.mulliganCount += 1;
+    setupSide.openingHandDrawn = false;
+    setupSide.hasBasicInHand = false;
+    setupSide.needsMulligan = false;
+
+    this.log.add("MULLIGAN_SHUFFLED", `${side.name} revealed no Basic Pokémon, shuffled ${returnedCardIds.length} card${returnedCardIds.length === 1 ? "" : "s"} back into their deck, and redraws.`, {
+      sideId,
+      returnedCount: returnedCardIds.length,
+      mulliganCount: setupSide.mulliganCount,
+    });
+
+    this.drawOpeningHandForSide(sideId, 7);
+    this.advanceSetupAfterOpeningHands();
+  }
+
+  syncSetupPlacementFlags(sideId) {
+    const setupSide = this.getSetupSide(sideId);
+    const activeZone = this.getActiveZoneForSide(sideId);
+    setupSide.activePlaced = Boolean(activeZone && activeZone.count > 0);
   }
 
   setArea(area) {
@@ -446,6 +599,12 @@ export class Game {
     return typeof card?.cardType === "string" && card.cardType.toLowerCase().includes("pokémon");
   }
 
+  isBasicPokemonCard(cardIdOrCard) {
+    const card = typeof cardIdOrCard === "string" ? this.getCard(cardIdOrCard) : cardIdOrCard;
+    const cardType = String(card?.cardType || "").toLowerCase();
+    return cardType.includes("pokémon") && cardType.includes("basic");
+  }
+
   canPlaceSelectedPokemonInZone(zoneIdOrZone) {
     const selection = this.display?.selection || null;
     const zone = typeof zoneIdOrZone === "string" ? this.getZone(zoneIdOrZone) : zoneIdOrZone;
@@ -506,8 +665,11 @@ export class Game {
 function normalizeSetup(setup = {}) {
   const normalized = {
     phase: setup?.phase || "setup",
+    step: setup?.step || (setup?.phase === "turn" ? "turn" : "coinFlip"),
     prizeCount: normalizePrizeCount(setup?.prizeCount),
-    currentTurnSideId: setup?.currentTurnSideId || null,
+    firstPlayerSideId: normalizeSideId(setup?.firstPlayerSideId),
+    currentTurnSideId: normalizeSideId(setup?.currentTurnSideId),
+    pokemonRevealed: Boolean(setup?.pokemonRevealed),
     sides: {
       player: normalizeSetupSide(setup?.sides?.player),
       opponent: normalizeSetupSide(setup?.sides?.opponent),
@@ -515,8 +677,18 @@ function normalizeSetup(setup = {}) {
     coinFlip: setup?.coinFlip || null,
   };
 
-  if (normalized.coinFlip?.resultSideId && !normalized.currentTurnSideId) {
-    normalized.currentTurnSideId = normalized.coinFlip.resultSideId;
+  if (!normalized.currentTurnSideId && normalized.firstPlayerSideId) {
+    normalized.currentTurnSideId = normalized.firstPlayerSideId;
+  }
+
+  // Backward compatibility with the older simplified setup, where the coin
+  // flip result was also the first player.
+  if (normalized.coinFlip?.resultSideId && !normalized.coinFlip?.winnerSideId) {
+    normalized.coinFlip = {
+      ...normalized.coinFlip,
+      winnerSideId: normalized.coinFlip.resultSideId,
+      winnerSideName: normalized.coinFlip.resultSideName,
+    };
   }
 
   return normalized;
@@ -527,7 +699,21 @@ function normalizeSetupSide(side = {}) {
     ready: Boolean(side?.ready),
     openingHandDrawn: Boolean(side?.openingHandDrawn),
     prizesSet: Boolean(side?.prizesSet),
+    mulliganCount: Number.isFinite(Number(side?.mulliganCount)) ? Number(side.mulliganCount) : 0,
+    hasBasicInHand: Boolean(side?.hasBasicInHand),
+    needsMulligan: Boolean(side?.needsMulligan),
+    activePlaced: Boolean(side?.activePlaced),
   };
+}
+
+function normalizeSideId(sideId) {
+  if (sideId === "opponent") {
+    return "opponent";
+  }
+  if (sideId === "player") {
+    return "player";
+  }
+  return null;
 }
 
 function normalizePrizeCount(value) {
@@ -537,6 +723,13 @@ function normalizePrizeCount(value) {
 
 function createDefaultSetup() {
   return normalizeSetup({});
+}
+
+function shuffleZone(zone) {
+  for (let index = zone.cardIds.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [zone.cardIds[index], zone.cardIds[swapIndex]] = [zone.cardIds[swapIndex], zone.cardIds[index]];
+  }
 }
 
 function normalizeSettings(settings = {}) {
