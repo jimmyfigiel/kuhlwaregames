@@ -1,11 +1,11 @@
 // src/games/pokemon-only-one/components/TestModeNotice.jsx
 
 import React from "react";
-import { getPlayMode, isOnePlayerTestMode, playerSlotToSideId } from "../view/viewRules.js";
+import { getPlayMode, isOnePlayerTestMode } from "../view/viewRules.js";
 
 export function TestModeNotice({ model, actionBridge }) {
   const playMode = getPlayMode(model);
-  const actingSide = playerSlotToSideId(actionBridge.playerSlot);
+  const actingSide = actionBridge.viewerSideId;
   const onePlayerTestMode = isOnePlayerTestMode(model);
 
   return (

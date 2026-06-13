@@ -9,7 +9,6 @@ import {
   getActiveZoneIdForSide,
   isOnePlayerTestMode,
   isPokemonCard,
-  playerSlotToSideId,
 } from "../view/viewRules.js";
 
 export function Popup({ model, popup, actionBridge, playerSlot }) {
@@ -80,10 +79,10 @@ function ZonePopup({ model, zoneId, actionBridge, playerSlot }) {
 }
 
 function ZonePopupContents({ model, zone, actionBridge, playerSlot }) {
-  const viewerSideId = playerSlotToSideId(playerSlot);
+  const viewerSideId = actionBridge.viewerSideId;
   const onePlayerTestMode = isOnePlayerTestMode(model);
   const canControlZone = canViewerControlZone(model, zone, viewerSideId);
-  const canSeeFaces = canViewerSeeZoneFaces(zone, viewerSideId, onePlayerTestMode);
+  const canSeeFaces = canViewerSeeZoneFaces(model, viewerSideId, zone);
   const cards = (zone.cardIds || []).map((cardId) => model.cards?.[cardId]).filter(Boolean);
 
   if (zone.zoneKind === "deck") {
@@ -137,7 +136,7 @@ function HiddenCardGrid({ cards }) {
 }
 
 function HandCardTile({ model, zone, card, actionBridge, playerSlot }) {
-  const viewerSideId = playerSlotToSideId(playerSlot);
+  const viewerSideId = actionBridge.viewerSideId;
   const canControlZone = canViewerControlZone(model, zone, viewerSideId);
   const canPlacePokemon = zone.zoneKind === "hand" && isPokemonCard(card) && canControlZone;
   const activeZoneId = canPlacePokemon ? getActiveZoneIdForSide(model, zone.ownerId) : null;

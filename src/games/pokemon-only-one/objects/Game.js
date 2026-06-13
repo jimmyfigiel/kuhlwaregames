@@ -81,7 +81,9 @@ export class Game {
   }
 
   playerSlotToSideId(playerSlot) {
-    if (playerSlot === "p2" || playerSlot === "player2" || playerSlot === "opponent") {
+    const raw = String(playerSlot || "").trim().toLowerCase();
+
+    if (["p2", "player2", "playertwo", "opponent", "2", "side2", "slot2", "guest", "joiner"].includes(raw)) {
       return "opponent";
     }
 
@@ -107,6 +109,41 @@ export class Game {
     }
 
     return this.canActorControlSide(playerSlot, zone.ownerId);
+  }
+
+  canActorSeeZoneFaces(playerSlot, zoneIdOrZone) {
+    const zone = typeof zoneIdOrZone === "string" ? this.getZone(zoneIdOrZone) : zoneIdOrZone;
+
+    if (!zone) {
+      return false;
+    }
+
+    if (zone.zoneKind === "deck" || zone.zoneKind === "prize") {
+      return false;
+    }
+
+    if (zone.faceDown === true && zone.visibility !== "owner") {
+      return false;
+    }
+
+    if (zone.visibility === "public") {
+      return true;
+    }
+
+    if (this.isOnePlayerTestMode() && zone.visibility === "owner") {
+      return true;
+    }
+
+    if (zone.visibility === "owner") {
+      return this.playerSlotToSideId(playerSlot) === zone.ownerId;
+    }
+
+    return false;
+  }
+
+  canActorSeeCardFace(playerSlot, cardId) {
+    const zone = this.getZoneContainingCard(cardId);
+    return this.canActorSeeZoneFaces(playerSlot, zone);
   }
 
   setArea(area) {

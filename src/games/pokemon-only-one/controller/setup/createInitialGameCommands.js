@@ -133,7 +133,7 @@ function createBattleZones() {
   const zoneDefinitions = [
     { zoneId: "opponentDeck", ownerId: "opponent", zoneKind: "deck", name: "Opponent Deck", visibility: "hidden", capacity: null, faceDown: true },
     { zoneId: "opponentDiscard", ownerId: "opponent", zoneKind: "discard", name: "Opponent Discard", visibility: "public", capacity: null, faceDown: false },
-    { zoneId: "opponentHand", ownerId: "opponent", zoneKind: "hand", name: "Opponent Hand", visibility: "owner", capacity: null, faceDown: true },
+    { zoneId: "opponentHand", ownerId: "opponent", zoneKind: "hand", name: "Opponent Hand", visibility: "owner", capacity: null, faceDown: false },
     { zoneId: "opponentActive", ownerId: "opponent", zoneKind: "active", name: "Opponent Active", visibility: "public", capacity: 1, faceDown: false },
     ...OPPONENT_BENCH_IDS.map((zoneId, index) => ({ zoneId, ownerId: "opponent", zoneKind: "bench", name: `Opponent Bench ${index + 1}`, visibility: "public", capacity: 1, faceDown: false })),
     ...OPPONENT_PRIZE_IDS.map((zoneId, index) => ({ zoneId, ownerId: "opponent", zoneKind: "prize", name: `Opponent Prize ${index + 1}`, visibility: "hidden", capacity: 1, faceDown: true })),

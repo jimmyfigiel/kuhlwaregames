@@ -9,11 +9,21 @@ export function isOnePlayerTestMode(model) {
 }
 
 export function playerSlotToSideId(playerSlot) {
-  if (playerSlot === "p2" || playerSlot === "player2" || playerSlot === "opponent") {
+  const raw = String(playerSlot || "").trim().toLowerCase();
+
+  if (["p2", "player2", "playertwo", "opponent", "2", "side2", "slot2", "guest", "joiner"].includes(raw)) {
     return "opponent";
   }
 
   return "player";
+}
+
+export function getViewerSideId(actionBridgeOrPlayerSlot) {
+  if (typeof actionBridgeOrPlayerSlot === "string") {
+    return playerSlotToSideId(actionBridgeOrPlayerSlot);
+  }
+
+  return actionBridgeOrPlayerSlot?.viewerSideId || playerSlotToSideId(actionBridgeOrPlayerSlot?.playerSlot);
 }
 
 export function canViewerControlSide(model, viewerSideId, sideId) {
@@ -36,8 +46,46 @@ export function canViewerControlZone(model, zone, viewerSideId) {
   return canViewerControlSide(model, viewerSideId, zone.ownerId);
 }
 
-export function canViewerSeeZoneFaces(zone, viewerSideId, onePlayerTestMode = false) {
+export function canViewerInspectZone(model, zone, viewerSideId) {
   if (!zone) {
+    return false;
+  }
+
+  if (isOnePlayerTestMode(model)) {
+    return true;
+  }
+
+  if (["deck", "prize"].includes(zone.zoneKind)) {
+    return false;
+  }
+
+  if (zone.visibility === "public") {
+    return true;
+  }
+
+  return zone.visibility === "owner" && zone.ownerId === viewerSideId;
+}
+
+export function canViewerSeeZoneFaces(zoneOrModel, viewerSideId, onePlayerTestModeOrZone = false) {
+  // Backward-compatible form: canViewerSeeZoneFaces(zone, viewerSideId, onePlayerTestMode)
+  if (zoneOrModel && zoneOrModel.zoneKind) {
+    return canViewerSeeZoneFacesWithMode(zoneOrModel, viewerSideId, Boolean(onePlayerTestModeOrZone));
+  }
+
+  // Preferred form: canViewerSeeZoneFaces(model, viewerSideId, zone)
+  return canViewerSeeZoneFacesWithMode(onePlayerTestModeOrZone, viewerSideId, isOnePlayerTestMode(zoneOrModel));
+}
+
+function canViewerSeeZoneFacesWithMode(zone, viewerSideId, onePlayerTestMode = false) {
+  if (!zone) {
+    return false;
+  }
+
+  if (zone.zoneKind === "deck" || zone.zoneKind === "prize") {
+    return false;
+  }
+
+  if (zone.faceDown === true && zone.visibility !== "owner") {
     return false;
   }
 
@@ -56,7 +104,62 @@ export function canViewerSeeZoneFaces(zone, viewerSideId, onePlayerTestMode = fa
   return false;
 }
 
-export function canPlaceSelectedPokemonInZone(model, zone, playerSlot = null) {
+export function canViewerSeeCardFace(model, viewerSideId, cardId) {
+  const zone = getZoneContainingCard(model, cardId);
+  if (!zone) {
+    return false;
+  }
+
+  return canViewerSeeZoneFaces(model, viewerSideId, zone);
+}
+
+export function shouldViewerSeePopup(model, popup, viewerSideId) {
+  if (!popup) {
+    return false;
+  }
+
+  if (isOnePlayerTestMode(model)) {
+    return true;
+  }
+
+  if (popup.openedBySideId && popup.openedBySideId !== viewerSideId) {
+    return false;
+  }
+
+  if (popup.type === "CARD_ZOOM") {
+    return canViewerSeeCardFace(model, viewerSideId, popup.cardId);
+  }
+
+  if (popup.type === "ZONE_POPUP") {
+    const zone = model.zones?.[popup.zoneId] || null;
+    if (!zone) {
+      return false;
+    }
+
+    if (popup.openedBySideId && popup.openedBySideId !== viewerSideId) {
+      return false;
+    }
+
+    return true;
+  }
+
+  return true;
+}
+
+export function shouldViewerSeeSelection(model, selection, viewerSideId) {
+  if (!selection) {
+    return false;
+  }
+
+  if (isOnePlayerTestMode(model)) {
+    return true;
+  }
+
+  const selectedBySideId = selection.selectedBySideId || playerSlotToSideId(selection.playerSlot);
+  return selectedBySideId === viewerSideId;
+}
+
+export function canPlaceSelectedPokemonInZone(model, zone, playerSlotOrBridge = null) {
   const selection = model.display?.selection || null;
 
   if (!selection?.cardId || !zone) {
@@ -70,7 +173,12 @@ export function canPlaceSelectedPokemonInZone(model, zone, playerSlot = null) {
     return false;
   }
 
-  const viewerSideId = playerSlotToSideId(playerSlot || selection.playerSlot || selection.selectedBySideId);
+  const viewerSideId = getViewerSideId(playerSlotOrBridge || selection.playerSlot || selection.selectedBySideId);
+
+  if (!shouldViewerSeeSelection(model, selection, viewerSideId)) {
+    return false;
+  }
+
   if (!canViewerControlZone(model, sourceZone, viewerSideId) || !canViewerControlZone(model, zone, viewerSideId)) {
     return false;
   }
@@ -91,6 +199,10 @@ export function isPokemonCard(card) {
 export function getFirstCardInZone(model, zoneId) {
   const cardId = model.zones?.[zoneId]?.cardIds?.[0];
   return cardId ? model.cards?.[cardId] || null : null;
+}
+
+export function getZoneContainingCard(model, cardId) {
+  return Object.values(model?.zones || {}).find((zone) => (zone.cardIds || []).includes(cardId)) || null;
 }
 
 export function getActiveZoneIdForSide(model, ownerId) {

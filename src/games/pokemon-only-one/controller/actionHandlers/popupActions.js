@@ -8,7 +8,7 @@ import { OpenZonePopupCommand } from "../../commands/openZonePopup.js";
 export function getPopupCommands(action) {
   switch (action.type) {
     case "OPEN_CARD_ZOOM":
-      return [new OpenCardZoomCommand({ cardId: action.cardId })];
+      return [new OpenCardZoomCommand({ cardId: action.cardId, playerSlot: action.playerSlot })];
 
     case "CLOSE_CARD_ZOOM":
       return [new CloseCardZoomCommand()];

@@ -15,7 +15,19 @@ export class OpenZonePopupCommand {
       return;
     }
 
-    game.display.openZonePopup(this.zoneId);
-    game.log.add("ZONE_POPUP_OPENED", `Opened ${zone.name}.`, { zoneId: this.zoneId, zoneKind: zone.zoneKind, count: zone.count, ownerId: zone.ownerId, playerSlot: this.playerSlot, canControl: game.canActorControlZone(this.playerSlot, zone) });
+    const actingSideId = game.playerSlotToSideId(this.playerSlot);
+
+    game.display.openZonePopup(this.zoneId, {
+      openedBySideId: actingSideId,
+    });
+    game.log.add("ZONE_POPUP_OPENED", `Opened ${zone.name}.`, {
+      zoneId: this.zoneId,
+      zoneKind: zone.zoneKind,
+      count: zone.count,
+      ownerId: zone.ownerId,
+      playerSlot: this.playerSlot,
+      actingSideId,
+      canControl: game.canActorControlZone(this.playerSlot, zone),
+    });
   }
 }

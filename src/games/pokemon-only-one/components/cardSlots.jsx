@@ -8,7 +8,7 @@ export function ActivePokemon({ model, zoneId, actionBridge, side }) {
   const zone = model.zones?.[zoneId];
   const card = getFirstCardInZone(model, zoneId);
   const label = zone?.name || `${side} active`;
-  const canReceiveSelectedCard = canPlaceSelectedPokemonInZone(model, zone, actionBridge.playerSlot);
+  const canReceiveSelectedCard = canPlaceSelectedPokemonInZone(model, zone, actionBridge);
 
   return (
     <section className={`poo-active-slot poo-${side}-active`} aria-label={label} title={label}>
@@ -34,7 +34,7 @@ export function ActivePokemon({ model, zoneId, actionBridge, side }) {
 export function SmallZone({ model, zoneId, actionBridge }) {
   const zone = model.zones?.[zoneId];
   const card = getFirstCardInZone(model, zoneId);
-  const canReceiveSelectedCard = canPlaceSelectedPokemonInZone(model, zone, actionBridge.playerSlot);
+  const canReceiveSelectedCard = canPlaceSelectedPokemonInZone(model, zone, actionBridge);
 
   return (
     <section className="poo-small-zone" aria-label={zone?.name || zoneId} title={zone?.name || zoneId}>

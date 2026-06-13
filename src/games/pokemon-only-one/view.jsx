@@ -9,6 +9,7 @@ import { SelectionNotice } from "./components/SelectionNotice.jsx";
 import { TestModeNotice } from "./components/TestModeNotice.jsx";
 import { createActionBridge } from "./view/actionBridge.js";
 import { resolveModel } from "./view/viewModel.js";
+import { shouldViewerSeePopup } from "./view/viewRules.js";
 import "./styles.css";
 
 export default function PokemonOnlyOneView(props) {
@@ -28,13 +29,14 @@ export default function PokemonOnlyOneView(props) {
   }
 
   const popup = model.display?.popup || null;
+  const visiblePopup = popup && shouldViewerSeePopup(model, popup, actionBridge.viewerSideId) ? popup : null;
 
   return (
     <div className="poo-shell">
       <BattleScreen model={model} actionBridge={actionBridge} />
       <TestModeNotice model={model} actionBridge={actionBridge} />
       <SelectionNotice model={model} actionBridge={actionBridge} />
-      {popup && <Popup model={model} popup={popup} actionBridge={actionBridge} playerSlot={actionBridge.playerSlot} />}
+      {visiblePopup && <Popup model={model} popup={visiblePopup} actionBridge={actionBridge} playerSlot={actionBridge.playerSlot} />}
       <LogPanel model={model} actionBridge={actionBridge} />
     </div>
   );

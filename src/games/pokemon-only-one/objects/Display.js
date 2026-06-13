@@ -15,8 +15,8 @@ export class Display {
     this.screen = screen;
   }
 
-  openCardZoom(cardId) {
-    this.popup = { type: "CARD_ZOOM", cardId };
+  openCardZoom(cardId, details = {}) {
+    this.popup = { type: "CARD_ZOOM", cardId, ...details };
   }
 
   selectCardForMove(cardId, sourceZoneId, details = {}) {
@@ -33,8 +33,8 @@ export class Display {
     this.selection = null;
   }
 
-  openZonePopup(zoneId) {
-    this.popup = { type: "ZONE_POPUP", zoneId };
+  openZonePopup(zoneId, details = {}) {
+    this.popup = { type: "ZONE_POPUP", zoneId, ...details };
   }
 
   closePopup() {

@@ -92,7 +92,11 @@ export class DrawCardCommand {
     }
 
     game.putCardInZone(card.id, handZone.id);
-    game.display.openCardZoom(card.id);
+    game.display.openCardZoom(card.id, {
+      openedBySideId: side.id,
+      sourceZoneId: handZone.id,
+      visibilityReason: "drawn-card",
+    });
     game.log.add("CARD_DRAWN", `Drew ${card.name} from ${deckZone.name} to ${handZone.name}.`, {
       cardId: card.id,
       cardName: card.name,

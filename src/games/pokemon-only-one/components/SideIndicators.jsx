@@ -1,14 +1,14 @@
 // src/games/pokemon-only-one/components/SideIndicators.jsx
 
 import React from "react";
-import { canViewerControlZone, playerSlotToSideId } from "../view/viewRules.js";
+import { canViewerControlZone } from "../view/viewRules.js";
 
 export function SideIndicators({ model, side, order, align, actionBridge }) {
   if (!side) {
     return <section className={`poo-indicators poo-indicators-${align}`} />;
   }
 
-  const viewerSideId = playerSlotToSideId(actionBridge.playerSlot);
+  const viewerSideId = actionBridge.viewerSideId;
   const values = {
     hand: { label: "HAND", zoneId: side.handZoneId, icon: "hand" },
     discard: { label: "DISCARD", zoneId: side.discardZoneId, icon: "discard" },
