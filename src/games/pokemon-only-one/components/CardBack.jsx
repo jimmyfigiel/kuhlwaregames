@@ -2,6 +2,12 @@
 
 import React from "react";
 
-export function CardBack() {
-  return <span className="poo-card-back" aria-hidden="true" />;
+const CARD_BACK_IMAGE_PATH = "/card-images/pokemon/card-back.svg";
+
+export function CardBack({ label = "Face-down card" }) {
+  return (
+    <span className="poo-card-back" aria-label={label} role="img">
+      <img src={CARD_BACK_IMAGE_PATH} alt="" aria-hidden="true" draggable="false" />
+    </span>
+  );
 }

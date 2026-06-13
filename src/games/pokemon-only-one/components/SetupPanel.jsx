@@ -81,25 +81,28 @@ function ChooseFirstPlayerPanel({ model, setup, actionBridge, viewerSideId }) {
     <div className="poo-setup-result" aria-live="polite">
       <strong>{winnerName} won the coin flip.</strong>
       <span> Choose who goes first.</span>
-      <div className="poo-setup-actions">
-        <button
-          type="button"
-          className="poo-ready-button"
-          disabled={!actionBridge.ready || !canChoose}
-          onClick={() => actionBridge.send({ type: "CHOOSE_FIRST_PLAYER", firstPlayerSideId: "player" })}
-        >
-          {getSideDisplayName(model, "player")} goes first
-        </button>
-        <button
-          type="button"
-          className="poo-ready-button"
-          disabled={!actionBridge.ready || !canChoose}
-          onClick={() => actionBridge.send({ type: "CHOOSE_FIRST_PLAYER", firstPlayerSideId: "opponent" })}
-        >
-          {getSideDisplayName(model, "opponent")} goes first
-        </button>
-      </div>
-      {!canChoose && <p>Waiting for {winnerName} to choose.</p>}
+      {canChoose ? (
+        <div className="poo-setup-actions">
+          <button
+            type="button"
+            className="poo-ready-button"
+            disabled={!actionBridge.ready}
+            onClick={() => actionBridge.send({ type: "CHOOSE_FIRST_PLAYER", firstPlayerSideId: "player" })}
+          >
+            {getSideDisplayName(model, "player")} goes first
+          </button>
+          <button
+            type="button"
+            className="poo-ready-button"
+            disabled={!actionBridge.ready}
+            onClick={() => actionBridge.send({ type: "CHOOSE_FIRST_PLAYER", firstPlayerSideId: "opponent" })}
+          >
+            {getSideDisplayName(model, "opponent")} goes first
+          </button>
+        </div>
+      ) : (
+        <p>Waiting for {winnerName} to choose.</p>
+      )}
     </div>
   );
 }

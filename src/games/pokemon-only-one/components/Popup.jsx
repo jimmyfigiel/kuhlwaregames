@@ -3,6 +3,7 @@
 import React from "react";
 import { CardBack } from "./CardBack.jsx";
 import {
+  canViewerControlSide,
   canViewerControlZone,
   canViewerModifyZone,
   canViewerSeeZoneFaces,
@@ -63,7 +64,7 @@ function CoinFlipPopup({ model, coinFlip, actionBridge }) {
   const winnerName = getSideDisplayName(model, winnerSideId);
   const headsName = getSideDisplayName(model, "player");
   const tailsName = getSideDisplayName(model, "opponent");
-  const canChoose = winnerSideId === viewerSideId || model.settings?.playMode === "onePlayerTest";
+  const canChoose = canViewerControlSide(model, viewerSideId, winnerSideId);
 
   return (
     <div className="poo-popup-backdrop" onClick={() => actionBridge.send({ type: "CLOSE_POPUP" })}>
