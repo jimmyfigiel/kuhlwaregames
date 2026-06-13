@@ -99,7 +99,18 @@ export function canViewerInspectZone(model, zone, viewerSideId) {
     return true;
   }
 
-  if (["deck", "prize"].includes(zone.zoneKind)) {
+  // In real two-player mode, player-private zones may only be opened by
+  // the side that owns them. Deck popups still do not reveal deck contents,
+  // but they may contain owner-only actions such as drawing when it is that
+  // side's turn.
+  if (["hand", "discard", "deck"].includes(zone.zoneKind)) {
+    return zone.ownerId === viewerSideId;
+  }
+
+  // Prizes remain closed information for now. The board shows prize count/card
+  // backs, but no player gets a prize-inspection popup until a future rule
+  // explicitly reveals them.
+  if (zone.zoneKind === "prize") {
     return false;
   }
 
@@ -188,7 +199,7 @@ export function shouldViewerSeePopup(model, popup, viewerSideId) {
       return false;
     }
 
-    return true;
+    return canViewerInspectZone(model, zone, viewerSideId);
   }
 
   return true;

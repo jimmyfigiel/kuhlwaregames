@@ -10,14 +10,14 @@ import { SetupPanel } from "./components/SetupPanel.jsx";
 import { TestModeNotice } from "./components/TestModeNotice.jsx";
 import { createActionBridge } from "./view/actionBridge.js";
 import { resolveModel } from "./view/viewModel.js";
-import { shouldViewerSeePopup } from "./view/viewRules.js";
+import { canViewerInspectZone, shouldViewerSeePopup } from "./view/viewRules.js";
 import "./styles.css";
 
 export default function PokemonOnlyOneView(props) {
   const [localPopup, setLocalPopup] = useState(null);
   const model = resolveModel(props);
   const baseActionBridge = createActionBridge(props);
-  const actionBridge = createLocalPopupActionBridge(baseActionBridge, localPopup, setLocalPopup);
+  const actionBridge = createLocalPopupActionBridge(model, baseActionBridge, localPopup, setLocalPopup);
 
   if (!model) {
     return (
@@ -48,13 +48,25 @@ export default function PokemonOnlyOneView(props) {
   );
 }
 
-function createLocalPopupActionBridge(baseActionBridge, localPopup, setLocalPopup) {
+function createLocalPopupActionBridge(model, baseActionBridge, localPopup, setLocalPopup) {
   return {
     ...baseActionBridge,
     send(action) {
       const actionType = action?.type || "UNKNOWN";
 
       if (actionType === "OPEN_ZONE_POPUP") {
+        const zone = model?.zones?.[action.zoneId] || null;
+
+        if (!canViewerInspectZone(model, zone, baseActionBridge.viewerSideId)) {
+          console.warn("[pokemon-only-one view] blocked private zone popup", {
+            zoneId: action.zoneId,
+            viewerSideId: baseActionBridge.viewerSideId,
+            ownerId: zone?.ownerId || null,
+            zoneKind: zone?.zoneKind || null,
+          });
+          return;
+        }
+
         setLocalPopup({
           type: "ZONE_POPUP",
           zoneId: action.zoneId,
