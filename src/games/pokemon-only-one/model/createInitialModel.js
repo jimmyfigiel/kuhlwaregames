@@ -10,8 +10,8 @@ export function createEmptyModel() {
     zones: {},
     cards: {},
     settings: {
-      playMode: "onePlayerTest",
-      onePlayerTestMode: true,
+      playMode: "twoPlayer",
+      onePlayerTestMode: false,
     },
     setup: {
       phase: "setup",

@@ -186,7 +186,7 @@ function clampPrizeCount(value) {
 }
 
 function normalizeSettings(settings = {}) {
-  const playMode = settings.playMode || (settings.onePlayerTestMode === false ? "twoPlayer" : "onePlayerTest");
+  const playMode = settings.playMode || (settings.onePlayerTestMode === true ? "onePlayerTest" : "twoPlayer");
   return {
     ...settings,
     playMode,

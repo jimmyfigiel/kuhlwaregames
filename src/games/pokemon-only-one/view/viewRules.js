@@ -1,7 +1,7 @@
 // src/games/pokemon-only-one/view/viewRules.js
 
 export function getPlayMode(model) {
-  return model?.settings?.playMode || (model?.settings?.onePlayerTestMode === false ? "twoPlayer" : "onePlayerTest");
+  return model?.settings?.playMode || (model?.settings?.onePlayerTestMode === true ? "onePlayerTest" : "twoPlayer");
 }
 
 export function isOnePlayerTestMode(model) {

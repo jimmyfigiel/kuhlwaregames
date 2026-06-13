@@ -15,7 +15,7 @@ export class Game {
     playerSides = {},
     zones = {},
     cards = {},
-    settings = { playMode: "onePlayerTest", onePlayerTestMode: true },
+    settings = { playMode: "twoPlayer", onePlayerTestMode: false },
     setup = createDefaultSetup(),
     display = new Display(),
     log = new GameLog(),
@@ -67,7 +67,7 @@ export class Game {
   }
 
   getPlayMode() {
-    return this.settings?.playMode || (this.settings?.onePlayerTestMode === false ? "twoPlayer" : "onePlayerTest");
+    return this.settings?.playMode || (this.settings?.onePlayerTestMode === true ? "onePlayerTest" : "twoPlayer");
   }
 
   isOnePlayerTestMode() {
@@ -737,7 +737,7 @@ function shuffleZone(zone) {
 }
 
 function normalizeSettings(settings = {}) {
-  const playMode = settings?.playMode || (settings?.onePlayerTestMode === false ? "twoPlayer" : "onePlayerTest");
+  const playMode = settings?.playMode || (settings?.onePlayerTestMode === true ? "onePlayerTest" : "twoPlayer");
   return {
     ...(settings || {}),
     playMode,
