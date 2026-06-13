@@ -114,6 +114,44 @@ export class Game {
     return this.canActorControlSide(playerSlot, zone.ownerId);
   }
 
+  getCurrentTurnSideId() {
+    this.setup = normalizeSetup(this.setup);
+    return this.setup.currentTurnSideId || this.setup.coinFlip?.resultSideId || null;
+  }
+
+  isTurnPhase() {
+    return this.setup?.phase === "turn" && Boolean(this.getCurrentTurnSideId());
+  }
+
+  canActorTakeTurnForSide(playerSlot, sideId) {
+    if (!this.canActorControlSide(playerSlot, sideId)) {
+      return false;
+    }
+
+    return this.isTurnPhase() && this.getCurrentTurnSideId() === sideId;
+  }
+
+  canActorModifySide(playerSlot, sideId) {
+    if (!this.canActorControlSide(playerSlot, sideId)) {
+      return false;
+    }
+
+    if ((this.setup?.phase || "setup") === "setup") {
+      return true;
+    }
+
+    return this.getCurrentTurnSideId() === sideId;
+  }
+
+  canActorModifyZone(playerSlot, zoneIdOrZone) {
+    const zone = typeof zoneIdOrZone === "string" ? this.getZone(zoneIdOrZone) : zoneIdOrZone;
+    if (!zone) {
+      return false;
+    }
+
+    return this.canActorModifySide(playerSlot, zone.ownerId);
+  }
+
   canActorSeeZoneFaces(playerSlot, zoneIdOrZone) {
     const zone = typeof zoneIdOrZone === "string" ? this.getZone(zoneIdOrZone) : zoneIdOrZone;
 

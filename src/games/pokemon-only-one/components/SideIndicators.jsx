@@ -1,7 +1,7 @@
 // src/games/pokemon-only-one/components/SideIndicators.jsx
 
 import React from "react";
-import { canViewerControlZone } from "../view/viewRules.js";
+import { canViewerControlZone, canViewerTakeTurnForZone, getCurrentTurnSideId, isTurnPhase } from "../view/viewRules.js";
 import { getSideDisplayName, getZoneDisplayName } from "../view/viewModel.js";
 
 export function SideIndicators({ model, side, order, align, actionBridge }) {
@@ -24,14 +24,26 @@ export function SideIndicators({ model, side, order, align, actionBridge }) {
         const zone = model.zones?.[item.zoneId];
         const count = zone?.cardIds?.length || 0;
         const canControl = canViewerControlZone(model, zone, viewerSideId);
+        const canTakeTurn = canViewerTakeTurnForZone(model, viewerSideId, zone);
         const action =
           key === "deck"
             ? { type: "DRAW_CARD", deckZoneId: item.zoneId }
             : { type: "OPEN_ZONE_POPUP", zoneId: item.zoneId };
         const zoneName = zone ? getZoneDisplayName(model, zone) : item.label;
         const actionLabel = key === "deck" ? `Draw from ${zoneName}` : `Open ${zoneName}`;
-        const disabled = !actionBridge.ready || !zone || (key === "deck" && !canControl);
-        const title = key === "deck" && !canControl ? `${zoneName} is controlled by ${getSideDisplayName(model, zone?.ownerId)}.` : actionLabel;
+        const currentTurnSideId = getCurrentTurnSideId(model);
+        const turnLabel = currentTurnSideId ? `${getSideDisplayName(model, currentTurnSideId)}'s turn` : "Waiting for turn order";
+        const disabled = !actionBridge.ready || !zone || (key === "deck" && !canTakeTurn);
+        const title =
+          key !== "deck"
+            ? actionLabel
+            : !canControl
+              ? `${zoneName} is controlled by ${getSideDisplayName(model, zone?.ownerId)}.`
+              : !isTurnPhase(model)
+                ? "Cards can be drawn after setup is complete."
+                : !canTakeTurn
+                  ? `Only ${turnLabel} can draw.`
+                  : actionLabel;
 
         return (
           <button

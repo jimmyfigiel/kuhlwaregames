@@ -55,8 +55,8 @@ export class SelectPokemonForPlacementCommand {
       return;
     }
 
-    if (!game.canActorControlZone(this.playerSlot, sourceZone)) {
-      game.log.add("COMMAND_ERROR", `You cannot select cards from ${sourceZone.name} in ${playMode} mode.`, {
+    if (!game.canActorModifyZone(this.playerSlot, sourceZone)) {
+      game.log.add("COMMAND_ERROR", `You cannot act with cards from ${sourceZone.name} in ${playMode} mode.`, {
         cardId: this.cardId,
         sourceZoneId: this.sourceZoneId,
         ownerId: sourceZone.ownerId,

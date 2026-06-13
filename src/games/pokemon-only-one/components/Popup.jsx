@@ -4,10 +4,13 @@ import React from "react";
 import { CardBack } from "./CardBack.jsx";
 import {
   canViewerControlZone,
+  canViewerModifyZone,
   canViewerSeeZoneFaces,
+  canViewerTakeTurnForZone,
+  getCurrentTurnSideId,
+  isTurnPhase,
   findFirstEmptyBenchZoneId,
   getActiveZoneIdForSide,
-  isOnePlayerTestMode,
   isPokemonCard,
 } from "../view/viewRules.js";
 import { getSideDisplayName, getZoneDisplayName } from "../view/viewModel.js";
@@ -130,7 +133,6 @@ function ZonePopup({ model, zoneId, actionBridge, playerSlot }) {
 
 function ZonePopupContents({ model, zone, actionBridge, playerSlot }) {
   const viewerSideId = actionBridge.viewerSideId;
-  const onePlayerTestMode = isOnePlayerTestMode(model);
   const canControlZone = canViewerControlZone(model, zone, viewerSideId);
   const canSeeFaces = canViewerSeeZoneFaces(model, viewerSideId, zone);
   const cards = (zone.cardIds || []).map((cardId) => model.cards?.[cardId]).filter(Boolean);
@@ -157,6 +159,17 @@ function ZonePopupContents({ model, zone, actionBridge, playerSlot }) {
 }
 
 function DeckContents({ model, zone, actionBridge, canControlZone }) {
+  const canTakeTurn = canViewerTakeTurnForZone(model, actionBridge.viewerSideId, zone);
+  const currentTurnSideId = getCurrentTurnSideId(model);
+  const currentTurnName = currentTurnSideId ? getSideDisplayName(model, currentTurnSideId) : "the starting player";
+  const buttonLabel = !canControlZone
+    ? `${getSideDisplayName(model, zone.ownerId)} controls this deck`
+    : !isTurnPhase(model)
+      ? "Draw after setup"
+      : !canTakeTurn
+        ? `Waiting for ${currentTurnName}`
+        : "Draw one card";
+
   return (
     <div className="poo-zone-message">
       <CardBack />
@@ -164,10 +177,10 @@ function DeckContents({ model, zone, actionBridge, canControlZone }) {
       <button
         type="button"
         className="poo-popup-action-button"
-        disabled={!actionBridge.ready || !canControlZone || (zone.cardIds || []).length === 0}
+        disabled={!actionBridge.ready || !canTakeTurn || (zone.cardIds || []).length === 0}
         onClick={() => actionBridge.send({ type: "DRAW_CARD", deckZoneId: zone.id })}
       >
-        {canControlZone ? "Draw one card" : `${getSideDisplayName(model, zone.ownerId)} controls this deck`}
+        {buttonLabel}
       </button>
     </div>
   );
@@ -188,7 +201,8 @@ function HiddenCardGrid({ cards }) {
 function HandCardTile({ model, zone, card, actionBridge, playerSlot }) {
   const viewerSideId = actionBridge.viewerSideId;
   const canControlZone = canViewerControlZone(model, zone, viewerSideId);
-  const canPlacePokemon = zone.zoneKind === "hand" && isPokemonCard(card) && canControlZone;
+  const canModifyZone = canViewerModifyZone(model, viewerSideId, zone);
+  const canPlacePokemon = zone.zoneKind === "hand" && isPokemonCard(card) && canControlZone && canModifyZone;
   const activeZoneId = canPlacePokemon ? getActiveZoneIdForSide(model, zone.ownerId) : null;
   const activeZone = activeZoneId ? model.zones?.[activeZoneId] || null : null;
   const canPlaceActive = Boolean(activeZone && (activeZone.cardIds || []).length === 0);

@@ -45,6 +45,21 @@ export class DrawCardCommand {
       return;
     }
 
+    if (!game.canActorTakeTurnForSide(this.playerSlot, side.id)) {
+      const currentTurnSideId = game.getCurrentTurnSideId();
+      const currentTurnSide = currentTurnSideId ? game.getPlayerSide(currentTurnSideId) : null;
+      game.log.add("COMMAND_ERROR", `Only ${currentTurnSide?.name || "the current player"} can draw right now.`, {
+        deckZoneId: deckZone.id,
+        ownerId: deckZone.ownerId,
+        playerSlot: this.playerSlot,
+        actingSide: game.playerSlotToSideId(this.playerSlot),
+        currentTurnSideId,
+        phase: game.setup?.phase || "setup",
+        playMode: game.getPlayMode(),
+      });
+      return;
+    }
+
     const handZone = game.getZone(side.handZoneId);
     if (!handZone) {
       game.log.add("COMMAND_ERROR", `Cannot draw from ${deckZone.name}; missing hand zone ${side.handZoneId}.`, {

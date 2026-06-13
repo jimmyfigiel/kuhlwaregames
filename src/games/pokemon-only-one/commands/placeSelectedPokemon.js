@@ -94,8 +94,8 @@ export class PlaceSelectedPokemonCommand {
       return;
     }
 
-    if (!game.canActorControlZone(this.playerSlot, sourceZone) || !game.canActorControlZone(this.playerSlot, targetZone)) {
-      game.log.add("COMMAND_ERROR", `You cannot place ${card.name} from ${sourceZone.name} into ${targetZone.name} in ${playMode} mode.`, {
+    if (!game.canActorModifyZone(this.playerSlot, sourceZone) || !game.canActorModifyZone(this.playerSlot, targetZone)) {
+      game.log.add("COMMAND_ERROR", `You cannot act to place ${card.name} from ${sourceZone.name} into ${targetZone.name} in ${playMode} mode.`, {
         cardId: card.id,
         sourceZoneId: sourceZone.id,
         targetZoneId: targetZone.id,

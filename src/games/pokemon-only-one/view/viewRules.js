@@ -46,6 +46,50 @@ export function canViewerControlZone(model, zone, viewerSideId) {
   return canViewerControlSide(model, viewerSideId, zone.ownerId);
 }
 
+export function getCurrentTurnSideId(model) {
+  return model?.setup?.currentTurnSideId || model?.setup?.coinFlip?.resultSideId || null;
+}
+
+export function isTurnPhase(model) {
+  return model?.setup?.phase === "turn" && Boolean(getCurrentTurnSideId(model));
+}
+
+export function canViewerTakeTurnForSide(model, viewerSideId, sideId) {
+  if (!canViewerControlSide(model, viewerSideId, sideId)) {
+    return false;
+  }
+
+  return isTurnPhase(model) && getCurrentTurnSideId(model) === sideId;
+}
+
+export function canViewerTakeTurnForZone(model, viewerSideId, zone) {
+  if (!zone) {
+    return false;
+  }
+
+  return canViewerTakeTurnForSide(model, viewerSideId, zone.ownerId);
+}
+
+export function canViewerModifySide(model, viewerSideId, sideId) {
+  if (!canViewerControlSide(model, viewerSideId, sideId)) {
+    return false;
+  }
+
+  if ((model?.setup?.phase || "setup") === "setup") {
+    return true;
+  }
+
+  return getCurrentTurnSideId(model) === sideId;
+}
+
+export function canViewerModifyZone(model, viewerSideId, zone) {
+  if (!zone) {
+    return false;
+  }
+
+  return canViewerModifySide(model, viewerSideId, zone.ownerId);
+}
+
 export function canViewerInspectZone(model, zone, viewerSideId) {
   if (!zone) {
     return false;
@@ -183,7 +227,7 @@ export function canPlaceSelectedPokemonInZone(model, zone, playerSlotOrBridge = 
     return false;
   }
 
-  if (!canViewerControlZone(model, sourceZone, viewerSideId) || !canViewerControlZone(model, zone, viewerSideId)) {
+  if (!canViewerModifyZone(model, viewerSideId, sourceZone) || !canViewerModifyZone(model, viewerSideId, zone)) {
     return false;
   }
 
