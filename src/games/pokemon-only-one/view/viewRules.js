@@ -140,8 +140,12 @@ function canViewerSeeZoneFacesWithMode(zone, viewerSideId, onePlayerTestMode = f
     return false;
   }
 
-  if (zone.faceDown === true && zone.visibility !== "owner") {
-    return false;
+  if (zone.faceDown === true) {
+    if (onePlayerTestMode) {
+      return true;
+    }
+
+    return zone.ownerId === viewerSideId;
   }
 
   if (zone.visibility === "public") {
@@ -235,6 +239,36 @@ export function canPlaceSelectedPokemonInZone(model, zone, playerSlotOrBridge = 
   const viewerSideId = getViewerSideId(playerSlotOrBridge || selection.playerSlot || selection.selectedBySideId);
 
   if (!shouldViewerSeeSelection(model, selection, viewerSideId)) {
+    return false;
+  }
+
+  if (!canViewerModifyZone(model, viewerSideId, sourceZone) || !canViewerModifyZone(model, viewerSideId, zone)) {
+    return false;
+  }
+
+  return (
+    sourceZone.zoneKind === "hand" &&
+    (model?.setup?.phase === "setup" ? isBasicPokemonCard(selectedCard) : isPokemonCard(selectedCard)) &&
+    ["active", "bench"].includes(zone.zoneKind) &&
+    zone.ownerId === sourceZone.ownerId &&
+    (zone.cardIds || []).length === 0
+  );
+}
+
+
+export function canPlaceLocalPokemonInZone(model, zone, localPlacement, viewerSideId) {
+  if (!localPlacement?.cardId || !zone) {
+    return false;
+  }
+
+  if (!shouldViewerSeeSelection(model, localPlacement, viewerSideId)) {
+    return false;
+  }
+
+  const selectedCard = model.cards?.[localPlacement.cardId] || null;
+  const sourceZone = localPlacement.sourceZoneId ? model.zones?.[localPlacement.sourceZoneId] : null;
+
+  if (!selectedCard || !sourceZone) {
     return false;
   }
 

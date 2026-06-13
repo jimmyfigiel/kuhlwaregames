@@ -7,7 +7,7 @@ import { PrizeGrid } from "./PrizeGrid.jsx";
 import { SideIndicators } from "./SideIndicators.jsx";
 import { getSideDisplayName } from "../view/viewModel.js";
 
-export function BattleScreen({ model, actionBridge }) {
+export function BattleScreen({ model, actionBridge, localPlacement }) {
   const viewerSideId = actionBridge?.viewerSideId === "opponent" ? "opponent" : "player";
   const ownSideId = viewerSideId;
   const opponentSideId = ownSideId === "player" ? "opponent" : "player";
@@ -26,6 +26,7 @@ export function BattleScreen({ model, actionBridge }) {
         side={topSide}
         model={model}
         actionBridge={actionBridge}
+        localPlacement={localPlacement}
       />
 
       <BattleSideBlock
@@ -35,12 +36,13 @@ export function BattleScreen({ model, actionBridge }) {
         side={bottomSide}
         model={model}
         actionBridge={actionBridge}
+        localPlacement={localPlacement}
       />
     </main>
   );
 }
 
-function BattleSideBlock({ position, relationship, sideId, side, model, actionBridge }) {
+function BattleSideBlock({ position, relationship, sideId, side, model, actionBridge, localPlacement }) {
   const isTop = position === "top";
   const sideName = getSideDisplayName(model, sideId);
   const benchTitle = `${sideName} bench`;
@@ -67,6 +69,7 @@ function BattleSideBlock({ position, relationship, sideId, side, model, actionBr
       model={model}
       zoneId={side?.activeZoneId}
       actionBridge={actionBridge}
+      localPlacement={localPlacement}
       side={sideId}
     />
   );
@@ -81,6 +84,7 @@ function BattleSideBlock({ position, relationship, sideId, side, model, actionBr
           model={model}
           zoneIds={side?.benchZoneIds || []}
           actionBridge={actionBridge}
+          localPlacement={localPlacement}
           side={sideId}
         />
       )}
@@ -107,6 +111,7 @@ function BattleSideBlock({ position, relationship, sideId, side, model, actionBr
           model={model}
           zoneIds={side?.benchZoneIds || []}
           actionBridge={actionBridge}
+          localPlacement={localPlacement}
           side={sideId}
         />
       )}

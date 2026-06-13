@@ -15,9 +15,10 @@ import "./styles.css";
 
 export default function PokemonOnlyOneView(props) {
   const [localPopup, setLocalPopup] = useState(null);
+  const [localPlacement, setLocalPlacement] = useState(null);
   const model = resolveModel(props);
   const baseActionBridge = createActionBridge(props);
-  const actionBridge = createLocalPopupActionBridge(model, baseActionBridge, localPopup, setLocalPopup);
+  const actionBridge = createLocalPopupActionBridge(model, baseActionBridge, localPopup, setLocalPopup, setLocalPlacement);
 
   if (!model) {
     return (
@@ -38,17 +39,17 @@ export default function PokemonOnlyOneView(props) {
 
   return (
     <div className="poo-shell">
-      <BattleScreen model={model} actionBridge={actionBridge} />
+      <BattleScreen model={model} actionBridge={actionBridge} localPlacement={localPlacement} />
       <SetupPanel model={model} actionBridge={actionBridge} />
       <TestModeNotice model={model} actionBridge={actionBridge} />
-      <SelectionNotice model={model} actionBridge={actionBridge} />
+      <SelectionNotice model={model} actionBridge={actionBridge} localPlacement={localPlacement} />
       {visiblePopup && <Popup model={model} popup={visiblePopup} actionBridge={actionBridge} playerSlot={actionBridge.playerSlot} />}
       <LogPanel model={model} actionBridge={actionBridge} />
     </div>
   );
 }
 
-function createLocalPopupActionBridge(model, baseActionBridge, localPopup, setLocalPopup) {
+function createLocalPopupActionBridge(model, baseActionBridge, localPopup, setLocalPopup, setLocalPlacement) {
   return {
     ...baseActionBridge,
     send(action) {
@@ -76,6 +77,46 @@ function createLocalPopupActionBridge(model, baseActionBridge, localPopup, setLo
         return;
       }
 
+
+      if (actionType === "SELECT_POKEMON_FOR_PLACEMENT") {
+        const sourceZone = model?.zones?.[action.sourceZoneId] || null;
+        const card = model?.cards?.[action.cardId] || null;
+
+        if (!sourceZone || !card) {
+          console.warn("[pokemon-only-one view] blocked local placement selection for missing card or source zone", {
+            cardId: action.cardId,
+            sourceZoneId: action.sourceZoneId,
+          });
+          return;
+        }
+
+        if (!canViewerInspectZone(model, sourceZone, baseActionBridge.viewerSideId)) {
+          console.warn("[pokemon-only-one view] blocked local placement selection from private zone", {
+            cardId: action.cardId,
+            sourceZoneId: action.sourceZoneId,
+            viewerSideId: baseActionBridge.viewerSideId,
+            ownerId: sourceZone.ownerId,
+          });
+          return;
+        }
+
+        setLocalPlacement({
+          type: "PLACE_POKEMON",
+          cardId: action.cardId,
+          sourceZoneId: action.sourceZoneId,
+          selectedBySideId: baseActionBridge.viewerSideId,
+        });
+        setLocalPopup(null);
+        return;
+      }
+
+      if (actionType === "CLEAR_SELECTION") {
+        setLocalPlacement(null);
+        setLocalPopup(null);
+        baseActionBridge.send(action);
+        return;
+      }
+
       if (actionType === "OPEN_CARD_ZOOM") {
         setLocalPopup({
           type: "CARD_ZOOM",
@@ -96,8 +137,9 @@ function createLocalPopupActionBridge(model, baseActionBridge, localPopup, setLo
         return;
       }
 
-      if (actionType === "DRAW_CARD") {
+      if (actionType === "DRAW_CARD" || actionType === "PLACE_SELECTED_POKEMON" || actionType === "PLACE_POKEMON_FROM_HAND") {
         setLocalPopup(null);
+        setLocalPlacement(null);
       }
 
       baseActionBridge.send(action);

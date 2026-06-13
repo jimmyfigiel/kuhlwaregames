@@ -164,8 +164,12 @@ export class Game {
       return false;
     }
 
-    if (zone.faceDown === true && zone.visibility !== "owner") {
-      return false;
+    if (zone.faceDown === true) {
+      if (this.isOnePlayerTestMode()) {
+        return true;
+      }
+
+      return this.playerSlotToSideId(playerSlot) === zone.ownerId;
     }
 
     if (zone.visibility === "public") {

@@ -4,8 +4,8 @@ import React from "react";
 import { shouldViewerSeeSelection } from "../view/viewRules.js";
 import { getSideDisplayName } from "../view/viewModel.js";
 
-export function SelectionNotice({ model, actionBridge }) {
-  const selection = model.display?.selection || null;
+export function SelectionNotice({ model, actionBridge, localPlacement }) {
+  const selection = localPlacement || null;
   const card = selection?.cardId ? model.cards?.[selection.cardId] : null;
   const sourceZone = selection?.sourceZoneId ? model.zones?.[selection.sourceZoneId] : null;
 
