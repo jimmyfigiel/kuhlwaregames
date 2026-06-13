@@ -7,26 +7,107 @@ import { PrizeGrid } from "./PrizeGrid.jsx";
 import { SideIndicators } from "./SideIndicators.jsx";
 
 export function BattleScreen({ model, actionBridge }) {
-  const opponent = model.playerSides?.opponent;
-  const player = model.playerSides?.player;
+  const viewerSideId = actionBridge?.viewerSideId === "opponent" ? "opponent" : "player";
+  const ownSideId = viewerSideId;
+  const opponentSideId = ownSideId === "player" ? "opponent" : "player";
+
+  const topSideId = opponentSideId;
+  const bottomSideId = ownSideId;
+  const topSide = model.playerSides?.[topSideId];
+  const bottomSide = model.playerSides?.[bottomSideId];
 
   return (
     <main className="poo-battle-screen" aria-label="Pokémon battle screen">
-      <BenchRow title="Opponent bench" model={model} zoneIds={opponent?.benchZoneIds || []} actionBridge={actionBridge} side="opponent" />
+      <BattleSideBlock
+        position="top"
+        relationship="opponent"
+        sideId={topSideId}
+        side={topSide}
+        model={model}
+        actionBridge={actionBridge}
+      />
 
-      <section className="poo-main-row poo-opponent-main" aria-label="Opponent play area">
-        <SideIndicators model={model} side={opponent} order={["hand", "discard", "deck"]} align="left" actionBridge={actionBridge} />
-        <ActivePokemon model={model} zoneId={opponent?.activeZoneId} actionBridge={actionBridge} side="opponent" />
-        <PrizeGrid model={model} zoneIds={opponent?.prizeZoneIds || []} side="opponent" />
-      </section>
-
-      <section className="poo-main-row poo-player-main" aria-label="Player play area">
-        <PrizeGrid model={model} zoneIds={player?.prizeZoneIds || []} side="player" />
-        <ActivePokemon model={model} zoneId={player?.activeZoneId} actionBridge={actionBridge} side="player" />
-        <SideIndicators model={model} side={player} order={["deck", "discard", "hand"]} align="right" actionBridge={actionBridge} />
-      </section>
-
-      <BenchRow title="Player bench" model={model} zoneIds={player?.benchZoneIds || []} actionBridge={actionBridge} side="player" />
+      <BattleSideBlock
+        position="bottom"
+        relationship="self"
+        sideId={bottomSideId}
+        side={bottomSide}
+        model={model}
+        actionBridge={actionBridge}
+      />
     </main>
+  );
+}
+
+function BattleSideBlock({ position, relationship, sideId, side, model, actionBridge }) {
+  const isTop = position === "top";
+  const benchTitle = relationship === "opponent" ? "Opponent bench" : "Your bench";
+  const playAreaLabel = relationship === "opponent" ? "Opponent play area" : "Your play area";
+  const mainClassName = [
+    "poo-main-row",
+    `poo-${position}-main`,
+    `poo-${relationship}-main`,
+    `poo-${sideId}-main`,
+  ].join(" ");
+
+  const indicators = (
+    <SideIndicators
+      model={model}
+      side={side}
+      order={isTop ? ["hand", "discard", "deck"] : ["deck", "discard", "hand"]}
+      align={isTop ? "left" : "right"}
+      actionBridge={actionBridge}
+    />
+  );
+
+  const activePokemon = (
+    <ActivePokemon
+      model={model}
+      zoneId={side?.activeZoneId}
+      actionBridge={actionBridge}
+      side={sideId}
+    />
+  );
+
+  const prizes = <PrizeGrid model={model} zoneIds={side?.prizeZoneIds || []} side={sideId} />;
+
+  return (
+    <>
+      {isTop && (
+        <BenchRow
+          title={benchTitle}
+          model={model}
+          zoneIds={side?.benchZoneIds || []}
+          actionBridge={actionBridge}
+          side={sideId}
+        />
+      )}
+
+      <section className={mainClassName} aria-label={playAreaLabel}>
+        {isTop ? (
+          <>
+            {indicators}
+            {activePokemon}
+            {prizes}
+          </>
+        ) : (
+          <>
+            {prizes}
+            {activePokemon}
+            {indicators}
+          </>
+        )}
+      </section>
+
+      {!isTop && (
+        <BenchRow
+          title={benchTitle}
+          model={model}
+          zoneIds={side?.benchZoneIds || []}
+          actionBridge={actionBridge}
+          side={sideId}
+        />
+      )}
+    </>
   );
 }
