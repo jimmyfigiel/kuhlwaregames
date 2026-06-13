@@ -2,6 +2,7 @@
 
 import React from "react";
 import { shouldViewerSeeSelection } from "../view/viewRules.js";
+import { getSideDisplayName } from "../view/viewModel.js";
 
 export function SelectionNotice({ model, actionBridge }) {
   const selection = model.display?.selection || null;
@@ -12,11 +13,12 @@ export function SelectionNotice({ model, actionBridge }) {
     return null;
   }
 
-  const sideName = sourceZone?.ownerId === "opponent" ? "opponent" : "player";
+  const sideId = sourceZone?.ownerId === "opponent" ? "opponent" : "player";
+  const sideName = getSideDisplayName(model, sideId);
 
   return (
     <section className="poo-selection-notice" aria-live="polite">
-      <strong>{card.name}</strong> selected from the {sideName} hand. Click the empty {sideName} Active slot or an empty {sideName} Bench slot to place it.
+      <strong>{card.name}</strong> selected from {sideName}'s hand. Click {sideName}'s empty Active slot or an empty Bench slot to place it.
       <button type="button" disabled={!actionBridge.ready} onClick={() => actionBridge.send({ type: "CLEAR_SELECTION" })}>
         Cancel
       </button>

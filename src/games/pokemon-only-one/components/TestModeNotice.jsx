@@ -2,10 +2,12 @@
 
 import React from "react";
 import { getPlayMode, isOnePlayerTestMode } from "../view/viewRules.js";
+import { getSideDisplayName } from "../view/viewModel.js";
 
 export function TestModeNotice({ model, actionBridge }) {
   const playMode = getPlayMode(model);
   const actingSide = actionBridge.viewerSideId;
+  const actingName = getSideDisplayName(model, actingSide);
   const onePlayerTestMode = isOnePlayerTestMode(model);
 
   return (
@@ -13,7 +15,7 @@ export function TestModeNotice({ model, actionBridge }) {
       <span>
         {onePlayerTestMode
           ? "One-player test mode: this browser can inspect and move cards for both sides."
-          : `Two-player mode: this browser is acting as ${actingSide}. Hidden zones stay hidden and only that side can act.`}
+          : `Two-player mode: this browser is acting as ${actingName}. Hidden zones stay hidden and only ${actingName} can act.`}
       </span>
       <button
         type="button"

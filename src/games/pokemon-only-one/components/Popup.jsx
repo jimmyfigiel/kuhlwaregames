@@ -10,6 +10,7 @@ import {
   isOnePlayerTestMode,
   isPokemonCard,
 } from "../view/viewRules.js";
+import { getSideDisplayName, getZoneDisplayName } from "../view/viewModel.js";
 
 export function Popup({ model, popup, actionBridge, playerSlot }) {
   if (popup.type === "CARD_ZOOM") {
@@ -53,9 +54,11 @@ function CardZoomPopup({ model, cardId, actionBridge }) {
 function CoinFlipPopup({ model, coinFlip, actionBridge }) {
   const resultSideId = coinFlip?.resultSideId || model.setup?.currentTurnSideId || null;
   const viewerSideId = actionBridge.viewerSideId === "opponent" ? "opponent" : "player";
-  const viewerLabel = resultSideId === viewerSideId ? "You go first" : "Opponent goes first";
+  const viewerLabel = resultSideId === viewerSideId ? "You go first" : `${getSideDisplayName(model, resultSideId)} goes first`;
   const faceLabel = coinFlip?.coinFace === "tails" ? "Tails" : "Heads";
-  const sideName = coinFlip?.resultSideName || model.playerSides?.[resultSideId]?.name || resultSideId || "Unknown side";
+  const sideName = getSideDisplayName(model, resultSideId);
+  const headsName = getSideDisplayName(model, "player");
+  const tailsName = getSideDisplayName(model, "opponent");
 
   return (
     <div className="poo-popup-backdrop" onClick={() => actionBridge.send({ type: "CLOSE_POPUP" })}>
@@ -69,7 +72,7 @@ function CoinFlipPopup({ model, coinFlip, actionBridge }) {
         <div className="poo-zone-popup-header">
           <div>
             <h2>Coin Flip</h2>
-            <p>Heads = Player side · Tails = Opponent side</p>
+            <p>Heads = {headsName} · Tails = {tailsName}</p>
           </div>
           <button type="button" onClick={() => actionBridge.send({ type: "CLOSE_POPUP" })}>
             Close
@@ -106,11 +109,11 @@ function ZonePopup({ model, zoneId, actionBridge, playerSlot }) {
         onClick={(event) => {
           event.stopPropagation();
         }}
-        aria-label={zone.name}
+        aria-label={getZoneDisplayName(model, zone)}
       >
         <div className="poo-zone-popup-header">
           <div>
-            <h2>{zone.name}</h2>
+            <h2>{getZoneDisplayName(model, zone)}</h2>
             <p>
               {zone.zoneKind} · {zone.cardIds?.length || 0} card{zone.cardIds?.length === 1 ? "" : "s"}
             </p>
@@ -133,7 +136,7 @@ function ZonePopupContents({ model, zone, actionBridge, playerSlot }) {
   const cards = (zone.cardIds || []).map((cardId) => model.cards?.[cardId]).filter(Boolean);
 
   if (zone.zoneKind === "deck") {
-    return <DeckContents zone={zone} actionBridge={actionBridge} canControlZone={canControlZone} />;
+    return <DeckContents model={model} zone={zone} actionBridge={actionBridge} canControlZone={canControlZone} />;
   }
 
   if (!canSeeFaces) {
@@ -153,7 +156,7 @@ function ZonePopupContents({ model, zone, actionBridge, playerSlot }) {
   );
 }
 
-function DeckContents({ zone, actionBridge, canControlZone }) {
+function DeckContents({ model, zone, actionBridge, canControlZone }) {
   return (
     <div className="poo-zone-message">
       <CardBack />
@@ -164,7 +167,7 @@ function DeckContents({ zone, actionBridge, canControlZone }) {
         disabled={!actionBridge.ready || !canControlZone || (zone.cardIds || []).length === 0}
         onClick={() => actionBridge.send({ type: "DRAW_CARD", deckZoneId: zone.id })}
       >
-        {canControlZone ? "Draw one card" : "Deck controlled by other side"}
+        {canControlZone ? "Draw one card" : `${getSideDisplayName(model, zone.ownerId)} controls this deck`}
       </button>
     </div>
   );

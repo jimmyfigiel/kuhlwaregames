@@ -5,6 +5,7 @@ import { ActivePokemon } from "./cardSlots.jsx";
 import { BenchRow } from "./BenchRow.jsx";
 import { PrizeGrid } from "./PrizeGrid.jsx";
 import { SideIndicators } from "./SideIndicators.jsx";
+import { getSideDisplayName } from "../view/viewModel.js";
 
 export function BattleScreen({ model, actionBridge }) {
   const viewerSideId = actionBridge?.viewerSideId === "opponent" ? "opponent" : "player";
@@ -41,8 +42,9 @@ export function BattleScreen({ model, actionBridge }) {
 
 function BattleSideBlock({ position, relationship, sideId, side, model, actionBridge }) {
   const isTop = position === "top";
-  const benchTitle = relationship === "opponent" ? "Opponent bench" : "Your bench";
-  const playAreaLabel = relationship === "opponent" ? "Opponent play area" : "Your play area";
+  const sideName = getSideDisplayName(model, sideId);
+  const benchTitle = `${sideName} bench`;
+  const playAreaLabel = `${sideName} play area`;
   const mainClassName = [
     "poo-main-row",
     `poo-${position}-main`,

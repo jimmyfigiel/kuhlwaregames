@@ -2,6 +2,7 @@
 
 import React from "react";
 import { canViewerControlSide, isOnePlayerTestMode } from "../view/viewRules.js";
+import { getSideDisplayName, getViewerRelationshipLabel } from "../view/viewModel.js";
 
 const PRIZE_COUNTS = [1, 2, 3, 4, 5, 6];
 
@@ -49,7 +50,7 @@ export function SetupPanel({ model, actionBridge }) {
 
       {setup.coinFlip?.resultSideId && (
         <div className="poo-setup-result" aria-live="polite">
-          Coin flip complete: {labelSideForViewer(setup.coinFlip.resultSideId, viewerSideId)} goes first.
+          Coin flip complete: {getSideDisplayName(model, setup.coinFlip.resultSideId)} goes first.
         </div>
       )}
     </section>
@@ -64,12 +65,14 @@ function SetupSideStatus({ model, setup, sideId, actionBridge, viewerSideId }) {
   const prizeCount = (side.prizeZoneIds || []).reduce((total, zoneId) => total + (model.zones?.[zoneId]?.cardIds?.length || 0), 0);
   const deckCount = model.zones?.[side.deckZoneId]?.cardIds?.length || 0;
   const disabled = !actionBridge.ready || !canControlSide || sideSetup.ready || setup.phase !== "setup";
+  const sideName = getSideDisplayName(model, sideId);
+  const relationshipLabel = getViewerRelationshipLabel(model, sideId, viewerSideId);
 
   return (
     <article className={sideSetup.ready ? "poo-setup-side poo-setup-side-ready" : "poo-setup-side"}>
       <div>
-        <h3>{labelSideForViewer(sideId, viewerSideId)}</h3>
-        <p>{side.name}</p>
+        <h3>{sideName}</h3>
+        <p>{relationshipLabel}</p>
       </div>
 
       <dl className="poo-setup-stats">
@@ -87,7 +90,7 @@ function SetupSideStatus({ model, setup, sideId, actionBridge, viewerSideId }) {
         </div>
       </dl>
 
-      <div className="poo-setup-checks" aria-label={`${side.name} setup status`}>
+      <div className="poo-setup-checks" aria-label={`${sideName} setup status`}>
         <span className={sideSetup.openingHandDrawn ? "poo-setup-check poo-setup-check-on" : "poo-setup-check"}>Draw 7</span>
         <span className={sideSetup.prizesSet ? "poo-setup-check poo-setup-check-on" : "poo-setup-check"}>Set prizes</span>
         <span className={sideSetup.ready ? "poo-setup-check poo-setup-check-on" : "poo-setup-check"}>Ready</span>
@@ -98,19 +101,12 @@ function SetupSideStatus({ model, setup, sideId, actionBridge, viewerSideId }) {
         className="poo-ready-button"
         disabled={disabled}
         onClick={() => actionBridge.send({ type: "READY_SETUP_SIDE", sideId })}
-        title={canControlSide ? "Draw 7, set prizes, and mark this side ready" : "Only this side's player can ready this side"}
+        title={canControlSide ? "Draw 7, set prizes, and mark ready" : `${sideName} must ready this side`}
       >
-        {sideSetup.ready ? "Ready" : canControlSide ? "Ready: Draw 7 + Set Prizes" : "Waiting"}
+        {sideSetup.ready ? "Ready" : canControlSide ? "Ready: Draw 7 + Set Prizes" : `Waiting for ${sideName}`}
       </button>
     </article>
   );
-}
-
-function labelSideForViewer(sideId, viewerSideId) {
-  if (sideId === viewerSideId) {
-    return "Your side";
-  }
-  return "Opponent side";
 }
 
 function normalizeSetup(setup = {}) {

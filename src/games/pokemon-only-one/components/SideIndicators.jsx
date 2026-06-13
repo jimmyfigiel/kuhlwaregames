@@ -2,6 +2,7 @@
 
 import React from "react";
 import { canViewerControlZone } from "../view/viewRules.js";
+import { getSideDisplayName, getZoneDisplayName } from "../view/viewModel.js";
 
 export function SideIndicators({ model, side, order, align, actionBridge }) {
   if (!side) {
@@ -9,6 +10,7 @@ export function SideIndicators({ model, side, order, align, actionBridge }) {
   }
 
   const viewerSideId = actionBridge.viewerSideId;
+  const sideName = getSideDisplayName(model, side.id);
   const values = {
     hand: { label: "HAND", zoneId: side.handZoneId, icon: "hand" },
     discard: { label: "DISCARD", zoneId: side.discardZoneId, icon: "discard" },
@@ -16,7 +18,7 @@ export function SideIndicators({ model, side, order, align, actionBridge }) {
   };
 
   return (
-    <section className={`poo-indicators poo-indicators-${align}`} aria-label={`${side.name} card zones`}>
+    <section className={`poo-indicators poo-indicators-${align}`} aria-label={`${sideName} card zones`}>
       {order.map((key) => {
         const item = values[key];
         const zone = model.zones?.[item.zoneId];
@@ -26,9 +28,10 @@ export function SideIndicators({ model, side, order, align, actionBridge }) {
           key === "deck"
             ? { type: "DRAW_CARD", deckZoneId: item.zoneId }
             : { type: "OPEN_ZONE_POPUP", zoneId: item.zoneId };
-        const actionLabel = key === "deck" ? `Draw from ${zone?.name || item.label}` : `Open ${zone?.name || item.label}`;
+        const zoneName = zone ? getZoneDisplayName(model, zone) : item.label;
+        const actionLabel = key === "deck" ? `Draw from ${zoneName}` : `Open ${zoneName}`;
         const disabled = !actionBridge.ready || !zone || (key === "deck" && !canControl);
-        const title = key === "deck" && !canControl ? `${zone?.name || item.label} is controlled by ${zone?.ownerId}.` : actionLabel;
+        const title = key === "deck" && !canControl ? `${zoneName} is controlled by ${getSideDisplayName(model, zone?.ownerId)}.` : actionLabel;
 
         return (
           <button
