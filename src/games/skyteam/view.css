@@ -1,0 +1,367 @@
+/* src/games/skyteam/view.css */
+
+.skyteam-shell {
+  --sky-blue: #2563eb;
+  --sky-orange: #f97316;
+  --sky-ink: #102033;
+  --sky-panel: rgba(255, 255, 255, 0.94);
+  --sky-line: rgba(37, 99, 235, 0.18);
+  color: var(--sky-ink);
+  display: grid;
+  gap: 14px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+.sky-hero {
+  border-radius: 22px;
+  padding: 18px;
+  background: linear-gradient(135deg, #d9f4ff, #fff5d6 55%, #ffd7ad);
+  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.18);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.sky-hero h1 {
+  margin: 0;
+  font-size: clamp(28px, 5vw, 56px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #17337a;
+}
+
+.sky-kicker,
+.sky-muted,
+.sky-instrument small,
+.sky-module small {
+  color: #506175;
+}
+
+.sky-status {
+  min-width: 128px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.sky-status strong,
+.sky-status span {
+  display: block;
+}
+
+.sky-card,
+.sky-instrument {
+  border: 1px solid var(--sky-line);
+  border-radius: 18px;
+  background: var(--sky-panel);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+  padding: 14px;
+}
+
+.sky-card h2,
+.sky-module h3 {
+  margin-top: 0;
+}
+
+.sky-setup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.sky-role-card.sky-pilot {
+  border-left: 8px solid var(--sky-blue);
+}
+
+.sky-role-card.sky-copilot {
+  border-left: 8px solid var(--sky-orange);
+}
+
+.sky-start-card {
+  grid-column: 1 / -1;
+}
+
+.sky-button-row,
+.sky-footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.skyteam-shell button,
+.skyteam-shell select {
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: white;
+  color: var(--sky-ink);
+  font-weight: 700;
+}
+
+.skyteam-shell button:disabled {
+  opacity: 0.42;
+}
+
+.skyteam-shell .sky-primary {
+  color: white;
+  background: #17337a;
+  border-color: #17337a;
+}
+
+.skyteam-shell .sky-secondary {
+  background: #eef2ff;
+}
+
+.sky-big-button {
+  font-size: 18px;
+  padding: 12px 16px !important;
+}
+
+.sky-instruments {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.sky-instrument span,
+.sky-instrument small {
+  display: block;
+}
+
+.sky-instrument strong {
+  display: block;
+  font-size: 24px;
+  color: #17337a;
+}
+
+.sky-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(320px, 1.3fr) minmax(260px, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.sky-seat {
+  border-top: 8px solid transparent;
+}
+
+.sky-seat.sky-pilot {
+  border-top-color: var(--sky-blue);
+}
+
+.sky-seat.sky-copilot {
+  border-top-color: var(--sky-orange);
+}
+
+.sky-seat.active {
+  outline: 4px solid rgba(34, 197, 94, 0.28);
+}
+
+.sky-turn-now {
+  color: #15803d;
+  font-weight: 800;
+}
+
+.sky-cockpit {
+  background: linear-gradient(180deg, rgba(237, 250, 255, 0.96), rgba(255, 255, 255, 0.96));
+}
+
+.sky-approach {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(54px, 1fr));
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.sky-approach-space {
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  border-radius: 12px;
+  padding: 8px 4px;
+  text-align: center;
+  background: #dff3ff;
+}
+
+.sky-approach-space.airport {
+  background: #d9f99d;
+}
+
+.sky-approach-space.current {
+  background: #17337a;
+  color: white;
+  transform: translateY(-4px);
+}
+
+.sky-approach-space span,
+.sky-approach-space strong,
+.sky-approach-space small {
+  display: block;
+}
+
+.sky-cockpit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.sky-module {
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.sky-axis-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.sky-die {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  color: white !important;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.sky-die.blue {
+  background: var(--sky-blue) !important;
+}
+
+.sky-die.orange {
+  background: var(--sky-orange) !important;
+}
+
+.sky-marker-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 3px 0;
+}
+
+.sky-switches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sky-switch {
+  border-radius: 999px;
+  padding: 5px 8px;
+  font-weight: 800;
+}
+
+.sky-switch.on {
+  background: #22c55e;
+  color: white;
+}
+
+.sky-switch.off {
+  background: #e5e7eb;
+  color: #475569;
+}
+
+.sky-dice-list {
+  display: grid;
+  gap: 10px;
+}
+
+.sky-die-card {
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 14px;
+  padding: 10px;
+  background: #fff;
+}
+
+.sky-die-card.placed {
+  opacity: 0.62;
+}
+
+.sky-die-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.sky-coffee-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sky-target-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 5px;
+}
+
+.sky-target-grid button {
+  padding: 6px !important;
+  font-size: 12px;
+}
+
+.sky-reroll-check {
+  display: block;
+  margin-top: 7px;
+  font-size: 12px;
+}
+
+.sky-win,
+.sky-loss {
+  margin-top: 12px;
+  border-radius: 14px;
+  padding: 12px;
+  font-weight: 900;
+}
+
+.sky-win {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.sky-loss {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.sky-log {
+  max-height: 260px;
+  overflow: auto;
+}
+
+.sky-log p {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  margin: 0;
+  padding: 6px 0;
+  font-size: 13px;
+}
+
+@media (max-width: 980px) {
+  .sky-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sky-hero {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .sky-approach {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
