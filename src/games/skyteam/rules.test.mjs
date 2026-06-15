@@ -36,6 +36,24 @@ function place(state, role, dieIndex, targetId, coffeeDelta = 0) {
   });
 }
 
+
+let twoPlayer = createInitialState({ mode: "twoPlayer" });
+twoPlayer = act(twoPlayer, { type: "CLAIM_ROLE", role: "pilot" }, "pilot-player");
+twoPlayer = act(twoPlayer, { type: "CLAIM_ROLE", role: "copilot" }, "copilot-player");
+twoPlayer = act(twoPlayer, { type: "START_GAME" }, "pilot-player");
+assert.equal(twoPlayer.phase, "briefing");
+twoPlayer = act(twoPlayer, { type: "ADD_BRIEFING_CHAT", text: "Clear close traffic and keep speed controlled." }, "pilot-player");
+assert.equal(twoPlayer.briefingChat.length, 1);
+twoPlayer = act(twoPlayer, { type: "ROLL_ROLE_DICE", role: "pilot" }, "pilot-player");
+assert.equal(twoPlayer.phase, "rolling");
+assert.equal(twoPlayer.roles.pilot.dice.length, 4);
+assert.equal(twoPlayer.roles.copilot.dice.length, 0);
+twoPlayer = act(twoPlayer, { type: "ADD_BRIEFING_CHAT", text: "This should be locked." }, "copilot-player");
+assert.match(twoPlayer.message, /only open/i);
+twoPlayer = act(twoPlayer, { type: "ROLL_ROLE_DICE", role: "copilot" }, "copilot-player");
+assert.equal(twoPlayer.phase, "placement");
+assert.equal(twoPlayer.roles.copilot.dice.length, 4);
+
 let state = createInitialState();
 assert.equal(state.phase, "setup");
 state = act(state, { type: "SET_MODE", mode: "onePlayerTest" });

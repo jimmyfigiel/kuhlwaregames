@@ -42,7 +42,7 @@ export function createInitialState(options = {}) {
   const now = Date.now();
   const state = {
     gameId: GAME_ID,
-    version: 1,
+    version: 2,
     scenarioId: "basic-montreal",
     scenarioName: "YUL Montréal-Trudeau",
     mode,
@@ -53,6 +53,7 @@ export function createInitialState(options = {}) {
     currentAltitude: ALTITUDES[0],
     activeRole: null,
     turnNumber: 0,
+    briefingChat: [],
     roles: {
       pilot: createRoleState("pilot"),
       copilot: createRoleState("copilot"),
@@ -99,6 +100,7 @@ function createRoleState(role) {
     playerName: null,
     dice: [],
     placedThisRound: 0,
+    rolledThisRound: false,
   };
 }
 
@@ -142,6 +144,10 @@ export function submitAction(input, directArg1, directArg2) {
         return startGame(state, actor);
       case "START_ROUND_ROLL":
         return startRoundRoll(state, actor);
+      case "ROLL_ROLE_DICE":
+        return rollRoleDice(state, action, actor);
+      case "ADD_BRIEFING_CHAT":
+        return addBriefingChat(state, action, actor);
       case "PLACE_DIE":
         return placeDie(state, action, actor);
       case "SPEND_COFFEE":
@@ -232,27 +238,88 @@ function startGame(state, actor) {
   state.status = "playing";
   state.activeRole = STARTERS_BY_ALTITUDE_INDEX[0];
   state.turnNumber = 0;
-  state.message = "Round 1 briefing. Discuss your plan, then roll dice behind the screens.";
+  state.briefingChat = [];
+  state.message = "Round 1 briefing. Discuss your plan in chat, then each player rolls their own dice.";
   return log(state, "START_GAME", state.message);
 }
 
-function startRoundRoll(state) {
-  if (state.phase !== "briefing") return addWarning(state, "Dice can only be rolled from the briefing phase.");
+function startRoundRoll(state, actor) {
+  if (state.phase !== "briefing" && state.phase !== "rolling") return addWarning(state, "Dice can only be rolled from the briefing phase.");
+  if (state.mode !== "onePlayerTest") return addWarning(state, "In two-player mode, each player must roll their own dice.");
+  beginRollingIfNeeded(state);
+  for (const role of ROLES) {
+    rollRoleNow(state, role);
+  }
+  return finishRollingIfReady(state, "Both seats rolled dice. Silent placement begins.");
+}
+
+function rollRoleDice(state, action, actor) {
+  if (state.phase !== "briefing" && state.phase !== "rolling") return addWarning(state, "Dice can only be rolled after the briefing starts.");
+  const role = action.role;
+  assertRole(role);
+  assertCanActAsRole(state, role, actor);
+  if (state.roles[role].rolledThisRound || state.roles[role].dice.length > 0) return addWarning(state, `${roleLabel(role)} has already rolled this round.`);
+  beginRollingIfNeeded(state);
+  rollRoleNow(state, role);
+  const waiting = ROLES.filter((eachRole) => !state.roles[eachRole].rolledThisRound).map(roleLabel);
+  if (waiting.length > 0) {
+    state.phase = "rolling";
+    state.activeRole = null;
+    state.message = `${roleLabel(role)} rolled. Waiting for ${waiting.join(" and ")} to roll.`;
+    return log(state, "ROLL_DICE", state.message);
+  }
+  return finishRollingIfReady(state, `${roleLabel(role)} rolled. Both crews are ready.`);
+}
+
+function beginRollingIfNeeded(state) {
   if (REROLL_ALTITUDE_INDEXES.has(state.altitudeIndex) && !state.altitudeRerollCollected) {
     state.tokens.rerolls += 1;
     state.altitudeRerollCollected = true;
   }
-  for (const role of ROLES) {
-    state.roles[role].dice = rollDiceForRole(role);
-    state.roles[role].placedThisRound = 0;
+  if (state.phase === "briefing") {
+    clearRoundPlacements(state);
+    state.turnNumber = 0;
+    for (const role of ROLES) {
+      state.roles[role].dice = [];
+      state.roles[role].placedThisRound = 0;
+      state.roles[role].rolledThisRound = false;
+    }
   }
-  clearRoundPlacements(state);
+  state.phase = "rolling";
+}
+
+function rollRoleNow(state, role) {
+  state.roles[role].dice = rollDiceForRole(role);
+  state.roles[role].placedThisRound = 0;
+  state.roles[role].rolledThisRound = true;
+}
+
+function finishRollingIfReady(state, prefix) {
+  if (!ROLES.every((role) => state.roles[role].rolledThisRound)) return state;
   state.phase = "placement";
   state.activeRole = STARTERS_BY_ALTITUDE_INDEX[state.altitudeIndex] || "pilot";
   state.turnNumber = 0;
   const rerollText = REROLL_ALTITUDE_INDEXES.has(state.altitudeIndex) ? " Reroll token collected." : "";
-  state.message = `Dice rolled. Silent placement begins. ${roleLabel(state.activeRole)} places first.${rerollText}`;
-  return log(state, "ROLL_DICE", state.message);
+  state.message = `${prefix} ${roleLabel(state.activeRole)} places first.${rerollText}`;
+  return log(state, "START_PLACEMENT", state.message);
+}
+
+function addBriefingChat(state, action, actor) {
+  if (state.phase !== "briefing") return addWarning(state, "Briefing chat is only open before dice are rolled.");
+  const text = String(action.text || "").trim();
+  if (!text) return addWarning(state, "Chat message cannot be empty.");
+  if (text.length > 400) return addWarning(state, "Briefing chat messages must be 400 characters or fewer.");
+  state.briefingChat = state.briefingChat || [];
+  state.briefingChat.push({
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    at: Date.now(),
+    playerId: actor.playerId || null,
+    playerName: actor.playerName || "Player",
+    text,
+  });
+  state.briefingChat = state.briefingChat.slice(-80);
+  state.message = `${actor.playerName || "Player"} added a briefing message.`;
+  return log(state, "BRIEFING_CHAT", state.message);
 }
 
 function placeDie(state, action, actor) {
@@ -512,6 +579,7 @@ function endRound(state) {
   for (const role of ROLES) {
     state.roles[role].dice = [];
     state.roles[role].placedThisRound = 0;
+    state.roles[role].rolledThisRound = false;
   }
 
   if (state.currentAltitude === 0 && !isAtAirport(state)) {
