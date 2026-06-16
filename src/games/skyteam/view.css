@@ -1395,3 +1395,13 @@
     order: 0;
   }
 }
+
+
+/* Seventh-pass gauge calibration */
+.sky-gauge-scale-brakes {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.sky-gear-flaps-gauge .sky-gauge-scale {
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+}

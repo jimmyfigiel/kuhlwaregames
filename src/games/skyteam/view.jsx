@@ -390,7 +390,7 @@ function AxisGauge({ state }) {
             );
           })}
         </div>
-        <span className="sky-plane-rotor" style={{ transform: `translate(-50%, -50%) rotate(${degrees - 90}deg)` }}>
+        <span className="sky-plane-rotor" style={{ transform: `translate(-50%, -50%) rotate(${degrees}deg)` }}>
           <span className="sky-plane-symbol">✈</span>
         </span>
       </div>
@@ -420,7 +420,7 @@ function EngineGauge({ state }) {
 }
 
 function GearFlapsGauge({ state }) {
-  const min = 2;
+  const min = 4;
   const max = 12;
   const numbers = Array.from({ length: max - min + 1 }, (_, index) => min + index);
   const bluePos = ((state.markers.blueAerodynamics - min) / (max - min)) * 100;
@@ -447,9 +447,9 @@ function GearFlapsGauge({ state }) {
 }
 
 function BrakesGauge({ state }) {
-  const min = 1;
-  const max = 7;
-  const numbers = Array.from({ length: max - min + 1 }, (_, index) => min + index);
+  const min = 1.5;
+  const max = 6.5;
+  const numbers = [2, 3, 4, 5, 6];
   const brakePos = ((state.markers.brakeThreshold - min) / (max - min)) * 100;
   return (
     <section className="sky-module sky-brakes-module">
@@ -457,9 +457,9 @@ function BrakesGauge({ state }) {
       <div className="sky-number-gauge sky-brakes-number-gauge" aria-label="Brakes gauge">
         <div className="sky-number-gauge-bar sky-brake-arc">
           <span className="sky-brake-fill" style={{ width: `${Math.max(0, Math.min(100, brakePos))}%` }} />
-          <span className="sky-gauge-marker brake-marker" style={{ left: `${brakePos}%` }} />
+          <span className="sky-gauge-marker brake-marker" style={{ left: `${Math.max(0, Math.min(100, brakePos))}%` }} />
         </div>
-        <div className="sky-gauge-scale sky-gauge-scale-seven">
+        <div className="sky-gauge-scale sky-gauge-scale-brakes">
           {numbers.map((value) => <span key={value}>{value}</span>)}
         </div>
       </div>
