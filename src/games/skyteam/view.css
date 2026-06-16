@@ -1405,3 +1405,30 @@
 .sky-gear-flaps-gauge .sky-gauge-scale {
   grid-template-columns: repeat(9, minmax(0, 1fr));
 }
+
+
+/* Eighth-pass: replace browser-dependent airplane glyph with centered SVG */
+.sky-plane-rotor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(74px, 12vw, 106px);
+  height: clamp(74px, 12vw, 106px);
+  display: grid;
+  place-items: center;
+  z-index: 3;
+  transform-origin: center center;
+}
+
+.sky-plane-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+  fill: #f8fafc;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.35));
+}
+
+.sky-plane-symbol {
+  display: none;
+}

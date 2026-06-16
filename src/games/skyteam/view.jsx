@@ -391,7 +391,7 @@ function AxisGauge({ state }) {
           })}
         </div>
         <span className="sky-plane-rotor" style={{ transform: `translate(-50%, -50%) rotate(${degrees}deg)` }}>
-          <span className="sky-plane-symbol">✈</span>
+          <AxisPlaneSvg />
         </span>
       </div>
       <div className="sky-axis-display">
@@ -400,6 +400,14 @@ function AxisGauge({ state }) {
         <span className="sky-mini-die orange">{copilot?.value || "—"}</span>
       </div>
     </section>
+  );
+}
+
+function AxisPlaneSvg() {
+  return (
+    <svg className="sky-plane-svg" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+      <path d="M50 4 L57 16 L57 42 L94 58 L94 70 L57 62 L57 78 L70 89 L70 97 L50 88 L30 97 L30 89 L43 78 L43 62 L6 70 L6 58 L43 42 L43 16 Z" />
+    </svg>
   );
 }
 
