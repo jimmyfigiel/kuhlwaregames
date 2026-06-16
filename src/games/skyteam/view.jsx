@@ -295,18 +295,16 @@ function CockpitPanel({ state }) {
     <section className="sky-cockpit sky-card">
       <h2>Shared Cockpit</h2>
       <ApproachTrack state={state} />
-      <div className="sky-cockpit-layout">
-        <div className="sky-cockpit-side sky-cockpit-left">
+      <div className="sky-cockpit-board">
+        <div className="sky-cockpit-top-row">
           <SwitchPanel title="Landing Gear" icon="🛬" switches={state.switches.landingGear} />
-        </div>
-        <div className="sky-cockpit-center">
           <AxisGauge state={state} />
+          <SwitchPanel title="Flaps" icon="◢" switches={state.switches.flaps} />
+        </div>
+        <div className="sky-cockpit-bottom-stack">
           <GearFlapsGauge state={state} />
           <EngineGauge state={state} />
           <BrakesGauge state={state} />
-        </div>
-        <div className="sky-cockpit-side sky-cockpit-right">
-          <SwitchPanel title="Flaps" icon="◢" switches={state.switches.flaps} />
         </div>
       </div>
       {state.phase === "won" && <div className="sky-win">Congratulations! {state.winReason}</div>}

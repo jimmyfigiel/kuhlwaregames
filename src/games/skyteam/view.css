@@ -843,3 +843,105 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Second-pass cockpit styling closer to the physical board */
+.sky-cockpit {
+  background: linear-gradient(180deg, #f6fbff 0%, #eef6fb 100%);
+}
+
+.sky-cockpit-board {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #203445 0%, #30485b 100%);
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.10), inset 0 12px 24px rgba(255,255,255,0.04), 0 14px 26px rgba(15, 23, 42, 0.18);
+}
+
+.sky-cockpit-top-row {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) minmax(240px, 1.25fr) minmax(170px, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.sky-cockpit-bottom-stack {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+.sky-cockpit-board .sky-module {
+  background: linear-gradient(180deg, #fbfdff 0%, #edf5fa 100%);
+  border: 1px solid rgba(18, 31, 46, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 16px rgba(0,0,0,0.14);
+}
+
+.sky-cockpit-top-row .sky-switch-module,
+.sky-cockpit-top-row .sky-attitude-module {
+  min-height: 100%;
+}
+
+.sky-cockpit-top-row .sky-switch-module h3,
+.sky-cockpit-top-row .sky-attitude-module h3,
+.sky-cockpit-bottom-stack .sky-module h3 {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #17337a;
+}
+
+.sky-cockpit-top-row .sky-switch-stack {
+  min-height: 140px;
+  align-content: center;
+}
+
+.sky-attitude-module {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+}
+
+.sky-attitude-ball {
+  width: 148px;
+  height: 148px;
+  border: 10px solid #1f2937;
+  box-shadow: inset 0 0 0 3px rgba(255,255,255,0.12), 0 10px 18px rgba(0,0,0,0.18);
+}
+
+.sky-axis-display {
+  width: 100%;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sky-engine-module .sky-throttle-box,
+.sky-speed-module .sky-marker-row,
+.sky-brakes-module .sky-marker-row {
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sky-speed-arc {
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+}
+
+.sky-brakes-module .sky-switch-module {
+  margin-top: 12px;
+}
+
+.sky-route-panel {
+  border-radius: 22px;
+}
+
+@media (max-width: 980px) {
+  .sky-cockpit-top-row,
+  .sky-cockpit-bottom-stack {
+    grid-template-columns: 1fr;
+  }
+}
