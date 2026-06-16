@@ -299,8 +299,7 @@ function CockpitPanel({ state }) {
           <AxisGauge state={state} />
           <SwitchPanel title="Flaps" icon="◢" switches={state.switches.flaps} />
         </div>
-        <div className="sky-cockpit-bottom-stack">
-          <GearFlapsGauge state={state} />
+        <div className="sky-cockpit-bottom-stack sky-cockpit-bottom-stack-two">
           <EngineGauge state={state} />
           <BrakesGauge state={state} />
         </div>
@@ -416,6 +415,7 @@ function EngineGauge({ state }) {
   const copilot = state.cockpit.engines.copilot;
   return (
     <section className="sky-module sky-engine-module">
+      <GearFlapsGauge state={state} />
       <h3>Engines ⚠</h3>
       <div className="sky-throttle-box">
         <span className="sky-mini-die blue">{pilot?.value || "—"}</span>
@@ -431,26 +431,26 @@ function GearFlapsGauge({ state }) {
   const min = 4;
   const max = 12;
   const numbers = Array.from({ length: max - min + 1 }, (_, index) => min + index);
-  const bluePos = ((state.markers.blueAerodynamics - min) / (max - min)) * 100;
-  const orangePos = ((state.markers.orangeAerodynamics - min) / (max - min)) * 100;
-  const segmentLeft = Math.max(0, Math.min(100, Math.min(bluePos, orangePos)));
-  const segmentRight = Math.max(0, Math.min(100, Math.max(bluePos, orangePos)));
+  const positionForValue = (value) => Math.max(0, Math.min(100, ((Number(value) - min) / (max - min)) * 100));
+  const bluePos = positionForValue(state.markers.blueAerodynamics);
+  const orangePos = positionForValue(state.markers.orangeAerodynamics);
+  const segmentLeft = Math.min(bluePos, orangePos);
+  const segmentRight = Math.max(bluePos, orangePos);
+
   return (
-    <section className="sky-module sky-speed-module">
+    <div className="sky-embedded-gauge sky-gear-flaps-gauge" aria-label="Gear and flaps range gauge">
       <h3>Gear / Flaps</h3>
-      <div className="sky-number-gauge sky-gear-flaps-gauge" aria-label="Gear and flaps range gauge">
+      <div className="sky-number-gauge">
         <div className="sky-number-gauge-bar sky-gear-flaps-bar">
           <span className="sky-range-fill" style={{ left: `${segmentLeft}%`, width: `${Math.max(0, segmentRight - segmentLeft)}%` }} />
           <span className="sky-gauge-marker blue-marker" style={{ left: `${bluePos}%` }} />
           <span className="sky-gauge-marker orange-marker" style={{ left: `${orangePos}%` }} />
         </div>
-        <div className="sky-gauge-scale">
+        <div className="sky-gauge-scale sky-gauge-scale-gear-flaps">
           {numbers.map((value) => <span key={value}>{value}</span>)}
         </div>
       </div>
-      <div className="sky-marker-row"><span>Gear marker</span><strong>{state.markers.blueAerodynamics}</strong></div>
-      <div className="sky-marker-row"><span>Flaps marker</span><strong>{state.markers.orangeAerodynamics}</strong></div>
-    </section>
+    </div>
   );
 }
 
