@@ -12,13 +12,13 @@ function playerName(player) {
 
 function isMine(state, role, player) {
   if (!state || !player) return false;
-  if (state.mode === "onePlayerTest") return true;
+  if (state.mode === "solo" || state.mode === "onePlayerTest") return true;
   return state.roles?.[role]?.playerId === player.id;
 }
 
 function rolesForViewer(state, player) {
   if (!state || !player) return [];
-  if (state.mode === "onePlayerTest") return ROLES;
+  if (state.mode === "solo" || state.mode === "onePlayerTest") return ROLES;
   return ROLES.filter((role) => state.roles?.[role]?.playerId === player.id);
 }
 
@@ -126,10 +126,11 @@ function SetupView({ state, player, act }) {
     <section className="sky-setup-grid">
       <section className="sky-card sky-control-card">
         <h2>Mode</h2>
-        <p className="sky-muted">One-player test mode lets one browser control both seats. Two-player mode enforces Pilot and Co-Pilot ownership.</p>
+        <p className="sky-muted">Solo mode uses the official solo dice flow. One-player test mode lets one browser control both seats with normal two-player rolling.</p>
         <div className="sky-button-row">
-          <button className={state.mode === "onePlayerTest" ? "sky-primary" : ""} onClick={() => act({ type: "SET_MODE", mode: "onePlayerTest" })}>One Player Test</button>
           <button className={state.mode === "twoPlayer" ? "sky-primary" : ""} onClick={() => act({ type: "SET_MODE", mode: "twoPlayer" })}>Two Player</button>
+          <button className={state.mode === "solo" ? "sky-primary" : ""} onClick={() => act({ type: "SET_MODE", mode: "solo" })}>Solo Mode</button>
+          <button className={state.mode === "onePlayerTest" ? "sky-primary" : ""} onClick={() => act({ type: "SET_MODE", mode: "onePlayerTest" })}>One Player Test</button>
         </div>
       </section>
 
@@ -201,22 +202,26 @@ function PlayerDiceDock({ state, player, myRoles, act, rerollSelection, setRerol
     <section className="sky-card sky-dice-dock">
       <div className="sky-dice-dock-title">
         <h2>Your Dice</h2>
-        <p className="sky-muted">Click one of your dice to choose a placement. Other players’ dice stay hidden.</p>
+        <p className="sky-muted">Click a die to choose a placement. In solo mode, only the starting color rolls four dice; the other color rolls one die at a time.</p>
       </div>
       {myRoles.map((role) => {
         const dice = state.roles[role]?.dice || [];
-        const canRoll = isMine(state, role, player) && (state.phase === "briefing" || state.phase === "rolling") && !state.roles[role]?.rolledThisRound;
+        const soloStarterRole = state.mode === "solo" ? state.activeRole : null;
+        const canRoll = isMine(state, role, player)
+          && (state.phase === "briefing" || state.phase === "rolling")
+          && !state.roles[role]?.rolledThisRound
+          && (state.mode !== "solo" || role === soloStarterRole);
         return (
           <div className={`sky-dice-rack sky-${role}`} key={role}>
             <div className="sky-rack-label">
               <strong>{ROLE_LABELS[role]}</strong>
               {state.phase === "placement" && state.activeRole === role && <span className="sky-turn-pill">Your turn</span>}
               {(state.phase === "briefing" || state.phase === "rolling") && state.roles[role]?.rolledThisRound && <span className="sky-wait-pill">Rolled</span>}
-              {canRoll && <button className="sky-primary" onClick={() => act({ type: "ROLL_ROLE_DICE", role })}>Roll {ROLE_LABELS[role]} Dice</button>}
+              {canRoll && <button className="sky-primary" onClick={() => act({ type: "ROLL_ROLE_DICE", role })}>Roll {state.mode === "solo" ? "Starting" : ROLE_LABELS[role]} Dice</button>}
             </div>
             <div className="sky-dice-row" aria-label={`${ROLE_LABELS[role]} dice`}>
               {dice.length === 0 ? (
-                [0, 1, 2, 3].map((index) => <button key={index} className={`sky-die-button ${role}`} disabled>?</button>)
+                state.mode === "solo" && state.phase === "placement" ? <p className="sky-muted">Waiting for solo die roll.</p> : [0, 1, 2, 3].map((index) => <button key={index} className={`sky-die-button ${role}`} disabled>?</button>)
               ) : (
                 dice.map((die) => (
                   <div key={die.id} className="sky-die-slot">
@@ -299,7 +304,8 @@ function CockpitPanel({ state }) {
           <AxisGauge state={state} />
           <SwitchPanel title="Flaps" icon="◢" switches={state.switches.flaps} />
         </div>
-        <div className="sky-cockpit-bottom-stack sky-cockpit-bottom-stack-two">
+        <div className="sky-cockpit-bottom-stack">
+          <GearFlapsGauge state={state} />
           <EngineGauge state={state} />
           <BrakesGauge state={state} />
         </div>
@@ -415,7 +421,6 @@ function EngineGauge({ state }) {
   const copilot = state.cockpit.engines.copilot;
   return (
     <section className="sky-module sky-engine-module">
-      <GearFlapsGauge state={state} />
       <h3>Engines ⚠</h3>
       <div className="sky-throttle-box">
         <span className="sky-mini-die blue">{pilot?.value || "—"}</span>
@@ -431,26 +436,26 @@ function GearFlapsGauge({ state }) {
   const min = 4;
   const max = 12;
   const numbers = Array.from({ length: max - min + 1 }, (_, index) => min + index);
-  const positionForValue = (value) => Math.max(0, Math.min(100, ((Number(value) - min) / (max - min)) * 100));
-  const bluePos = positionForValue(state.markers.blueAerodynamics);
-  const orangePos = positionForValue(state.markers.orangeAerodynamics);
-  const segmentLeft = Math.min(bluePos, orangePos);
-  const segmentRight = Math.max(bluePos, orangePos);
-
+  const bluePos = ((state.markers.blueAerodynamics - min) / (max - min)) * 100;
+  const orangePos = ((state.markers.orangeAerodynamics - min) / (max - min)) * 100;
+  const segmentLeft = Math.max(0, Math.min(100, Math.min(bluePos, orangePos)));
+  const segmentRight = Math.max(0, Math.min(100, Math.max(bluePos, orangePos)));
   return (
-    <div className="sky-embedded-gauge sky-gear-flaps-gauge" aria-label="Gear and flaps range gauge">
+    <section className="sky-module sky-speed-module">
       <h3>Gear / Flaps</h3>
-      <div className="sky-number-gauge">
+      <div className="sky-number-gauge sky-gear-flaps-gauge" aria-label="Gear and flaps range gauge">
         <div className="sky-number-gauge-bar sky-gear-flaps-bar">
           <span className="sky-range-fill" style={{ left: `${segmentLeft}%`, width: `${Math.max(0, segmentRight - segmentLeft)}%` }} />
           <span className="sky-gauge-marker blue-marker" style={{ left: `${bluePos}%` }} />
           <span className="sky-gauge-marker orange-marker" style={{ left: `${orangePos}%` }} />
         </div>
-        <div className="sky-gauge-scale sky-gauge-scale-gear-flaps">
+        <div className="sky-gauge-scale">
           {numbers.map((value) => <span key={value}>{value}</span>)}
         </div>
       </div>
-    </div>
+      <div className="sky-marker-row"><span>Gear marker</span><strong>{state.markers.blueAerodynamics}</strong></div>
+      <div className="sky-marker-row"><span>Flaps marker</span><strong>{state.markers.orangeAerodynamics}</strong></div>
+    </section>
   );
 }
 
@@ -621,7 +626,7 @@ function DieFace({ value }) {
 function ActionFooter({ state, act }) {
   return (
     <section className="sky-card sky-footer-actions">
-      {state.phase === "briefing" && <p>Briefing phase: talk strategy in chat, not die values. Then each player rolls their own dice.</p>}
+      {state.phase === "briefing" && <p>{state.mode === "solo" ? "Solo briefing: talk strategy, then roll only the starting color shown by the altitude arrow." : "Briefing phase: talk strategy in chat, not die values. Then each player rolls their own dice."}</p>}
       {state.phase === "rolling" && <p>Rolling phase: at least one crew member has rolled. Wait for the other seat. No more strategy chat.</p>}
       {state.phase === "placement" && <p>Silent phase: place one die at a time. Axis and Engines are mandatory every round.</p>}
       {state.phase === "endRound" && <button className="sky-primary sky-big-button" onClick={() => act({ type: "END_ROUND" })}>End Round / Descend</button>}

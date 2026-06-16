@@ -38,7 +38,7 @@ const BRAKE_THRESHOLDS = [1.5, 2.5, 4.5, 6.5];
 
 export function createInitialState(options = {}) {
   const optionMode = options?.options?.mode || options?.mode || "twoPlayer";
-  const mode = optionMode === "onePlayerTest" ? "onePlayerTest" : "twoPlayer";
+  const mode = optionMode === "solo" || optionMode === "onePlayerTest" ? optionMode : "twoPlayer";
   const now = Date.now();
   const state = {
     gameId: GAME_ID,
@@ -54,6 +54,7 @@ export function createInitialState(options = {}) {
     activeRole: null,
     turnNumber: 0,
     briefingChat: [],
+    solo: createEmptySoloState(),
     roles: {
       pilot: createRoleState("pilot"),
       copilot: createRoleState("copilot"),
@@ -114,6 +115,14 @@ function createEmptyCockpit() {
   };
 }
 
+function createEmptySoloState() {
+  return {
+    starterRole: null,
+    responseRole: null,
+    responseDiceRolled: 0,
+  };
+}
+
 export function submitAction(input, directArg1, directArg2) {
   const envelope = isEnvelope(input) ? input : { state: input, playerSlot: null, action: directArg1 || directArg2 };
   const state = clone(envelope.state || createInitialState());
@@ -169,15 +178,17 @@ export function submitAction(input, directArg1, directArg2) {
 
 function setMode(state, mode, actor) {
   if (state.phase !== "setup") return addWarning(state, "Mode can only be changed before the game starts.");
-  const cleanMode = mode === "onePlayerTest" ? "onePlayerTest" : "twoPlayer";
+  const cleanMode = mode === "solo" || mode === "onePlayerTest" ? mode : "twoPlayer";
   state.mode = cleanMode;
-  if (cleanMode === "onePlayerTest" && actor.playerId) {
+  if ((cleanMode === "solo" || cleanMode === "onePlayerTest") && actor.playerId) {
     for (const role of ROLES) {
       state.roles[role].playerId = actor.playerId;
-      state.roles[role].playerName = actor.playerName || "Solo Tester";
+      state.roles[role].playerName = actor.playerName || (cleanMode === "solo" ? "Solo Pilot" : "Solo Tester");
     }
   }
-  state.message = cleanMode === "onePlayerTest" ? "One-player test mode enabled. You control both Pilot and Co-Pilot." : "Two-player mode enabled. Each player should claim a role.";
+  if (cleanMode === "solo") state.message = "Solo mode enabled. Roll only the starting color, then alternate with one die at a time from the other color.";
+  else if (cleanMode === "onePlayerTest") state.message = "One-player test mode enabled. You control both Pilot and Co-Pilot with normal two-player dice rolling.";
+  else state.message = "Two-player mode enabled. Each player should claim a role.";
   return log(state, "SET_MODE", state.message);
 }
 
@@ -186,12 +197,12 @@ function claimRole(state, role, actor) {
   if (state.phase !== "setup") return addWarning(state, "Roles can only be claimed before the game starts.");
   if (!actor.playerId) return addWarning(state, "Could not identify the player claiming the role.");
 
-  if (state.mode === "onePlayerTest") {
+  if (state.mode === "solo" || state.mode === "onePlayerTest") {
     for (const eachRole of ROLES) {
       state.roles[eachRole].playerId = actor.playerId;
-      state.roles[eachRole].playerName = actor.playerName || "Solo Tester";
+      state.roles[eachRole].playerName = actor.playerName || (state.mode === "solo" ? "Solo Pilot" : "Solo Tester");
     }
-    state.message = "One-player test mode: you control both seats.";
+    state.message = state.mode === "solo" ? "Solo mode: you control both seats with the solo dice flow." : "One-player test mode: you control both seats.";
     return log(state, "CLAIM_ROLE", state.message);
   }
 
@@ -223,10 +234,10 @@ function releaseRole(state, role, actor) {
 
 function startGame(state, actor) {
   if (state.phase !== "setup") return addWarning(state, "The approach has already started.");
-  if (state.mode === "onePlayerTest" && actor.playerId) {
+  if ((state.mode === "solo" || state.mode === "onePlayerTest") && actor.playerId) {
     for (const role of ROLES) {
       state.roles[role].playerId = state.roles[role].playerId || actor.playerId;
-      state.roles[role].playerName = state.roles[role].playerName || actor.playerName || "Solo Tester";
+      state.roles[role].playerName = state.roles[role].playerName || actor.playerName || (state.mode === "solo" ? "Solo Pilot" : "Solo Tester");
     }
   }
   if (state.mode === "twoPlayer" && (!state.roles.pilot.playerId || !state.roles.copilot.playerId)) {
@@ -240,12 +251,19 @@ function startGame(state, actor) {
   state.activeRole = STARTERS_BY_ALTITUDE_INDEX[0];
   state.turnNumber = 0;
   state.briefingChat = [];
-  state.message = "Round 1 briefing. Discuss your plan in chat, then each player rolls their own dice.";
+  state.solo = createEmptySoloState();
+  state.message = state.mode === "solo"
+    ? "Round 1 briefing. Solo mode: roll only the starting color shown by the altitude arrow."
+    : "Round 1 briefing. Discuss your plan in chat, then each player rolls their own dice.";
   return log(state, "START_GAME", state.message);
 }
 
 function startRoundRoll(state, actor) {
   if (state.phase !== "briefing" && state.phase !== "rolling") return addWarning(state, "Dice can only be rolled from the briefing phase.");
+  if (state.mode === "solo") {
+    const starter = STARTERS_BY_ALTITUDE_INDEX[state.altitudeIndex] || "pilot";
+    return startSoloRoundRoll(state, starter, actor);
+  }
   if (state.mode !== "onePlayerTest") return addWarning(state, "In two-player mode, each player must roll their own dice.");
   beginRollingIfNeeded(state);
   for (const role of ROLES) {
@@ -259,6 +277,7 @@ function rollRoleDice(state, action, actor) {
   const role = action.role;
   assertRole(role);
   assertCanActAsRole(state, role, actor);
+  if (state.mode === "solo") return startSoloRoundRoll(state, role, actor);
   if (state.roles[role].rolledThisRound || state.roles[role].dice.length > 0) return addWarning(state, `${roleLabel(role)} has already rolled this round.`);
   beginRollingIfNeeded(state);
   rollRoleNow(state, role);
@@ -270,6 +289,29 @@ function rollRoleDice(state, action, actor) {
     return log(state, "ROLL_DICE", state.message);
   }
   return finishRollingIfReady(state, `${roleLabel(role)} rolled. Both crews are ready.`);
+}
+
+function startSoloRoundRoll(state, role, actor) {
+  if (state.mode !== "solo") return addWarning(state, "Solo rolling is only available in solo mode.");
+  assertRole(role);
+  assertCanActAsRole(state, role, actor);
+  const starter = STARTERS_BY_ALTITUDE_INDEX[state.altitudeIndex] || "pilot";
+  if (role !== starter) return addWarning(state, `Solo mode starts this round with ${roleLabel(starter)} dice.`);
+  if (state.roles[role].rolledThisRound || state.roles[role].dice.length > 0) return addWarning(state, `${roleLabel(role)} has already rolled this round.`);
+
+  beginRollingIfNeeded(state);
+  rollRoleNow(state, starter);
+  const responseRole = otherRole(starter);
+  state.roles[responseRole].dice = [];
+  state.roles[responseRole].placedThisRound = 0;
+  state.roles[responseRole].rolledThisRound = false;
+  state.solo = { starterRole: starter, responseRole, responseDiceRolled: 0 };
+  state.phase = "placement";
+  state.activeRole = starter;
+  state.turnNumber = 0;
+  const rerollText = REROLL_ALTITUDE_INDEXES.has(state.altitudeIndex) ? " Reroll token collected." : "";
+  state.message = `Solo mode: ${roleLabel(starter)} rolled 4 dice and places first. After each ${roleLabel(starter)} die, one ${roleLabel(responseRole)} die is rolled and placed.${rerollText}`;
+  return log(state, "START_SOLO_PLACEMENT", state.message);
 }
 
 function beginRollingIfNeeded(state) {
@@ -364,9 +406,39 @@ function placeDie(state, action, actor) {
     return log(state, "ROUND_FULL", state.message);
   }
 
-  state.activeRole = role === "pilot" ? "copilot" : "pilot";
+  if (state.mode === "solo") {
+    advanceSoloAfterPlacement(state, role);
+    state.message = `${roleLabel(role)} placed ${die.value} on ${placement.label}. ${roleLabel(state.activeRole)} is next.`;
+    return log(state, "PLACE_DIE", state.message);
+  }
+
+  state.activeRole = otherRole(role);
   state.message = `${roleLabel(role)} placed ${die.value} on ${placement.label}. ${roleLabel(state.activeRole)} is next.`;
   return log(state, "PLACE_DIE", state.message);
+}
+
+function advanceSoloAfterPlacement(state, role) {
+  const starter = state.solo?.starterRole || STARTERS_BY_ALTITUDE_INDEX[state.altitudeIndex] || "pilot";
+  const responseRole = state.solo?.responseRole || otherRole(starter);
+
+  if (role === starter) {
+    const nextIndex = Number(state.solo?.responseDiceRolled || 0) + 1;
+    const newDie = rollOneDieForRole(responseRole, nextIndex);
+    state.roles[responseRole].dice.push(newDie);
+    state.roles[responseRole].rolledThisRound = state.roles[responseRole].dice.length >= 4;
+    state.solo.responseDiceRolled = nextIndex;
+    state.activeRole = responseRole;
+    state.message = `Solo mode: rolled one ${roleLabel(responseRole)} die. Place it now.`;
+    return;
+  }
+
+  const starterHasUnplacedDice = state.roles[starter].dice.some((die) => !die.placed);
+  if (starterHasUnplacedDice) {
+    state.activeRole = starter;
+    return;
+  }
+
+  state.activeRole = responseRole;
 }
 
 function validateTarget(state, role, targetId, value) {
@@ -623,6 +695,7 @@ function clearRoundPlacements(state) {
   const axisPosition = state.cockpit?.axis?.position || 0;
   state.cockpit = createEmptyCockpit();
   state.cockpit.axis.position = axisPosition;
+  state.solo = createEmptySoloState();
 }
 
 function allDicePlaced(state) {
@@ -642,15 +715,23 @@ function remainingTraffic(state) {
 }
 
 function rollDiceForRole(role) {
-  return [0, 1, 2, 3].map((index) => ({
-    id: `${role}-die-${index + 1}`,
+  return [0, 1, 2, 3].map((index) => createDie(role, index + 1));
+}
+
+function rollOneDieForRole(role, index) {
+  return createDie(role, index);
+}
+
+function createDie(role, index) {
+  return {
+    id: `${role}-die-${index}`,
     role,
     value: randomDieValue(),
     placed: false,
     targetId: null,
     originalValue: null,
     coffeeDelta: 0,
-  }));
+  };
 }
 
 function randomDieValue() {
@@ -670,10 +751,14 @@ function assertRole(role) {
 }
 
 function assertCanActAsRole(state, role, actor) {
-  if (state.mode === "onePlayerTest") return;
+  if (state.mode === "solo" || state.mode === "onePlayerTest") return;
   const owner = state.roles[role]?.playerId;
   if (!owner) throw new Error(`${roleLabel(role)} has not been claimed.`);
   if (actor.playerId && owner !== actor.playerId) throw new Error(`Only the ${roleLabel(role)} can act for that role.`);
+}
+
+function otherRole(role) {
+  return role === "pilot" ? "copilot" : "pilot";
 }
 
 function roleLabel(role) {

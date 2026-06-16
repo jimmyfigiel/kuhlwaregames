@@ -6,7 +6,7 @@ export default {
   title: "Sky Team",
   shortTitle: "Sky Team",
   description:
-    "Cooperative cockpit landing game with one-player test mode and two-player Pilot / Co-Pilot mode.",
+    "Cooperative cockpit landing game with solo mode, one-player test mode, and two-player Pilot / Co-Pilot mode.",
   minPlayers: 1,
   maxPlayers: 2,
   playerSlots: [
@@ -22,6 +22,7 @@ export default {
       defaultValue: "twoPlayer",
       choices: [
         { value: "twoPlayer", label: "Two Player" },
+        { value: "solo", label: "Solo Mode" },
         { value: "onePlayerTest", label: "One Player Test" },
       ],
     },
