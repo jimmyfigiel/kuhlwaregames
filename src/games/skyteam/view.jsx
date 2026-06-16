@@ -295,13 +295,19 @@ function CockpitPanel({ state }) {
     <section className="sky-cockpit sky-card">
       <h2>Shared Cockpit</h2>
       <ApproachTrack state={state} />
-      <div className="sky-cockpit-grid">
-        <AxisGauge state={state} />
-        <EngineGauge state={state} />
-        <SpeedGauge state={state} />
-        <SwitchPanel title="Landing Gear" icon="🛬" switches={state.switches.landingGear} />
-        <SwitchPanel title="Flaps" icon="◢" switches={state.switches.flaps} />
-        <SwitchPanel title="Brakes" icon="▰" switches={state.switches.brakes} />
+      <div className="sky-cockpit-layout">
+        <div className="sky-cockpit-side sky-cockpit-left">
+          <SwitchPanel title="Landing Gear" icon="🛬" switches={state.switches.landingGear} />
+        </div>
+        <div className="sky-cockpit-center">
+          <AxisGauge state={state} />
+          <GearFlapsGauge state={state} />
+          <EngineGauge state={state} />
+          <BrakesGauge state={state} />
+        </div>
+        <div className="sky-cockpit-side sky-cockpit-right">
+          <SwitchPanel title="Flaps" icon="◢" switches={state.switches.flaps} />
+        </div>
       </div>
       {state.phase === "won" && <div className="sky-win">Congratulations! {state.winReason}</div>}
       {state.phase === "lost" && <div className="sky-loss">Crash / Failure: {state.lossReason}</div>}
@@ -310,6 +316,7 @@ function CockpitPanel({ state }) {
 }
 
 function ApproachTrack({ state }) {
+  const renderedSpaces = [...state.approach.spaces].map((space, index) => ({ space, index })).reverse();
   return (
     <section className="sky-route-panel" aria-label="Approach route">
       <div className="sky-route-header">
@@ -317,14 +324,15 @@ function ApproachTrack({ state }) {
         <strong>{state.scenarioName}</strong>
       </div>
       <div className="sky-route-column">
-        {state.approach.spaces.map((space, index) => {
+        {renderedSpaces.map(({ space, index }, renderIndex) => {
           const isCurrent = index === state.approach.currentIndex;
           const aheadBy = index - state.approach.currentIndex + 1;
+          const isLastRendered = renderIndex === renderedSpaces.length - 1;
           return (
             <div className={`sky-route-space ${isCurrent ? "current" : ""} ${space.kind === "airport" ? "airport" : ""}`} key={space.id}>
               <div className="sky-route-left">
                 <span className="sky-route-number">{space.kind === "airport" ? "RWY" : Math.max(1, aheadBy)}</span>
-                <span className="sky-route-line" />
+                {!isLastRendered && <span className="sky-route-line" />}
               </div>
               <div className="sky-route-screen">
                 {isCurrent && <span className="sky-own-plane">✈</span>}
@@ -377,18 +385,29 @@ function EngineGauge({ state }) {
   );
 }
 
-function SpeedGauge({ state }) {
+function GearFlapsGauge({ state }) {
   return (
     <section className="sky-module sky-speed-module">
-      <h3>Speed / Brakes</h3>
-      <div className="sky-speed-arc">
+      <h3>Gear / Flaps</h3>
+      <div className="sky-speed-arc sky-gear-flaps-arc">
         <span className="blue-marker" style={{ left: `${Math.min(90, state.markers.blueAerodynamics * 7)}%` }} />
         <span className="orange-marker" style={{ left: `${Math.min(90, state.markers.orangeAerodynamics * 7)}%` }} />
+      </div>
+      <div className="sky-marker-row"><span>Gear marker</span><strong>{state.markers.blueAerodynamics}</strong></div>
+      <div className="sky-marker-row"><span>Flaps marker</span><strong>{state.markers.orangeAerodynamics}</strong></div>
+    </section>
+  );
+}
+
+function BrakesGauge({ state }) {
+  return (
+    <section className="sky-module sky-brakes-module">
+      <h3>Brakes</h3>
+      <div className="sky-speed-arc sky-brake-arc">
         <span className="brake-marker" style={{ left: `${Math.min(90, state.markers.brakeThreshold * 12)}%` }} />
       </div>
-      <div className="sky-marker-row"><span>Blue aero</span><strong>{state.markers.blueAerodynamics}</strong></div>
-      <div className="sky-marker-row"><span>Orange aero</span><strong>{state.markers.orangeAerodynamics}</strong></div>
-      <div className="sky-marker-row"><span>Brake</span><strong>{state.markers.brakeThreshold}</strong></div>
+      <div className="sky-marker-row"><span>Brake strength</span><strong>{state.markers.brakeThreshold}</strong></div>
+      <SwitchPanel title="Brake Track" icon="▰" switches={state.switches.brakes} />
     </section>
   );
 }

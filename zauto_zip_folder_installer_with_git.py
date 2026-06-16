@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 import tempfile
 import threading
 import time
@@ -19,8 +20,8 @@ class AutoZipFolderInstaller(tk.Tk):
         super().__init__()
 
         self.title(APP_TITLE)
-        self.geometry("980x720")
-        self.minsize(820, 580)
+        self.geometry("980x760")
+        self.minsize(820, 620)
 
         self.monitor_folder_var = tk.StringVar()
         self.project_root_var = tk.StringVar()
@@ -28,6 +29,7 @@ class AutoZipFolderInstaller(tk.Tk):
         self.status_var = tk.StringVar(value="Choose a monitor folder, project root, and destination folder.")
         self.monitor_state_var = tk.StringVar(value="Not monitoring.")
         self.detect_mode_var = tk.StringVar(value="auto")
+        self.git_commit_enabled_var = tk.BooleanVar(value=True)
 
         self.is_monitoring = False
         self.monitor_thread = None
@@ -50,7 +52,7 @@ class AutoZipFolderInstaller(tk.Tk):
         ttk.Entry(monitor_frame, textvariable=self.monitor_folder_var).pack(side="left", fill="x", expand=True, padx=(0, 8))
         ttk.Button(monitor_frame, text="Browse Monitor Folder...", command=self.browse_monitor_folder).pack(side="left")
 
-        project_frame = ttk.LabelFrame(main, text="2. Project root", padding=10)
+        project_frame = ttk.LabelFrame(main, text="2. Project root / Git repository root", padding=10)
         project_frame.pack(fill="x", pady=(0, 8))
         ttk.Entry(project_frame, textvariable=self.project_root_var).pack(side="left", fill="x", expand=True, padx=(0, 8))
         ttk.Button(project_frame, text="Browse Project Root...", command=self.browse_project_root).pack(side="left")
@@ -65,6 +67,14 @@ class AutoZipFolderInstaller(tk.Tk):
         ttk.Radiobutton(options_frame, text="Auto-detect", value="auto", variable=self.detect_mode_var).pack(side="left")
         ttk.Radiobutton(options_frame, text="Prefer internal src folder", value="src", variable=self.detect_mode_var).pack(side="left", padx=(14, 0))
         ttk.Radiobutton(options_frame, text="Copy whole zip contents", value="whole", variable=self.detect_mode_var).pack(side="left", padx=(14, 0))
+
+        git_frame = ttk.LabelFrame(main, text="Git", padding=10)
+        git_frame.pack(fill="x", pady=(0, 8))
+        ttk.Checkbutton(
+            git_frame,
+            text="After a zip installs successfully, commit all repository changes using the zip filename as the commit message",
+            variable=self.git_commit_enabled_var,
+        ).pack(anchor="w")
 
         controls = ttk.Frame(main)
         controls.pack(fill="x", pady=(0, 8))
@@ -84,7 +94,8 @@ class AutoZipFolderInstaller(tk.Tk):
         help_text = (
             "How it works: put a .zip file into the monitor folder. The app waits until the zip stops changing, "
             "extracts it, detects the source root, and copies files into the destination folder. Existing files are overwritten. "
-            "No backups are created."
+            "No backups are created. If Git commit is enabled, the app runs git add -A and git commit from the project root "
+            "after a successful copy."
         )
         ttk.Label(main, text=help_text, wraplength=920, foreground="#555555").pack(anchor="w", pady=(8, 0))
 
@@ -143,6 +154,13 @@ class AutoZipFolderInstaller(tk.Tk):
         if not destination_folder.exists() or not destination_folder.is_dir():
             messagebox.showerror("Missing destination folder", "Please select a valid destination folder.")
             return None, None, None
+        if self.git_commit_enabled_var.get() and not (project_root / ".git").exists():
+            messagebox.showerror(
+                "Project root is not a Git repository",
+                "Git commit is enabled, but the selected project root does not contain a .git folder.\n\n"
+                "Choose the actual repository root or turn off Git commit.",
+            )
+            return None, None, None
         return monitor_folder, project_root, destination_folder
 
     def start_monitoring(self):
@@ -154,11 +172,16 @@ class AutoZipFolderInstaller(tk.Tk):
             return
         self.is_monitoring = True
         self.stop_event.clear()
-        self.monitor_thread = threading.Thread(target=self.monitor_loop, args=(monitor_folder, destination_folder), daemon=True)
+        self.monitor_thread = threading.Thread(
+            target=self.monitor_loop,
+            args=(monitor_folder, project_root, destination_folder),
+            daemon=True,
+        )
         self.monitor_thread.start()
         self.monitor_state_var.set(f"Monitoring: {monitor_folder}")
         self.status_var.set("Monitoring started.")
         self.log(f"Started monitoring: {monitor_folder}")
+        self.log(f"Project root: {project_root}")
         self.log(f"Destination: {destination_folder}")
 
     def stop_monitoring(self):
@@ -171,10 +194,10 @@ class AutoZipFolderInstaller(tk.Tk):
         self.status_var.set("Stopping monitor.")
         self.log("Stopping monitor...")
 
-    def monitor_loop(self, monitor_folder, destination_folder):
+    def monitor_loop(self, monitor_folder, project_root, destination_folder):
         while not self.stop_event.is_set():
             try:
-                self.scan_for_zips(monitor_folder, destination_folder)
+                self.scan_for_zips(monitor_folder, project_root, destination_folder)
             except Exception as exc:
                 self.log_threadsafe(f"Monitor error: {exc}")
                 self.set_status_threadsafe("Monitor error. See log.")
@@ -188,10 +211,10 @@ class AutoZipFolderInstaller(tk.Tk):
         if not monitor_folder:
             return
         self.log(f"Processing existing zip files in: {monitor_folder}")
-        self.scan_for_zips(monitor_folder, destination_folder)
+        self.scan_for_zips(monitor_folder, project_root, destination_folder)
         self.status_var.set("Existing zip scan complete.")
 
-    def scan_for_zips(self, monitor_folder, destination_folder):
+    def scan_for_zips(self, monitor_folder, project_root, destination_folder):
         zip_files = sorted(monitor_folder.glob("*.zip"), key=lambda path: path.stat().st_mtime)
         for zip_path in zip_files:
             zip_key = str(zip_path.resolve())
@@ -201,7 +224,7 @@ class AutoZipFolderInstaller(tk.Tk):
                 continue
             self.processing_zips.add(zip_key)
             try:
-                self.process_zip(zip_path, destination_folder)
+                self.process_zip(zip_path, project_root, destination_folder)
                 self.processed_zips.add(zip_key)
             finally:
                 self.processing_zips.discard(zip_key)
@@ -215,7 +238,7 @@ class AutoZipFolderInstaller(tk.Tk):
         except (FileNotFoundError, PermissionError):
             return False
 
-    def process_zip(self, zip_path, destination_folder):
+    def process_zip(self, zip_path, project_root, destination_folder):
         self.log_threadsafe(f"Found zip: {zip_path.name}")
         self.set_status_threadsafe(f"Processing {zip_path.name}...")
         extract_dir = Path(tempfile.mkdtemp(prefix="auto_zip_install_"))
@@ -225,13 +248,28 @@ class AutoZipFolderInstaller(tk.Tk):
                 if bad_file:
                     raise ValueError(f"Zip appears damaged near: {bad_file}")
                 zip_ref.extractall(extract_dir)
+
             source_root = self.find_source_root(extract_dir)
             if not source_root:
                 raise ValueError("Could not detect source root inside zip.")
+
             copied, overwritten = self.copy_tree(source_root, destination_folder)
             self.log_threadsafe(f"Detected source root: {source_root}")
             self.log_threadsafe(f"Installed {zip_path.name}: copied {copied}, overwritten {overwritten}.")
-            self.set_status_threadsafe(f"Installed {zip_path.name}.")
+
+            if self.git_commit_enabled_var.get():
+                commit_message = zip_path.stem
+                commit_result = self.commit_repository_changes(project_root, commit_message)
+                if commit_result == "committed":
+                    self.log_threadsafe(f"Git commit created: {commit_message}")
+                    self.set_status_threadsafe(f"Installed and committed {zip_path.name}.")
+                elif commit_result == "no_changes":
+                    self.log_threadsafe("Git commit skipped: no repository changes detected after copy.")
+                    self.set_status_threadsafe(f"Installed {zip_path.name}; no Git changes to commit.")
+                else:
+                    self.set_status_threadsafe(f"Installed {zip_path.name}; Git commit failed. See log.")
+            else:
+                self.set_status_threadsafe(f"Installed {zip_path.name}.")
         except Exception as exc:
             self.log_threadsafe(f"FAILED {zip_path.name}: {exc}")
             self.set_status_threadsafe(f"Failed {zip_path.name}. See log.")
@@ -293,6 +331,47 @@ class AutoZipFolderInstaller(tk.Tk):
             shutil.copy2(source_file, destination_file)
             copied += 1
         return copied, overwritten
+
+    def commit_repository_changes(self, project_root, commit_message):
+        project_root = Path(project_root)
+
+        if not (project_root / ".git").exists():
+            self.log_threadsafe(f"Git commit failed: {project_root} is not a Git repository root.")
+            return "failed"
+
+        if not shutil.which("git"):
+            self.log_threadsafe("Git commit failed: git was not found on PATH.")
+            return "failed"
+
+        try:
+            status_before_add = self.run_git(project_root, ["status", "--porcelain"])
+            if not status_before_add.stdout.strip():
+                return "no_changes"
+
+            self.run_git(project_root, ["add", "-A"])
+
+            status_after_add = self.run_git(project_root, ["status", "--porcelain"])
+            if not status_after_add.stdout.strip():
+                return "no_changes"
+
+            self.run_git(project_root, ["commit", "-m", commit_message])
+            return "committed"
+        except subprocess.CalledProcessError as exc:
+            error_text = (exc.stderr or exc.stdout or str(exc)).strip()
+            self.log_threadsafe(f"Git commit failed: {error_text}")
+            return "failed"
+        except Exception as exc:
+            self.log_threadsafe(f"Git commit failed: {exc}")
+            return "failed"
+
+    def run_git(self, project_root, args):
+        return subprocess.run(
+            ["git", *args],
+            cwd=project_root,
+            text=True,
+            capture_output=True,
+            check=True,
+        )
 
     def on_close(self):
         if self.is_monitoring:
