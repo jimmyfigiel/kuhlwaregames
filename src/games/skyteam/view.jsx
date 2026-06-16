@@ -312,7 +312,10 @@ function CockpitPanel({ state }) {
 }
 
 function ApproachTrack({ state }) {
-  const renderedSpaces = [...state.approach.spaces].map((space, index) => ({ space, index })).reverse();
+  const renderedSpaces = state.approach.spaces
+    .map((space, index) => ({ space, index }))
+    .filter(({ index }) => index >= state.approach.currentIndex)
+    .reverse();
   return (
     <section className="sky-route-panel" aria-label="Approach route">
       <div className="sky-route-header">
@@ -350,35 +353,37 @@ function AxisGauge({ state }) {
   const copilot = state.cockpit.axis.copilot;
   const degrees = state.cockpit.axis.position * 18;
   const axisMarkers = [
-    { id: "far-left", kind: "x", label: "X" },
-    { id: "left-2", kind: "solid", label: "▲" },
-    { id: "left-1", kind: "solid", label: "▲" },
-    { id: "center", kind: "open", label: "▽" },
-    { id: "right-1", kind: "solid", label: "▲" },
-    { id: "right-2", kind: "solid", label: "▲" },
-    { id: "far-right", kind: "x", label: "X" },
+    { id: "far-left", kind: "x", label: "✕", rotate: 0 },
+    { id: "left-2", kind: "solid", label: "▲", rotate: -55 },
+    { id: "left-1", kind: "solid", label: "▲", rotate: -25 },
+    { id: "center", kind: "open", label: "△", rotate: 180 },
+    { id: "right-1", kind: "solid", label: "▲", rotate: 25 },
+    { id: "right-2", kind: "solid", label: "▲", rotate: 55 },
+    { id: "far-right", kind: "x", label: "✕", rotate: 0 },
   ];
   return (
     <section className="sky-module sky-attitude-module">
+      <div className="sky-axis-helper-top sky-axis-helper-top-left" aria-hidden="true">
+        <span className="sky-axis-helper-plane left">✈</span>
+      </div>
+      <div className="sky-axis-helper-top sky-axis-helper-top-right" aria-hidden="true">
+        <span className="sky-axis-helper-plane right">✈</span>
+      </div>
       <h3>Axis ⚠</h3>
-      <div className="sky-axis-widget">
-        <div className="sky-axis-helper blue" aria-hidden="true">
-          <span className="sky-axis-helper-plane left">✈</span>
+      <div className="sky-attitude-ball">
+        <div className="sky-horizon" />
+        <div className="sky-axis-marker-ring" aria-hidden="true">
+          {axisMarkers.map((marker) => (
+            <span
+              key={marker.id}
+              className={`sky-axis-marker sky-axis-marker-${marker.id} sky-axis-marker-${marker.kind}`}
+              style={{ transform: `translate(-50%, -50%) rotate(${marker.rotate}deg)` }}
+            >
+              {marker.label}
+            </span>
+          ))}
         </div>
-        <div className="sky-attitude-ball">
-          <div className="sky-horizon" />
-          <div className="sky-axis-marker-ring" aria-hidden="true">
-            {axisMarkers.map((marker) => (
-              <span key={marker.id} className={`sky-axis-marker sky-axis-marker-${marker.id} sky-axis-marker-${marker.kind}`}>
-                {marker.label}
-              </span>
-            ))}
-          </div>
-          <span className="sky-plane-symbol" style={{ transform: `translate(-50%, -50%) rotate(${degrees - 90}deg)` }}>✈</span>
-        </div>
-        <div className="sky-axis-helper orange" aria-hidden="true">
-          <span className="sky-axis-helper-plane right">✈</span>
-        </div>
+        <span className="sky-plane-symbol" style={{ transform: `translate(-50%, -50%) rotate(${degrees - 90}deg)` }}>✈</span>
       </div>
       <div className="sky-axis-display">
         <span className="sky-mini-die blue">{pilot?.value || "—"}</span>

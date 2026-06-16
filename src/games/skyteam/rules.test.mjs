@@ -77,7 +77,8 @@ state = place(state, "pilot", 1, "axis-pilot");
 state = place(state, "copilot", 1, "axis-copilot");
 state = place(state, "pilot", 2, "engine-pilot");
 state = place(state, "copilot", 2, "engine-copilot");
-assert.equal(state.approach.currentIndex, 1);
+assert.equal(state.approach.currentIndex, 0);
+assert.equal(state.approach.pendingAdvance, 1);
 assert.equal(state.phase, "placement");
 
 state.roles.pilot.dice[2].placed = true;
@@ -96,6 +97,16 @@ state = place(state, "copilot", 1, "axis-copilot");
 state = place(state, "pilot", 1, "axis-pilot");
 state = place(state, "copilot", 2, "engine-copilot");
 state = place(state, "pilot", 2, "engine-pilot");
+state.roles.pilot.dice[2].placed = true;
+state.roles.pilot.placedThisRound += 1;
+state.roles.copilot.dice[2].placed = true;
+state.roles.copilot.placedThisRound += 1;
+state.roles.pilot.dice[3].placed = true;
+state.roles.pilot.placedThisRound += 1;
+state.roles.copilot.dice[3].placed = true;
+state.roles.copilot.placedThisRound += 1;
+state.phase = "endRound";
+state = act(state, { type: "END_ROUND" });
 assert.equal(state.phase, "lost");
 assert.match(state.lossReason, /Collision/i);
 

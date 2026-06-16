@@ -63,6 +63,7 @@ export function createInitialState(options = {}) {
       currentIndex: 0,
       spaces: BASIC_MONTREAL_APPROACH.map((space) => ({ ...space })),
       lastAdvance: 0,
+      pendingAdvance: 0,
     },
     markers: {
       blueAerodynamics: 4.5,
@@ -514,11 +515,13 @@ function resolveEngines(state) {
   let advance = 1;
   if (speed < state.markers.blueAerodynamics) advance = 0;
   if (speed > state.markers.orangeAerodynamics) advance = 2;
-  advanceApproach(state, advance);
+  state.approach.lastAdvance = advance;
+  state.approach.pendingAdvance = advance;
 }
 
 function advanceApproach(state, advance) {
   state.approach.lastAdvance = advance;
+  state.approach.pendingAdvance = 0;
   if (advance <= 0) return;
   const currentSpace = state.approach.spaces[state.approach.currentIndex];
   if (currentSpace?.kind === "airport") {
@@ -571,6 +574,10 @@ function endRound(state) {
   }
 
   if (isFinalRound(state)) return checkFinalLanding(state);
+
+  const pendingAdvance = Number(state.approach.pendingAdvance || 0);
+  advanceApproach(state, pendingAdvance);
+  if (state.phase === "lost") return state;
 
   state.altitudeIndex += 1;
   state.currentAltitude = ALTITUDES[state.altitudeIndex] ?? 0;
