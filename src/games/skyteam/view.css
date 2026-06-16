@@ -945,3 +945,141 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Third-pass cockpit refinements */
+.sky-layout-cockpit-only {
+  grid-template-columns: 1fr;
+}
+
+.sky-layout-cockpit-only .sky-cockpit {
+  width: 100%;
+}
+
+.sky-cockpit-top-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sky-cockpit-top-row > * {
+  min-width: 0;
+}
+
+.sky-cockpit-top-row .sky-module {
+  padding: 10px;
+}
+
+.sky-cockpit-top-row .sky-switch-module h3,
+.sky-cockpit-top-row .sky-attitude-module h3 {
+  font-size: clamp(14px, 2vw, 18px);
+}
+
+.sky-cockpit-top-row .sky-switch-stack {
+  min-height: 0;
+}
+
+.sky-cockpit-top-row .sky-switch {
+  font-size: clamp(11px, 1.5vw, 14px);
+  padding: 6px 8px;
+}
+
+.sky-attitude-ball {
+  width: clamp(88px, 16vw, 148px);
+  height: clamp(88px, 16vw, 148px);
+}
+
+.sky-axis-display strong {
+  font-size: clamp(14px, 1.8vw, 18px);
+}
+
+.sky-axis-display .sky-mini-die {
+  width: clamp(28px, 4vw, 38px);
+  height: clamp(28px, 4vw, 38px);
+  font-size: clamp(14px, 2vw, 20px);
+}
+
+.sky-cockpit-bottom-stack {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sky-number-gauge {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.sky-number-gauge-bar {
+  position: relative;
+  height: 22px;
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.18);
+}
+
+.sky-gear-flaps-bar {
+  background: linear-gradient(90deg, #dbeafe 0%, #eff6ff 48%, #ffedd5 100%);
+}
+
+.sky-range-fill {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(37,99,235,0.3), rgba(249,115,22,0.3));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.65);
+}
+
+.sky-brake-fill {
+  position: absolute;
+  inset: 3px auto 3px 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(252,165,165,0.55), rgba(220,38,38,0.35));
+}
+
+.sky-gauge-marker {
+  position: absolute;
+  top: -3px;
+  width: 4px;
+  height: 28px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+}
+
+.sky-gauge-scale {
+  display: grid;
+  grid-template-columns: repeat(11, minmax(0, 1fr));
+  gap: 0;
+  font-size: 12px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.sky-gauge-scale-seven {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.sky-gauge-scale span {
+  text-align: center;
+}
+
+.sky-marker-row {
+  font-size: 14px;
+}
+
+.sky-seat {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .sky-cockpit-top-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sky-cockpit-bottom-stack {
+    grid-template-columns: 1fr;
+  }
+
+  .sky-gauge-scale {
+    font-size: 11px;
+  }
+}
