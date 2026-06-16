@@ -1288,3 +1288,49 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+
+/* Fifth-pass axis centering + ring markers */
+.sky-attitude-ball {
+  border-width: 16px;
+  overflow: visible;
+}
+
+.sky-horizon {
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.sky-axis-marker-ring {
+  inset: -10px;
+}
+
+.sky-axis-marker-far-left { left: 8%; top: 37%; }
+.sky-axis-marker-left-2 { left: 20%; top: 14%; }
+.sky-axis-marker-left-1 { left: 35%; top: 5%; }
+.sky-axis-marker-center { left: 50%; top: 2%; }
+.sky-axis-marker-right-1 { left: 65%; top: 5%; }
+.sky-axis-marker-right-2 { left: 80%; top: 14%; }
+.sky-axis-marker-far-right { left: 92%; top: 37%; }
+
+.sky-axis-marker-open,
+.sky-axis-marker-solid,
+.sky-axis-marker-x {
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.25));
+}
+
+.sky-axis-marker-open {
+  font-size: 20px;
+}
+
+.sky-axis-marker-solid {
+  font-size: 18px;
+}
+
+.sky-axis-marker-x {
+  font-size: 17px;
+}
+
+.sky-plane-symbol {
+  font-size: clamp(68px, 11.5vw, 98px);
+}

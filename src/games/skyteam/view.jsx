@@ -354,11 +354,11 @@ function AxisGauge({ state }) {
   const degrees = state.cockpit.axis.position * 18;
   const axisMarkers = [
     { id: "far-left", kind: "x", label: "✕", rotate: 0 },
-    { id: "left-2", kind: "solid", label: "▲", rotate: -55 },
-    { id: "left-1", kind: "solid", label: "▲", rotate: -25 },
+    { id: "left-2", kind: "solid", label: "▲", rotate: 140 },
+    { id: "left-1", kind: "solid", label: "▲", rotate: 160 },
     { id: "center", kind: "open", label: "△", rotate: 180 },
-    { id: "right-1", kind: "solid", label: "▲", rotate: 25 },
-    { id: "right-2", kind: "solid", label: "▲", rotate: 55 },
+    { id: "right-1", kind: "solid", label: "▲", rotate: 200 },
+    { id: "right-2", kind: "solid", label: "▲", rotate: 220 },
     { id: "far-right", kind: "x", label: "✕", rotate: 0 },
   ];
   return (
@@ -383,7 +383,7 @@ function AxisGauge({ state }) {
             </span>
           ))}
         </div>
-        <span className="sky-plane-symbol" style={{ transform: `translate(-50%, -50%) rotate(${degrees - 90}deg)` }}>✈</span>
+        <span className="sky-plane-symbol" style={{ transform: `translate(calc(-50% - 6px), -50%) rotate(${degrees - 90}deg)` }}>✈</span>
       </div>
       <div className="sky-axis-display">
         <span className="sky-mini-die blue">{pilot?.value || "—"}</span>
