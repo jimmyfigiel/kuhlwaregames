@@ -375,7 +375,7 @@ function AxisGauge({ state }) {
         <div className="sky-axis-marker-ring" aria-hidden="true">
           {axisMarkers.map((marker) => {
             const radians = (marker.angle * Math.PI) / 180;
-            const radius = 47;
+            const radius = 52;
             const left = 50 + radius * Math.sin(radians);
             const top = 50 - radius * Math.cos(radians);
             const rotate = 180 + marker.angle;

@@ -1432,3 +1432,17 @@
 .sky-plane-symbol {
   display: none;
 }
+
+
+/* Ninth-pass: move axis markers onto ring outline */
+.sky-axis-marker-open {
+  font-size: 15px;
+}
+
+.sky-axis-marker-solid {
+  font-size: 13px;
+}
+
+.sky-axis-marker-x {
+  font-size: 13px;
+}
