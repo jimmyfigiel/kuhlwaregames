@@ -353,13 +353,13 @@ function AxisGauge({ state }) {
   const copilot = state.cockpit.axis.copilot;
   const degrees = state.cockpit.axis.position * 18;
   const axisMarkers = [
-    { id: "far-left", kind: "x", label: "✕", rotate: 0 },
-    { id: "left-2", kind: "solid", label: "▲", rotate: 140 },
-    { id: "left-1", kind: "solid", label: "▲", rotate: 160 },
-    { id: "center", kind: "open", label: "△", rotate: 180 },
-    { id: "right-1", kind: "solid", label: "▲", rotate: 200 },
-    { id: "right-2", kind: "solid", label: "▲", rotate: 220 },
-    { id: "far-right", kind: "x", label: "✕", rotate: 0 },
+    { id: "far-left", kind: "x", label: "✕", angle: -72 },
+    { id: "left-2", kind: "solid", label: "▲", angle: -48 },
+    { id: "left-1", kind: "solid", label: "▲", angle: -24 },
+    { id: "center", kind: "open", label: "△", angle: 0 },
+    { id: "right-1", kind: "solid", label: "▲", angle: 24 },
+    { id: "right-2", kind: "solid", label: "▲", angle: 48 },
+    { id: "far-right", kind: "x", label: "✕", angle: 72 },
   ];
   return (
     <section className="sky-module sky-attitude-module">
@@ -373,17 +373,26 @@ function AxisGauge({ state }) {
       <div className="sky-attitude-ball">
         <div className="sky-horizon" />
         <div className="sky-axis-marker-ring" aria-hidden="true">
-          {axisMarkers.map((marker) => (
-            <span
-              key={marker.id}
-              className={`sky-axis-marker sky-axis-marker-${marker.id} sky-axis-marker-${marker.kind}`}
-              style={{ transform: `translate(-50%, -50%) rotate(${marker.rotate}deg)` }}
-            >
-              {marker.label}
-            </span>
-          ))}
+          {axisMarkers.map((marker) => {
+            const radians = (marker.angle * Math.PI) / 180;
+            const radius = 47;
+            const left = 50 + radius * Math.sin(radians);
+            const top = 50 - radius * Math.cos(radians);
+            const rotate = 180 + marker.angle;
+            return (
+              <span
+                key={marker.id}
+                className={`sky-axis-marker sky-axis-marker-${marker.kind}`}
+                style={{ left: `${left}%`, top: `${top}%`, transform: `translate(-50%, -50%) rotate(${rotate}deg)` }}
+              >
+                {marker.label}
+              </span>
+            );
+          })}
         </div>
-        <span className="sky-plane-symbol" style={{ transform: `translate(calc(-50% - 6px), -50%) rotate(${degrees - 90}deg)` }}>✈</span>
+        <span className="sky-plane-rotor" style={{ transform: `translate(-50%, -50%) rotate(${degrees - 90}deg)` }}>
+          <span className="sky-plane-symbol">✈</span>
+        </span>
       </div>
       <div className="sky-axis-display">
         <span className="sky-mini-die blue">{pilot?.value || "—"}</span>

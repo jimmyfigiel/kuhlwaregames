@@ -1334,3 +1334,64 @@
 .sky-plane-symbol {
   font-size: clamp(68px, 11.5vw, 98px);
 }
+
+/* Sixth-pass axis marker spacing, true centering, and mobile top-row fallback */
+.sky-axis-marker-ring {
+  inset: 0;
+}
+
+.sky-axis-marker {
+  position: absolute;
+  line-height: 1;
+  transform-origin: center center;
+}
+
+.sky-axis-marker-open {
+  font-size: 16px;
+}
+
+.sky-axis-marker-solid {
+  font-size: 14px;
+}
+
+.sky-axis-marker-x {
+  font-size: 14px;
+}
+
+.sky-plane-rotor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(74px, 12vw, 106px);
+  height: clamp(74px, 12vw, 106px);
+  display: grid;
+  place-items: center;
+  z-index: 3;
+  transform-origin: center center;
+}
+
+.sky-plane-symbol {
+  position: static;
+  display: block;
+  line-height: 1;
+  font-size: clamp(68px, 11.5vw, 98px);
+}
+
+.sky-axis-helper-top {
+  z-index: 5;
+}
+
+@media (max-width: 980px) {
+  .sky-cockpit-top-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sky-cockpit-top-row .sky-attitude-module {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+
+  .sky-cockpit-top-row .sky-switch-module {
+    order: 0;
+  }
+}
