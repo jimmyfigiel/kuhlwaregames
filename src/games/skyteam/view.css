@@ -1487,3 +1487,150 @@
     height: min(46vw, 156px);
   }
 }
+
+
+/* Move Gear / Flaps gauge back into Engines and align labels as ticks */
+.sky-cockpit-bottom-stack-two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sky-engine-gear-flaps {
+  border-radius: 12px;
+  background: rgba(241, 245, 249, 0.78);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 10px;
+  margin-bottom: 12px;
+}
+
+.sky-engine-gear-flaps h4 {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #17337a;
+  font-size: 14px;
+}
+
+.sky-engine-gear-flaps .sky-number-gauge {
+  margin-bottom: 0;
+}
+
+.sky-engine-gear-flaps .sky-gauge-scale,
+.sky-gear-flaps-gauge .sky-gauge-scale {
+  display: flex;
+  justify-content: space-between;
+  grid-template-columns: none;
+}
+
+.sky-engine-gear-flaps .sky-gauge-scale span,
+.sky-gear-flaps-gauge .sky-gauge-scale span {
+  flex: 0 0 auto;
+  min-width: 1ch;
+}
+
+@media (max-width: 980px) {
+  .sky-cockpit-bottom-stack-two {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile information-space cleanup */
+.sky-hero-compact {
+  padding: 8px 12px;
+  border-radius: 14px;
+  min-height: auto;
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.12);
+  justify-content: center;
+}
+
+.sky-hero-compact::after {
+  display: none;
+}
+
+.sky-hero-compact h1 {
+  margin: 0;
+  font-size: clamp(18px, 4vw, 28px);
+  letter-spacing: 0.02em;
+  text-align: center;
+  line-height: 1.15;
+}
+
+.sky-dice-token-strip {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 4px 0 0;
+}
+
+.sky-dice-token-strip span {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.12);
+  font-weight: 800;
+}
+
+.sky-dice-token-strip strong {
+  color: #fff7b8;
+}
+
+.sky-attitude-module h3 {
+  margin-bottom: 8px;
+  font-size: clamp(18px, 4vw, 26px);
+  color: #17337a;
+}
+
+@media (max-width: 720px) {
+  .skyteam-shell {
+    gap: 8px;
+    padding: 6px;
+  }
+
+  .sky-hero-compact {
+    padding: 7px 10px;
+    border-radius: 12px;
+  }
+
+  .sky-dice-dock {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .sky-dice-dock-title {
+    align-items: center;
+  }
+
+  .sky-dice-dock-title h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .sky-dice-dock-title p {
+    display: none;
+  }
+
+  .sky-dice-rack {
+    padding: 8px;
+    gap: 7px;
+  }
+
+  .sky-rack-label {
+    gap: 6px;
+  }
+
+  .sky-die-button {
+    width: 50px;
+    height: 50px;
+  }
+
+  .sky-dice-row {
+    gap: 8px;
+  }
+
+  .sky-dice-token-strip {
+    font-size: 13px;
+    padding-top: 0;
+  }
+}

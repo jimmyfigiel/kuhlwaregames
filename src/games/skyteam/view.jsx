@@ -71,23 +71,14 @@ export default function SkyTeamView({ room, gameState, player, submitAction, ini
 
   return (
     <main className="skyteam-shell">
-      <header className="sky-hero">
-        <div>
-          <p className="sky-kicker">Sky Team · {state.scenarioName}</p>
-          <h1>Landing Procedure</h1>
-          <p>{state.message}</p>
-        </div>
-        <div className={`sky-status sky-status-${state.phase}`}>
-          <strong>{state.phase}</strong>
-          <span>Round {state.round || "—"}</span>
-        </div>
+      <header className="sky-hero sky-hero-compact">
+        <h1>Sky Team - {state.scenarioName}</h1>
       </header>
 
       {state.phase === "setup" ? (
         <SetupView state={state} player={player} act={act} />
       ) : (
         <>
-          <TopInstruments state={state} />
           <PlayerDiceDock
             state={state}
             player={player}
@@ -202,7 +193,7 @@ function PlayerDiceDock({ state, player, myRoles, act, rerollSelection, setRerol
     <section className="sky-card sky-dice-dock">
       <div className="sky-dice-dock-title">
         <h2>Your Dice</h2>
-        <p className="sky-muted">Click a die to choose a placement. In solo mode, only the starting color rolls four dice; the other color rolls one die at a time.</p>
+        <p className="sky-muted">Click a die to place it.</p>
       </div>
       {myRoles.map((role) => {
         const dice = state.roles[role]?.dice || [];
@@ -249,6 +240,10 @@ function PlayerDiceDock({ state, player, myRoles, act, rerollSelection, setRerol
           </div>
         );
       })}
+      <div className="sky-dice-token-strip" aria-label="Coffee and reroll tokens">
+        <span>☕ Coffee <strong>{state.tokens.coffee}</strong></span>
+        <span>↻ Rerolls <strong>{state.tokens.rerolls}</strong></span>
+      </div>
     </section>
   );
 }
@@ -304,8 +299,7 @@ function CockpitPanel({ state }) {
           <AxisGauge state={state} />
           <SwitchPanel title="Flaps" icon="◢" switches={state.switches.flaps} />
         </div>
-        <div className="sky-cockpit-bottom-stack">
-          <GearFlapsGauge state={state} />
+        <div className="sky-cockpit-bottom-stack sky-cockpit-bottom-stack-two">
           <EngineGauge state={state} />
           <BrakesGauge state={state} />
         </div>
@@ -374,7 +368,7 @@ function AxisGauge({ state }) {
       <div className="sky-axis-helper-top sky-axis-helper-top-right" aria-hidden="true">
         <span className="sky-axis-helper-plane right">✈</span>
       </div>
-      <h3>Axis ⚠</h3>
+      <h3>{formatAltitude(state.currentAltitude)}</h3>
       <div className="sky-attitude-ball">
         <div className="sky-horizon" />
         <div className="sky-axis-marker-ring" aria-hidden="true">
@@ -421,6 +415,7 @@ function EngineGauge({ state }) {
   const copilot = state.cockpit.engines.copilot;
   return (
     <section className="sky-module sky-engine-module">
+      <GearFlapsGauge state={state} />
       <h3>Engines ⚠</h3>
       <div className="sky-throttle-box">
         <span className="sky-mini-die blue">{pilot?.value || "—"}</span>
@@ -441,8 +436,8 @@ function GearFlapsGauge({ state }) {
   const segmentLeft = Math.max(0, Math.min(100, Math.min(bluePos, orangePos)));
   const segmentRight = Math.max(0, Math.min(100, Math.max(bluePos, orangePos)));
   return (
-    <section className="sky-module sky-speed-module">
-      <h3>Gear / Flaps</h3>
+    <div className="sky-engine-gear-flaps">
+      <h4>Gear / Flaps</h4>
       <div className="sky-number-gauge sky-gear-flaps-gauge" aria-label="Gear and flaps range gauge">
         <div className="sky-number-gauge-bar sky-gear-flaps-bar">
           <span className="sky-range-fill" style={{ left: `${segmentLeft}%`, width: `${Math.max(0, segmentRight - segmentLeft)}%` }} />
@@ -453,9 +448,7 @@ function GearFlapsGauge({ state }) {
           {numbers.map((value) => <span key={value}>{value}</span>)}
         </div>
       </div>
-      <div className="sky-marker-row"><span>Gear marker</span><strong>{state.markers.blueAerodynamics}</strong></div>
-      <div className="sky-marker-row"><span>Flaps marker</span><strong>{state.markers.orangeAerodynamics}</strong></div>
-    </section>
+    </div>
   );
 }
 
