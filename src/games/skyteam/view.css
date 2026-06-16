@@ -1446,3 +1446,44 @@
 .sky-axis-marker-x {
   font-size: 13px;
 }
+
+
+/* Tenth-pass: larger ring and better marker centering */
+.sky-attitude-ball {
+  width: clamp(165px, 27vw, 234px);
+  height: clamp(165px, 27vw, 234px);
+  border-width: 18px;
+}
+
+.sky-plane-rotor {
+  width: clamp(108px, 17vw, 156px);
+  height: clamp(108px, 17vw, 156px);
+}
+
+.sky-axis-marker-open {
+  font-size: 14px;
+}
+
+.sky-axis-marker-solid {
+  font-size: 12px;
+}
+
+.sky-axis-marker-x {
+  font-size: 12px;
+}
+
+.sky-axis-helper-top {
+  top: 12px;
+}
+
+@media (max-width: 980px) {
+  .sky-attitude-ball {
+    width: min(72vw, 234px);
+    height: min(72vw, 234px);
+  }
+
+  .sky-plane-rotor {
+    width: min(46vw, 156px);
+    height: min(46vw, 156px);
+  }
+}

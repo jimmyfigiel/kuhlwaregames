@@ -351,7 +351,7 @@ function ApproachTrack({ state }) {
 function AxisGauge({ state }) {
   const pilot = state.cockpit.axis.pilot;
   const copilot = state.cockpit.axis.copilot;
-  const degrees = state.cockpit.axis.position * 18;
+  const degrees = state.cockpit.axis.position * 24;
   const axisMarkers = [
     { id: "far-left", kind: "x", label: "✕", angle: -72 },
     { id: "left-2", kind: "solid", label: "▲", angle: -48 },
@@ -375,7 +375,7 @@ function AxisGauge({ state }) {
         <div className="sky-axis-marker-ring" aria-hidden="true">
           {axisMarkers.map((marker) => {
             const radians = (marker.angle * Math.PI) / 180;
-            const radius = 52;
+            const radius = 55;
             const left = 50 + radius * Math.sin(radians);
             const top = 50 - radius * Math.cos(radians);
             const rotate = 180 + marker.angle;
