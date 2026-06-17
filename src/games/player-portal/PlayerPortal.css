@@ -493,6 +493,13 @@
   font-size: 0.85rem;
 }
 
+.player-portal .create-game-option.selected-button {
+  background: #ffd479;
+  color: #1e1e1e;
+  border-color: #ffd479;
+}
+
+.player-portal .create-game-option.selected-button strong,
 .player-portal .create-game-option.selected-button span {
   color: #1e1e1e;
 }

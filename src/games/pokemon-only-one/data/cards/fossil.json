@@ -20,9 +20,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/001-aerodactyl.jpg",
       "image_path": "/card-images/pokemon/fossil/001-aerodactyl.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 60,
       "evolves_from": "",
       "powers": [
@@ -36,15 +38,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Mysterious Fossil"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -77,13 +70,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 43.01,
         "raw": "$43.01"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-002-articuno",
@@ -101,22 +95,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -127,7 +112,7 @@
           "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -155,13 +140,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 55.33,
         "raw": "$55.33"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-003-ditto",
@@ -179,7 +165,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 50,
       "evolves_from": "",
       "powers": [
@@ -222,13 +208,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 43.61,
         "raw": "$43.61"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-004-dragonite",
@@ -242,9 +229,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/004-dragonite.jpg",
       "image_path": "/card-images/pokemon/fossil/004-dragonite.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 100,
       "evolves_from": "",
       "powers": [
@@ -258,15 +247,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Colorless"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Dragonair"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -293,13 +273,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 193.0,
         "raw": "$193"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-005-gengar",
@@ -313,9 +294,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/005-gengar.jpg",
       "image_path": "/card-images/pokemon/fossil/005-gengar.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 80,
       "evolves_from": "",
       "powers": [
@@ -329,15 +312,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Psychic"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Haunter"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic",
@@ -363,13 +337,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 205.0,
         "raw": "$205"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-006-haunter",
@@ -383,9 +358,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/006-haunter.jpg",
       "image_path": "/card-images/pokemon/fossil/006-haunter.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 50,
       "evolves_from": "",
       "powers": [
@@ -399,15 +376,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Psychic"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Gastly"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Psychic",
             "Colorless"
@@ -430,13 +398,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 49.59,
         "raw": "$49.59"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-007-hitmonlee",
@@ -454,22 +423,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting"
@@ -479,7 +439,7 @@
           "text": "If your opponent has any Benched Pokémon, choose 1 of them and this attack does 20 damage to it. (Don't apply Weakness and Resistance for Benched Pokémon.)"
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting",
@@ -505,13 +465,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 42.08,
         "raw": "$42.08"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-008-hypno",
@@ -525,9 +486,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/008-hypno.jpg",
       "image_path": "/card-images/pokemon/fossil/008-hypno.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 90,
       "evolves_from": "",
       "powers": [],
@@ -537,21 +500,12 @@
           "cost": [
             "Psychic"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Drowzee"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Psychic"
-          ],
           "name": "Prophecy",
           "damage": "",
           "text": "Look at up to 3 cards from the top of either player's deck and rearrange them as you like."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic",
@@ -578,13 +532,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 36.57,
         "raw": "$36.57"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-009-kabutops",
@@ -598,24 +553,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/009-kabutops.jpg",
       "image_path": "/card-images/pokemon/fossil/009-kabutops.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Kabuto"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting"
@@ -625,7 +573,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting",
@@ -652,13 +600,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 35.37,
         "raw": "$35.37"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-010-lapras",
@@ -676,7 +625,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
@@ -686,21 +635,12 @@
           "cost": [
             "Water"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Water"
-          ],
           "name": "Water Gun",
           "damage": "10+",
           "text": "Does 10 damage plus 10 more damage for each Water Energy attached to Lapras but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Water"
@@ -726,13 +666,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 21.36,
         "raw": "$21.36"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-011-magneton",
@@ -746,24 +687,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/011-magneton.jpg",
       "image_path": "/card-images/pokemon/fossil/011-magneton.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Lightning"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Magnemite"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Lightning",
             "Colorless"
@@ -773,7 +707,7 @@
           "text": "Don't apply Weakness and Resistance for this attack. (Any other effects that would happen after applying Weakness and Resistance still happen.)"
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Lightning",
             "Lightning",
@@ -801,13 +735,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 18.49,
         "raw": "$18.49"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-012-moltres",
@@ -825,7 +760,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fire",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
@@ -835,21 +770,12 @@
           "cost": [
             "Fire"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Fire"
-          ],
           "name": "Wildfire",
           "damage": "",
           "text": "You may discard any number of Fire Energy cards attached to Moltres when you use this attack. If you do, discard that many cards from the top of your opponent's deck."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fire",
             "Fire",
@@ -877,13 +803,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 62.93,
         "raw": "$62.93"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-013-muk",
@@ -897,9 +824,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/013-muk.jpg",
       "image_path": "/card-images/pokemon/fossil/013-muk.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 70,
       "evolves_from": "",
       "powers": [
@@ -913,15 +842,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Grimer"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass",
@@ -948,13 +868,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 11.32,
         "raw": "$11.32"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-014-raichu",
@@ -968,24 +889,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/014-raichu.jpg",
       "image_path": "/card-images/pokemon/fossil/014-raichu.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 90,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Lightning"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Pikachu"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Lightning",
             "Lightning",
@@ -1012,13 +926,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 48.39,
         "raw": "$48.39"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-015-zapdos",
@@ -1036,22 +951,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Lightning"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Lightning",
             "Lightning",
@@ -1079,13 +985,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 40.27,
         "raw": "$40.27"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-016-aerodactyl",
@@ -1099,9 +1006,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/016-aerodactyl.jpg",
       "image_path": "/card-images/pokemon/fossil/016-aerodactyl.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 60,
       "evolves_from": "",
       "powers": [
@@ -1115,15 +1024,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Mysterious Fossil"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -1156,13 +1056,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 7.15,
         "raw": "$7.15"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-017-articuno",
@@ -1180,22 +1081,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -1206,7 +1098,7 @@
           "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -1234,13 +1126,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 10.05,
         "raw": "$10.05"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-018-ditto",
@@ -1258,7 +1151,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 50,
       "evolves_from": "",
       "powers": [
@@ -1301,13 +1194,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 14.19,
         "raw": "$14.19"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-019-dragonite",
@@ -1321,9 +1215,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/019-dragonite.jpg",
       "image_path": "/card-images/pokemon/fossil/019-dragonite.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 100,
       "evolves_from": "",
       "powers": [
@@ -1337,15 +1233,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Colorless"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Dragonair"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -1372,13 +1259,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 25.54,
         "raw": "$25.54"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-020-gengar",
@@ -1392,9 +1280,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/020-gengar.jpg",
       "image_path": "/card-images/pokemon/fossil/020-gengar.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 80,
       "evolves_from": "",
       "powers": [
@@ -1408,15 +1298,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Psychic"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Haunter"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic",
@@ -1442,13 +1323,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 35.95,
         "raw": "$35.95"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-021-haunter",
@@ -1462,9 +1344,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/021-haunter.jpg",
       "image_path": "/card-images/pokemon/fossil/021-haunter.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 50,
       "evolves_from": "",
       "powers": [
@@ -1478,15 +1362,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Psychic"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Gastly"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Psychic",
             "Colorless"
@@ -1509,13 +1384,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 9.1,
         "raw": "$9.10"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-022-hitmonlee",
@@ -1533,22 +1409,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting"
@@ -1558,7 +1425,7 @@
           "text": "If your opponent has any Benched Pokémon, choose 1 of them and this attack does 20 damage to it. (Don't apply Weakness and Resistance for Benched Pokémon.)"
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting",
@@ -1584,13 +1451,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 5.46,
         "raw": "$5.46"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-023-hypno",
@@ -1604,9 +1472,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/023-hypno.jpg",
       "image_path": "/card-images/pokemon/fossil/023-hypno.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 90,
       "evolves_from": "",
       "powers": [],
@@ -1616,21 +1486,12 @@
           "cost": [
             "Psychic"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Drowzee"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Psychic"
-          ],
           "name": "Prophecy",
           "damage": "",
           "text": "Look at up to 3 cards from the top of either player's deck and rearrange them as you like."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic",
@@ -1657,13 +1518,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 5.3,
         "raw": "$5.30"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-024-kabutops",
@@ -1677,24 +1539,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/024-kabutops.jpg",
       "image_path": "/card-images/pokemon/fossil/024-kabutops.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Kabuto"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting"
@@ -1704,7 +1559,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting",
@@ -1731,13 +1586,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 5.84,
         "raw": "$5.84"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-025-lapras",
@@ -1755,7 +1611,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
@@ -1765,21 +1621,12 @@
           "cost": [
             "Water"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Water"
-          ],
           "name": "Water Gun",
           "damage": "10+",
           "text": "Does 10 damage plus 10 more damage for each Water Energy attached to Lapras but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Water"
@@ -1805,13 +1652,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 7.12,
         "raw": "$7.12"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-026-magneton",
@@ -1825,24 +1673,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/026-magneton.jpg",
       "image_path": "/card-images/pokemon/fossil/026-magneton.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Lightning"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Magnemite"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Lightning",
             "Colorless"
@@ -1852,7 +1693,7 @@
           "text": "Don't apply Weakness and Resistance for this attack. (Any other effects that would happen after applying Weakness and Resistance still happen.)"
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Lightning",
             "Lightning",
@@ -1880,13 +1721,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 5.44,
         "raw": "$5.44"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-027-moltres",
@@ -1904,7 +1746,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fire",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
@@ -1914,21 +1756,12 @@
           "cost": [
             "Fire"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Fire"
-          ],
           "name": "Wildfire",
           "damage": "",
           "text": "You may discard any number of Fire Energy cards attached to Moltres when you use this attack. If you do, discard that many cards from the top of your opponent's deck."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fire",
             "Fire",
@@ -1956,13 +1789,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 10.03,
         "raw": "$10.03"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-028-muk",
@@ -1976,9 +1810,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/028-muk.jpg",
       "image_path": "/card-images/pokemon/fossil/028-muk.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 70,
       "evolves_from": "",
       "powers": [
@@ -1992,15 +1828,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Grimer"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass",
@@ -2027,13 +1854,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 4.69,
         "raw": "$4.69"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-029-raichu",
@@ -2047,24 +1875,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/029-raichu.jpg",
       "image_path": "/card-images/pokemon/fossil/029-raichu.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 90,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Lightning"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Pikachu"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Lightning",
             "Lightning",
@@ -2091,13 +1912,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 9.35,
         "raw": "$9.35"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-030-zapdos",
@@ -2115,22 +1937,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Lightning"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Lightning",
             "Lightning",
@@ -2158,13 +1971,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 9.03,
         "raw": "$9.03"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-031-arbok",
@@ -2178,9 +1992,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/031-arbok.jpg",
       "image_path": "/card-images/pokemon/fossil/031-arbok.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
@@ -2190,21 +2006,12 @@
           "cost": [
             "Grass"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Ekans"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Grass"
-          ],
           "name": "Terror Strike",
           "damage": "10",
           "text": "Flip a coin. If heads and if your opponent has any Benched Pokémon, he or she chooses 1 of them and switches it with the Defending Pokémon. (Do the damage before switching the Pokémon.)"
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass",
@@ -2231,13 +2038,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.15,
         "raw": "$1.15"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-032-cloyster",
@@ -2251,24 +2059,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/032-cloyster.jpg",
       "image_path": "/card-images/pokemon/fossil/032-cloyster.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Shellder"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water",
             "Water"
@@ -2278,7 +2079,7 @@
           "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed. If tails, this attack does nothing (not even damage)."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Water"
@@ -2304,13 +2105,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.08,
         "raw": "$1.08"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-033-gastly",
@@ -2328,7 +2130,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
@@ -2338,21 +2140,12 @@
           "cost": [
             "Psychic"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Psychic"
-          ],
           "name": "Lick",
           "damage": "10",
           "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic"
@@ -2375,13 +2168,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.54,
         "raw": "$1.54"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-034-golbat",
@@ -2395,24 +2189,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/034-golbat.jpg",
       "image_path": "/card-images/pokemon/fossil/034-golbat.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Zubat"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -2423,7 +2210,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass",
@@ -2453,13 +2240,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.68,
         "raw": "$0.68"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-035-golduck",
@@ -2473,24 +2261,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/035-golduck.jpg",
       "image_path": "/card-images/pokemon/fossil/035-golduck.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Psyduck"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Psychic"
           ],
@@ -2499,7 +2280,7 @@
           "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -2525,13 +2306,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.08,
         "raw": "$1.08"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-036-golem",
@@ -2545,24 +2327,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/036-golem.jpg",
       "image_path": "/card-images/pokemon/fossil/036-golem.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Graveler"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting",
@@ -2574,7 +2349,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting",
@@ -2604,13 +2379,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 2.85,
         "raw": "$2.85"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-037-graveler",
@@ -2624,24 +2400,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/037-graveler.jpg",
       "image_path": "/card-images/pokemon/fossil/037-graveler.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Geodude"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting"
@@ -2651,7 +2420,7 @@
           "text": "During your opponent's next turn, whenever 30 or less damage is done to Graveler (after applying Weakness and Resistance), prevent that damage. (Any other effects of attacks still happen.)"
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting",
@@ -2678,13 +2447,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.77,
         "raw": "$0.77"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-038-kingler",
@@ -2698,9 +2468,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/038-kingler.jpg",
       "image_path": "/card-images/pokemon/fossil/038-kingler.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
@@ -2710,21 +2482,12 @@
           "cost": [
             "Water"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Krabby"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Water"
-          ],
           "name": "Flail",
           "damage": "10×",
           "text": "Does 10 damage times the number of damage counters on Kingler."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -2752,13 +2515,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.98,
         "raw": "$0.98"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-039-magmar",
@@ -2776,7 +2540,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fire",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
@@ -2786,21 +2550,12 @@
           "cost": [
             "Fire"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Fire"
-          ],
           "name": "Smokescreen",
           "damage": "10",
           "text": "If the Defending Pokémon tries to attack during your opponent's next turn, your opponent flips a coin. If tails, that attack does nothing."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fire",
             "Fire"
@@ -2825,13 +2580,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.0,
         "raw": "$1.00"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-040-omastar",
@@ -2845,24 +2601,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/040-omastar.jpg",
       "image_path": "/card-images/pokemon/fossil/040-omastar.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Omanyte"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water",
             "Colorless"
@@ -2872,7 +2621,7 @@
           "text": "Does 20 damage plus 10 more damage for each Water Energy attached to Omastar but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Water"
@@ -2897,13 +2646,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.28,
         "raw": "$1.28"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-041-sandslash",
@@ -2917,24 +2667,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/041-sandslash.jpg",
       "image_path": "/card-images/pokemon/fossil/041-sandslash.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Sandshrew"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless"
@@ -2944,7 +2687,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting"
@@ -2975,13 +2718,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.64,
         "raw": "$1.64"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-042-seadra",
@@ -2995,24 +2739,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/042-seadra.jpg",
       "image_path": "/card-images/pokemon/fossil/042-seadra.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Horsea"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water",
             "Colorless"
@@ -3022,7 +2759,7 @@
           "text": "Does 20 damage plus 10 more damage for each Water Energy attached to Seadra but not used to pay for this attack's Energy cost. You can't add more than 20 damage in this way."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Colorless",
@@ -3048,13 +2785,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.8,
         "raw": "$0.80"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-043-slowbro",
@@ -3068,9 +2806,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/043-slowbro.jpg",
       "image_path": "/card-images/pokemon/fossil/043-slowbro.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 60,
       "evolves_from": "",
       "powers": [
@@ -3084,15 +2824,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Psychic"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Slowbro"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic"
@@ -3117,13 +2848,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 2.0,
         "raw": "$2.00"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-044-tentacruel",
@@ -3137,9 +2869,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/044-tentacruel.jpg",
       "image_path": "/card-images/pokemon/fossil/044-tentacruel.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
@@ -3149,21 +2883,12 @@
           "cost": [
             "Water"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Tentacool"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Water"
-          ],
           "name": "Supersonic",
           "damage": "",
           "text": "Flip a coin. If heads, the Defending Pokémon is now Confused."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Water"
@@ -3186,13 +2911,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.29,
         "raw": "$1.29"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-045-weezing",
@@ -3206,24 +2932,17 @@
       "local_image_path": "public/card-images/pokemon/fossil/045-weezing.jpg",
       "image_path": "/card-images/pokemon/fossil/045-weezing.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Koffing"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass"
@@ -3233,7 +2952,7 @@
           "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass",
@@ -3259,13 +2978,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.47,
         "raw": "$1.47"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-046-ekans",
@@ -3283,7 +3003,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
@@ -3293,21 +3013,12 @@
           "cost": [
             "Grass"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Grass"
-          ],
           "name": "Spit Poison",
           "damage": "",
           "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Grass",
             "Colorless"
@@ -3332,13 +3043,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.43,
         "raw": "$0.43"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-047-geodude",
@@ -3356,22 +3068,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fighting",
             "Colorless"
@@ -3396,13 +3099,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.42,
         "raw": "$0.42"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-048-grimer",
@@ -3420,22 +3124,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless"
           ],
@@ -3444,7 +3139,7 @@
           "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Grass"
           ],
@@ -3468,13 +3163,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.48,
         "raw": "$0.48"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-049-horsea",
@@ -3492,22 +3188,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water"
           ],
@@ -3529,13 +3216,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.48,
         "raw": "$0.48"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-050-kabuto",
@@ -3549,9 +3237,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/050-kabuto.jpg",
       "image_path": "/card-images/pokemon/fossil/050-kabuto.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 30,
       "evolves_from": "",
       "powers": [
@@ -3565,15 +3255,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Mysterious Fossil"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless"
           ],
@@ -3597,13 +3278,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.62,
         "raw": "$1.62"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-051-krabby",
@@ -3621,7 +3303,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
@@ -3631,21 +3313,12 @@
           "cost": [
             "Water"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Water"
-          ],
           "name": "Call for Family",
           "damage": "",
           "text": "Search your deck for a Basic Pokémon named Krabby and put it onto your Bench. Shuffle your deck afterward. (You can't use this attack if your Bench is full.)"
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Colorless"
@@ -3671,13 +3344,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.44,
         "raw": "$0.44"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-052-omanyte",
@@ -3691,9 +3365,11 @@
       "local_image_path": "public/card-images/pokemon/fossil/052-omanyte.jpg",
       "image_path": "/card-images/pokemon/fossil/052-omanyte.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 40,
       "evolves_from": "",
       "powers": [
@@ -3707,15 +3383,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Mysterious Fossil"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water"
           ],
@@ -3739,13 +3406,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.72,
         "raw": "$0.72"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-053-psyduck",
@@ -3763,22 +3431,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Psychic"
           ],
@@ -3787,7 +3446,7 @@
           "text": "Your opponent can't play Trainer cards during his or her next turn."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water"
           ],
@@ -3811,13 +3470,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 2.22,
         "raw": "$2.22"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-054-shellder",
@@ -3835,7 +3495,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 30,
       "evolves_from": "",
       "powers": [],
@@ -3845,21 +3505,12 @@
           "cost": [
             "Water"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Water"
-          ],
           "name": "Supersonic",
           "damage": "",
           "text": "Flip a coin. If heads, the Defending Pokémon is now Confused."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water"
           ],
@@ -3883,13 +3534,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.47,
         "raw": "$0.47"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-055-slowpoke",
@@ -3907,22 +3559,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Psychic"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless"
           ],
@@ -3931,7 +3574,7 @@
           "text": "Flip a coin. If heads, remove a damage counter from Slowpoke. This attack can't be used if Slowpoke has no damage counters on it."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic"
@@ -3956,13 +3599,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Miki Tanaka",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.99,
         "raw": "$0.99"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-056-tentacool",
@@ -3980,7 +3624,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 30,
       "evolves_from": "",
       "powers": [
@@ -3994,15 +3638,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water"
           ],
@@ -4024,13 +3659,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.48,
         "raw": "$0.48"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-057-zubat",
@@ -4048,22 +3684,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless"
@@ -4073,7 +3700,7 @@
           "text": "Flip a coin. If heads, the Defending Pokémon is now Confused."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Grass",
             "Colorless"
@@ -4102,13 +3729,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Kagemaru Himeno",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.53,
         "raw": "$0.53"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-058-mr-fuji",
@@ -4136,13 +3764,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.27,
         "raw": "$1.27"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-059-energy-search",
@@ -4170,13 +3799,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Standard",
       "market_price": {
         "currency": "USD",
         "value": 0.43,
         "raw": "$0.43"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-060-gambler",
@@ -4204,13 +3834,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.46,
         "raw": "$0.46"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-061-recycle",
@@ -4238,13 +3869,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.42,
         "raw": "$0.42"
-      }
+      },
+      "set_code": "FO"
     },
     {
       "id": "fossil-062-mysterious-fossil",
@@ -4272,13 +3904,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.45,
         "raw": "$0.45"
-      }
+      },
+      "set_code": "FO"
     }
   ],
   "errors": [],
@@ -4287,6 +3920,310 @@
     "updated_cards": 57,
     "unchanged_cards": 0,
     "skipped_cards": 5,
+    "errors": 0
+  },
+  "data_repair_errors": [
+    {
+      "name": "Aerodactyl",
+      "source_url": "https://www.tcgcollector.com/cards/8/aerodactyl-fossil-1-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Articuno",
+      "source_url": "https://www.tcgcollector.com/cards/58/articuno-fossil-2-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Ditto",
+      "source_url": "https://www.tcgcollector.com/cards/390/ditto-fossil-3-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Dragonite",
+      "source_url": "https://www.tcgcollector.com/cards/408/dragonite-fossil-4-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Gengar",
+      "source_url": "https://www.tcgcollector.com/cards/610/gengar-fossil-5-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Haunter",
+      "source_url": "https://www.tcgcollector.com/cards/715/haunter-fossil-6-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Hitmonlee",
+      "source_url": "https://www.tcgcollector.com/cards/735/hitmonlee-fossil-7-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Hypno",
+      "source_url": "https://www.tcgcollector.com/cards/780/hypno-fossil-8-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Kabutops",
+      "source_url": "https://www.tcgcollector.com/cards/824/kabutops-fossil-9-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Lapras",
+      "source_url": "https://www.tcgcollector.com/cards/893/lapras-fossil-10-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Magneton",
+      "source_url": "https://www.tcgcollector.com/cards/1038/magneton-fossil-11-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Moltres",
+      "source_url": "https://www.tcgcollector.com/cards/1170/moltres-fossil-12-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Muk",
+      "source_url": "https://www.tcgcollector.com/cards/1188/muk-fossil-13-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Raichu",
+      "source_url": "https://www.tcgcollector.com/cards/1446/raichu-fossil-14-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Zapdos",
+      "source_url": "https://www.tcgcollector.com/cards/1962/zapdos-fossil-15-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Aerodactyl",
+      "source_url": "https://www.tcgcollector.com/cards/11/aerodactyl-fossil-16-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Articuno",
+      "source_url": "https://www.tcgcollector.com/cards/62/articuno-fossil-17-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Ditto",
+      "source_url": "https://www.tcgcollector.com/cards/391/ditto-fossil-18-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Dragonite",
+      "source_url": "https://www.tcgcollector.com/cards/411/dragonite-fossil-19-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Gengar",
+      "source_url": "https://www.tcgcollector.com/cards/615/gengar-fossil-20-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Haunter",
+      "source_url": "https://www.tcgcollector.com/cards/716/haunter-fossil-21-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Hitmonlee",
+      "source_url": "https://www.tcgcollector.com/cards/737/hitmonlee-fossil-22-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Hypno",
+      "source_url": "https://www.tcgcollector.com/cards/783/hypno-fossil-23-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Kabutops",
+      "source_url": "https://www.tcgcollector.com/cards/827/kabutops-fossil-24-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Lapras",
+      "source_url": "https://www.tcgcollector.com/cards/895/lapras-fossil-25-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Magneton",
+      "source_url": "https://www.tcgcollector.com/cards/1043/magneton-fossil-26-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Moltres",
+      "source_url": "https://www.tcgcollector.com/cards/1174/moltres-fossil-27-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Muk",
+      "source_url": "https://www.tcgcollector.com/cards/1192/muk-fossil-28-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Raichu",
+      "source_url": "https://www.tcgcollector.com/cards/1451/raichu-fossil-29-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Zapdos",
+      "source_url": "https://www.tcgcollector.com/cards/1966/zapdos-fossil-30-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Arbok",
+      "source_url": "https://www.tcgcollector.com/cards/39/arbok-fossil-31-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Cloyster",
+      "source_url": "https://www.tcgcollector.com/cards/249/cloyster-fossil-32-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Gastly",
+      "source_url": "https://www.tcgcollector.com/cards/604/gastly-fossil-33-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Golbat",
+      "source_url": "https://www.tcgcollector.com/cards/653/golbat-fossil-34-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Golduck",
+      "source_url": "https://www.tcgcollector.com/cards/662/golduck-fossil-35-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Golem",
+      "source_url": "https://www.tcgcollector.com/cards/668/golem-fossil-36-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Graveler",
+      "source_url": "https://www.tcgcollector.com/cards/684/graveler-fossil-37-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Kingler",
+      "source_url": "https://www.tcgcollector.com/cards/851/kingler-fossil-38-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Magmar",
+      "source_url": "https://www.tcgcollector.com/cards/1020/magmar-fossil-39-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Omastar",
+      "source_url": "https://www.tcgcollector.com/cards/1275/omastar-fossil-40-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Sandslash",
+      "source_url": "https://www.tcgcollector.com/cards/1557/sandslash-fossil-41-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Seadra",
+      "source_url": "https://www.tcgcollector.com/cards/1577/seadra-fossil-42-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Slowbro",
+      "source_url": "https://www.tcgcollector.com/cards/1644/slowbro-fossil-43-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Tentacruel",
+      "source_url": "https://www.tcgcollector.com/cards/1767/tentacruel-fossil-44-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Weezing",
+      "source_url": "https://www.tcgcollector.com/cards/1934/weezing-fossil-45-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Ekans",
+      "source_url": "https://www.tcgcollector.com/cards/446/ekans-fossil-46-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Geodude",
+      "source_url": "https://www.tcgcollector.com/cards/618/geodude-fossil-47-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Grimer",
+      "source_url": "https://www.tcgcollector.com/cards/689/grimer-fossil-48-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Horsea",
+      "source_url": "https://www.tcgcollector.com/cards/754/horsea-fossil-49-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Kabuto",
+      "source_url": "https://www.tcgcollector.com/cards/821/kabuto-fossil-50-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Krabby",
+      "source_url": "https://www.tcgcollector.com/cards/880/krabby-fossil-51-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Omanyte",
+      "source_url": "https://www.tcgcollector.com/cards/1269/omanyte-fossil-52-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Psyduck",
+      "source_url": "https://www.tcgcollector.com/cards/1425/psyduck-fossil-53-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Shellder",
+      "source_url": "https://www.tcgcollector.com/cards/1605/shellder-fossil-54-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Slowpoke",
+      "source_url": "https://www.tcgcollector.com/cards/1649/slowpoke-fossil-55-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Tentacool",
+      "source_url": "https://www.tcgcollector.com/cards/1761/tentacool-fossil-56-62",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Zubat",
+      "source_url": "https://www.tcgcollector.com/cards/1971/zubat-fossil-57-62",
+      "error": "unhashable type: 'list'"
+    }
+  ],
+  "data_repair_last_run": {
+    "fields": [
+      "attacks",
+      "energy_provides",
+      "hp",
+      "metadata_cleanup",
+      "pokemon_type",
+      "powers",
+      "rules_text",
+      "stage",
+      "wrr"
+    ],
+    "changed_cards": 55,
+    "unchanged_cards": 7,
+    "skipped_cards": 0,
     "errors": 0
   }
 }

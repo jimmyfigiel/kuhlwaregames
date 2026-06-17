@@ -20,9 +20,11 @@
       "local_image_path": "public/card-images/pokemon/base-set/001-alakazam.jpg",
       "image_path": "/card-images/pokemon/base-set/001-alakazam.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 80,
       "evolves_from": "",
       "powers": [
@@ -36,15 +38,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Psychic"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Kadabra"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic",
@@ -72,13 +65,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 83.94,
         "raw": "$83.94"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-002-blastoise",
@@ -92,9 +86,11 @@
       "local_image_path": "public/card-images/pokemon/base-set/002-blastoise.jpg",
       "image_path": "/card-images/pokemon/base-set/002-blastoise.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 100,
       "evolves_from": "",
       "powers": [
@@ -108,15 +104,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Wartortle"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -144,13 +131,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 220.0,
         "raw": "$220"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-003-chansey",
@@ -168,22 +156,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 120,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Colorless"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless"
@@ -193,7 +172,7 @@
           "text": "Flip a coin. If heads, prevent all damage done to Chansey during your opponent's next turn. (Any other effects of attacks still happen.)"
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -226,13 +205,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 64.36,
         "raw": "$64.36"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-004-charizard",
@@ -246,9 +226,11 @@
       "local_image_path": "public/card-images/pokemon/base-set/004-charizard.jpg",
       "image_path": "/card-images/pokemon/base-set/004-charizard.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fire",
       "hp": 120,
       "evolves_from": "",
       "powers": [
@@ -262,15 +244,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fire"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Charmeleon"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fire",
             "Fire",
@@ -305,13 +278,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 630.0,
         "raw": "$630"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-005-clefairy",
@@ -329,7 +303,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
@@ -339,21 +313,12 @@
           "cost": [
             "Colorless"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Colorless"
-          ],
           "name": "Sing",
           "damage": "",
           "text": "Flip a coin. If heads, the Defending Pokémon is now Asleep."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -385,13 +350,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 36.16,
         "raw": "$36.16"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-006-gyarados",
@@ -405,24 +371,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/006-gyarados.jpg",
       "image_path": "/card-images/pokemon/base-set/006-gyarados.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 100,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Magikarp"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -433,7 +392,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -468,13 +427,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 54.97,
         "raw": "$54.97"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-007-hitmonchan",
@@ -492,7 +452,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
@@ -502,21 +462,12 @@
           "cost": [
             "Fighting"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Fighting"
-          ],
           "name": "Jab",
           "damage": "20",
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting",
@@ -543,13 +494,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 25.13,
         "raw": "$25.13"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-008-machamp",
@@ -563,9 +515,11 @@
       "local_image_path": "public/card-images/pokemon/base-set/008-machamp.jpg",
       "image_path": "/card-images/pokemon/base-set/008-machamp.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 100,
       "evolves_from": "",
       "powers": [
@@ -579,15 +533,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Machoke"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting",
@@ -616,13 +561,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 34.64,
         "raw": "$34.64"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-009-magneton",
@@ -636,24 +582,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/009-magneton.jpg",
       "image_path": "/card-images/pokemon/base-set/009-magneton.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Lightning"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Magnemite"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Lightning",
             "Lightning",
@@ -664,7 +603,7 @@
           "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Lightning",
             "Lightning",
@@ -691,13 +630,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 36.89,
         "raw": "$36.89"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-010-mewtwo",
@@ -723,15 +663,6 @@
         {
           "sort_order": 1,
           "cost": [
-            "Psychic"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
             "Psychic",
             "Colorless"
           ],
@@ -740,7 +671,7 @@
           "text": "Does 10 damage plus 10 more damage for each Energy card attached to the Defending Pokémon."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic"
@@ -767,13 +698,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 78.14,
         "raw": "$78.14"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-011-nidoking",
@@ -787,24 +719,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/011-nidoking.jpg",
       "image_path": "/card-images/pokemon/base-set/011-nidoking.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 90,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Nidorino"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Grass",
             "Colorless",
@@ -815,7 +740,7 @@
           "text": "Flip a coin. If heads, this attack does 30 damage plus 10 more damage; if tails, this attack does 30 damage and Nidoking does 10 damage to itself."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass",
@@ -843,13 +768,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 37.21,
         "raw": "$37.21"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-012-ninetales",
@@ -863,24 +789,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/012-ninetales.jpg",
       "image_path": "/card-images/pokemon/base-set/012-ninetales.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fire",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fire"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Vulpix"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless"
@@ -890,7 +809,7 @@
           "text": "If your opponent has any Benched Pokémon, choose 1 of them and switch it with his or her Active Pokémon."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fire",
             "Fire",
@@ -917,13 +836,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 37.08,
         "raw": "$37.08"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-013-poliwrath",
@@ -937,24 +857,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/013-poliwrath.jpg",
       "image_path": "/card-images/pokemon/base-set/013-poliwrath.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 90,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Poliwhirl"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -965,7 +878,7 @@
           "text": "Does 30 damage plus 10 more damage for each Water Energy attached to Poliwrath but not used to pay for this attack's Energy cost. Extra Water Energy after the 2nd doesn't count."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -994,13 +907,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 37.93,
         "raw": "$37.93"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-014-raichu",
@@ -1014,24 +928,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/014-raichu.jpg",
       "image_path": "/card-images/pokemon/base-set/014-raichu.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Lightning"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Pikachu"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Lightning",
             "Colorless",
@@ -1042,7 +949,7 @@
           "text": "Flip a coin. If heads, during your opponent's next turn, prevent all effects of attacks, including damage, done to Raichu."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Lightning",
             "Lightning",
@@ -1069,13 +976,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 73.18,
         "raw": "$73.18"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-015-venusaur",
@@ -1089,9 +997,11 @@
       "local_image_path": "public/card-images/pokemon/base-set/015-venusaur.jpg",
       "image_path": "/card-images/pokemon/base-set/015-venusaur.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 100,
       "evolves_from": "",
       "powers": [
@@ -1105,15 +1015,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Ivysaur"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass",
@@ -1141,13 +1042,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 154.0,
         "raw": "$154"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-016-zapdos",
@@ -1165,22 +1067,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 90,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Lightning"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Lightning",
             "Lightning",
@@ -1192,7 +1085,7 @@
           "text": "Flip a coin. If tails, Zapdos does 30 damage to itself."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Lightning",
             "Lightning",
@@ -1221,13 +1114,14 @@
       "provides": [],
       "rarity": "Rare Holo",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 53.88,
         "raw": "$53.88"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-017-beedrill",
@@ -1241,24 +1135,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/017-beedrill.jpg",
       "image_path": "/card-images/pokemon/base-set/017-beedrill.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 2"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 2 — Evolves from Kakuna"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -1269,7 +1156,7 @@
           "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass",
@@ -1299,13 +1186,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 5.53,
         "raw": "$5.53"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-018-dragonair",
@@ -1319,24 +1207,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/018-dragonair.jpg",
       "image_path": "/card-images/pokemon/base-set/018-dragonair.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Colorless"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Dratini"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -1347,7 +1228,7 @@
           "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -1375,13 +1256,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 16.69,
         "raw": "$16.69"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-019-dugtrio",
@@ -1395,24 +1277,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/019-dugtrio.jpg",
       "image_path": "/card-images/pokemon/base-set/019-dugtrio.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Diglett"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting",
@@ -1423,7 +1298,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting",
@@ -1457,13 +1332,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 10.96,
         "raw": "$10.96"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-020-electabuzz",
@@ -1481,7 +1357,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
@@ -1491,21 +1367,12 @@
           "cost": [
             "Lightning"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Lightning"
-          ],
           "name": "Thundershock",
           "damage": "10",
           "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Lightning",
             "Colorless"
@@ -1531,13 +1398,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 13.47,
         "raw": "$13.47"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-021-electrode",
@@ -1551,9 +1419,11 @@
       "local_image_path": "public/card-images/pokemon/base-set/021-electrode.jpg",
       "image_path": "/card-images/pokemon/base-set/021-electrode.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 80,
       "evolves_from": "",
       "powers": [
@@ -1567,15 +1437,6 @@
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Lightning"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Voltorb"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Lightning",
             "Lightning",
@@ -1601,13 +1462,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 7.75,
         "raw": "$7.75"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-022-pidgeotto",
@@ -1621,24 +1483,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/022-pidgeotto.jpg",
       "image_path": "/card-images/pokemon/base-set/022-pidgeotto.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Colorless"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Pidgey"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless"
@@ -1648,7 +1503,7 @@
           "text": "If your opponent has any Benched Pokémon, he or she chooses 1 of them and switches it with the Defending Pokémon. (Do the damage before switching the Pokémon.)"
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -1680,13 +1535,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 11.59,
         "raw": "$11.59"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-023-arcanine",
@@ -1700,24 +1556,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/023-arcanine.jpg",
       "image_path": "/card-images/pokemon/base-set/023-arcanine.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fire",
       "hp": 100,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fire"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Growlithe"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fire",
             "Fire",
@@ -1728,7 +1577,7 @@
           "text": "Discard 1 Fire Energy card attached to Arcanine in order to use this attack."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fire",
             "Fire",
@@ -1757,13 +1606,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 5.17,
         "raw": "$5.17"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-024-charmeleon",
@@ -1777,24 +1627,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/024-charmeleon.jpg",
       "image_path": "/card-images/pokemon/base-set/024-charmeleon.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fire",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fire"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Charmander"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -1805,7 +1648,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fire",
             "Fire",
@@ -1831,13 +1674,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 2.65,
         "raw": "$2.65"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-025-dewgong",
@@ -1851,24 +1695,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/025-dewgong.jpg",
       "image_path": "/card-images/pokemon/base-set/025-dewgong.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Seel"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -1879,7 +1716,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -1908,13 +1745,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 3.71,
         "raw": "$3.71"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-026-dratini",
@@ -1932,22 +1770,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Colorless"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless"
           ],
@@ -1971,13 +1800,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 3.28,
         "raw": "$3.28"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-027-farfetch-d",
@@ -1995,7 +1825,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
@@ -2005,21 +1835,12 @@
           "cost": [
             "Colorless"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Colorless"
-          ],
           "name": "Leek Slap",
           "damage": "30",
           "text": "Flip a coin. If tails, this attack does nothing. Either way, you can't use this attack again as long as Farfetch'd stays in play (even putting Farfetch'd on the Bench won't let you use it again)."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -2051,13 +1872,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.93,
         "raw": "$1.93"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-028-growlithe",
@@ -2075,22 +1897,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fire",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fire"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fire",
             "Colorless"
@@ -2115,13 +1928,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.47,
         "raw": "$1.47"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-029-haunter",
@@ -2135,9 +1949,11 @@
       "local_image_path": "public/card-images/pokemon/base-set/029-haunter.jpg",
       "image_path": "/card-images/pokemon/base-set/029-haunter.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
@@ -2147,21 +1963,12 @@
           "cost": [
             "Psychic"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Gastly"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Psychic"
-          ],
           "name": "Hypnosis",
           "damage": "",
           "text": "The Defending Pokémon is now Asleep."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic"
@@ -2186,13 +1993,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 2.47,
         "raw": "$2.47"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-030-ivysaur",
@@ -2206,24 +2014,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/030-ivysaur.jpg",
       "image_path": "/card-images/pokemon/base-set/030-ivysaur.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Bulbasaur"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Grass",
             "Colorless",
@@ -2234,7 +2035,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass",
@@ -2260,13 +2061,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 6.18,
         "raw": "$6.18"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-031-jynx",
@@ -2284,7 +2086,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
@@ -2294,21 +2096,12 @@
           "cost": [
             "Psychic"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Psychic"
-          ],
           "name": "Doubleslap",
           "damage": "10×",
           "text": "Flip 2 coins. This attack does 10 damage times the number of heads."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic",
@@ -2335,13 +2128,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.21,
         "raw": "$1.21"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-032-kadabra",
@@ -2355,24 +2149,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/032-kadabra.jpg",
       "image_path": "/card-images/pokemon/base-set/032-kadabra.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Psychic"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Abra"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic"
@@ -2382,7 +2169,7 @@
           "text": "Discard 1 Psychic Energy card attached to Kadabra in order to use this attack. Remove all damage counters from Kadabra."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic",
@@ -2410,13 +2197,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.97,
         "raw": "$1.97"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-033-kakuna",
@@ -2430,24 +2218,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/033-kakuna.jpg",
       "image_path": "/card-images/pokemon/base-set/033-kakuna.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Weedle"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless"
@@ -2457,7 +2238,7 @@
           "text": "Flip a coin. If heads, prevent all damage done to Kakuna during your opponent's next turn. (Any other effects of attacks still happen.)"
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass"
@@ -2483,13 +2264,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.51,
         "raw": "$1.51"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-034-machoke",
@@ -2503,24 +2285,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/034-machoke.jpg",
       "image_path": "/card-images/pokemon/base-set/034-machoke.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 80,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Machoke"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting",
@@ -2531,7 +2306,7 @@
           "text": "Does 50 damage minus 10 damage for each damage counter on Machoke."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting",
@@ -2560,13 +2335,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.32,
         "raw": "$1.32"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-035-magikarp",
@@ -2584,22 +2360,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 30,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless"
           ],
@@ -2608,7 +2375,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water"
           ],
@@ -2632,13 +2399,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 3.81,
         "raw": "$3.81"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-036-magmar",
@@ -2656,22 +2424,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fire",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fire"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fire",
             "Fire"
@@ -2681,7 +2440,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fire",
             "Fire",
@@ -2708,13 +2467,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 3.18,
         "raw": "$3.18"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-037-nidorino",
@@ -2728,24 +2488,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/037-nidorino.jpg",
       "image_path": "/card-images/pokemon/base-set/037-nidorino.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Nidoran ♂"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Grass",
             "Colorless",
@@ -2756,7 +2509,7 @@
           "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass",
@@ -2783,13 +2536,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 3.03,
         "raw": "$3.03"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-038-poliwhirl",
@@ -2803,24 +2557,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/038-poliwhirl.jpg",
       "image_path": "/card-images/pokemon/base-set/038-poliwhirl.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Poliwag"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water",
             "Water"
@@ -2830,7 +2577,7 @@
           "text": "Choose 1 of the Defending Pokémon's attacks. That Pokémon can't use that attack during your opponent's next turn."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Water",
@@ -2856,13 +2603,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.87,
         "raw": "$1.87"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-039-porygon",
@@ -2880,7 +2628,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 30,
       "evolves_from": "",
       "powers": [],
@@ -2890,21 +2638,12 @@
           "cost": [
             "Colorless"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Colorless"
-          ],
           "name": "Conversion 1",
           "damage": "",
           "text": "If the Defending Pokémon has a Weakness, you may change it to a type of your choice other than Colorless."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless"
@@ -2935,13 +2674,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Tomoaki Imakuni",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 2.9,
         "raw": "$2.90"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-040-raticate",
@@ -2955,9 +2695,11 @@
       "local_image_path": "public/card-images/pokemon/base-set/040-raticate.jpg",
       "image_path": "/card-images/pokemon/base-set/040-raticate.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
@@ -2967,21 +2709,12 @@
           "cost": [
             "Colorless"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Rattata"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Colorless"
-          ],
           "name": "Bite",
           "damage": "20",
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless",
@@ -3013,13 +2746,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 3.02,
         "raw": "$3.02"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-041-seel",
@@ -3037,22 +2771,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water"
           ],
@@ -3076,13 +2801,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.09,
         "raw": "$1.09"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-042-wartortle",
@@ -3096,24 +2822,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/042-wartortle.jpg",
       "image_path": "/card-images/pokemon/base-set/042-wartortle.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Squirtle"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water",
             "Colorless"
@@ -3123,7 +2842,7 @@
           "text": "Flip a coin. If heads, prevent all damage done to Wartortle during your opponent's next turn. (Any other effects of attacks still happen.)"
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Colorless",
@@ -3149,13 +2868,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 4.7,
         "raw": "$4.70"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-043-abra",
@@ -3173,22 +2893,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 30,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Psychic"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Psychic"
           ],
@@ -3210,13 +2921,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.07,
         "raw": "$1.07"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-044-bulbasaur",
@@ -3234,22 +2946,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass"
@@ -3274,13 +2977,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 4.89,
         "raw": "$4.89"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-045-caterpie",
@@ -3298,22 +3002,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Grass"
           ],
@@ -3337,13 +3032,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.13,
         "raw": "$1.13"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-046-charmander",
@@ -3361,22 +3057,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fire",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fire"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless"
           ],
@@ -3385,7 +3072,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fire",
             "Colorless"
@@ -3410,13 +3097,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 4.28,
         "raw": "$4.28"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-047-diglett",
@@ -3434,7 +3122,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 30,
       "evolves_from": "",
       "powers": [],
@@ -3444,21 +3132,12 @@
           "cost": [
             "Fighting"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Fighting"
-          ],
           "name": "Dig",
           "damage": "10",
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting"
@@ -3487,13 +3166,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.96,
         "raw": "$0.96"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-048-doduo",
@@ -3511,22 +3191,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Colorless"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless"
           ],
@@ -3554,13 +3225,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.63,
         "raw": "$1.63"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-049-drowzee",
@@ -3578,22 +3250,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Psychic"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless"
           ],
@@ -3602,7 +3265,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Psychic",
             "Psychic"
@@ -3627,13 +3290,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.84,
         "raw": "$0.84"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-050-gastly",
@@ -3651,7 +3315,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Psychic",
       "hp": 30,
       "evolves_from": "",
       "powers": [],
@@ -3661,21 +3325,12 @@
           "cost": [
             "Psychic"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Psychic"
-          ],
           "name": "Sleeping Gas",
           "damage": "",
           "text": "Flip a coin. If heads, the Defending Pokémon is now Asleep."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Psychic",
             "Colorless"
@@ -3698,13 +3353,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.86,
         "raw": "$0.86"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-051-koffing",
@@ -3722,22 +3378,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass"
@@ -3762,13 +3409,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.84,
         "raw": "$0.84"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-052-machop",
@@ -3786,22 +3434,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fighting"
           ],
@@ -3825,13 +3464,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.56,
         "raw": "$0.56"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-053-magnemite",
@@ -3849,7 +3489,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
@@ -3859,21 +3499,12 @@
           "cost": [
             "Lightning"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Lightning"
-          ],
           "name": "Thunder Wave",
           "damage": "10",
           "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Lightning",
             "Colorless"
@@ -3898,13 +3529,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.69,
         "raw": "$0.69"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-054-metapod",
@@ -3918,24 +3550,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/054-metapod.jpg",
       "image_path": "/card-images/pokemon/base-set/054-metapod.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 70,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Caterpie"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless"
@@ -3945,7 +3570,7 @@
           "text": "Flip a coin. If heads, prevent all damage done to Metapod during your opponent's next turn. (Any other effects of attacks still happen.)"
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass"
@@ -3971,13 +3596,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.91,
         "raw": "$0.91"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-055-nidoran-m",
@@ -3995,22 +3621,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Grass"
           ],
@@ -4034,13 +3651,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.84,
         "raw": "$0.84"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-056-onix",
@@ -4058,7 +3676,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 90,
       "evolves_from": "",
       "powers": [],
@@ -4068,21 +3686,12 @@
           "cost": [
             "Fighting"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Fighting"
-          ],
           "name": "Rock Throw",
           "damage": "10",
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fighting",
             "Fighting"
@@ -4109,13 +3718,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.22,
         "raw": "$1.22"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-057-pidgey",
@@ -4133,22 +3743,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Colorless"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless"
@@ -4179,13 +3780,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 2.0,
         "raw": "$2.00"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-058-pikachu",
@@ -4203,22 +3805,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Lightning"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless"
           ],
@@ -4227,7 +3820,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Lightning",
             "Colorless"
@@ -4252,13 +3845,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 6.57,
         "raw": "$6.57"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-059-poliwag",
@@ -4276,22 +3870,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water"
           ],
@@ -4315,13 +3900,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.92,
         "raw": "$0.92"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-060-ponyta",
@@ -4339,22 +3925,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fire",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fire"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless",
             "Colorless"
@@ -4364,7 +3941,7 @@
           "text": ""
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Fire",
             "Fire"
@@ -4389,13 +3966,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.85,
         "raw": "$0.85"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-061-rattata",
@@ -4413,22 +3991,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Colorless",
       "hp": 30,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Colorless"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless"
           ],
@@ -4456,13 +4025,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.92,
         "raw": "$0.92"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-062-sandshrew",
@@ -4480,22 +4050,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fighting",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fighting"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fighting"
           ],
@@ -4525,13 +4086,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.07,
         "raw": "$1.07"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-063-squirtle",
@@ -4549,7 +4111,7 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
@@ -4559,21 +4121,12 @@
           "cost": [
             "Water"
           ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
-          "cost": [
-            "Water"
-          ],
           "name": "Bubble",
           "damage": "10",
           "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Colorless"
@@ -4598,13 +4151,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 8.19,
         "raw": "$8.19"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-064-starmie",
@@ -4618,24 +4172,17 @@
       "local_image_path": "public/card-images/pokemon/base-set/064-starmie.jpg",
       "image_path": "/card-images/pokemon/base-set/064-starmie.jpg",
       "supertype": "Pokemon",
-      "subtypes": [],
+      "subtypes": [
+        "Stage 1"
+      ],
       "stage": "",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 60,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Stage 1 — Evolves from Staryu"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water",
             "Water"
@@ -4645,7 +4192,7 @@
           "text": "Discard 1 Water Energy card attached to Starmie in order to use this attack. Remove all damage counters from Starmie."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Water",
             "Colorless",
@@ -4671,13 +4218,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.96,
         "raw": "$0.96"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-065-staryu",
@@ -4695,22 +4243,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Water",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Water"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Water"
           ],
@@ -4734,13 +4273,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.64,
         "raw": "$0.64"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-066-tangela",
@@ -4758,22 +4298,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Grass",
             "Colorless"
@@ -4783,7 +4314,7 @@
           "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
         },
         {
-          "sort_order": 3,
+          "sort_order": 2,
           "cost": [
             "Grass",
             "Grass",
@@ -4810,13 +4341,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.3,
         "raw": "$1.30"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-067-voltorb",
@@ -4834,22 +4366,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Lightning",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Lightning"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Colorless"
           ],
@@ -4873,13 +4396,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 5.57,
         "raw": "$5.57"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-068-vulpix",
@@ -4897,22 +4421,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Fire",
       "hp": 50,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Fire"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Fire",
             "Fire"
@@ -4937,13 +4452,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.89,
         "raw": "$0.89"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-069-weedle",
@@ -4961,22 +4477,13 @@
         "Basic"
       ],
       "stage": "Basic",
-      "pokemon_type": "",
+      "pokemon_type": "Grass",
       "hp": 40,
       "evolves_from": "",
       "powers": [],
       "attacks": [
         {
           "sort_order": 1,
-          "cost": [
-            "Grass"
-          ],
-          "name": "Pokémon",
-          "damage": "",
-          "text": "Basic"
-        },
-        {
-          "sort_order": 2,
           "cost": [
             "Grass"
           ],
@@ -5000,13 +4507,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Mitsuhiro Arita",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.52,
         "raw": "$0.52"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-070-clefairy-doll",
@@ -5034,13 +4542,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 8.23,
         "raw": "$8.23"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-071-computer-search",
@@ -5068,13 +4577,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 3.36,
         "raw": "$3.36"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-072-devolution-spray",
@@ -5102,13 +4612,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 7.97,
         "raw": "$7.97"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-073-impostor-professor-oak",
@@ -5136,13 +4647,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 7.97,
         "raw": "$7.97"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-074-item-finder",
@@ -5170,13 +4682,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 9.42,
         "raw": "$9.42"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-075-lass",
@@ -5204,13 +4717,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 4.02,
         "raw": "$4.02"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-076-pok-mon-breeder",
@@ -5238,13 +4752,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 7.62,
         "raw": "$7.62"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-077-pok-mon-trader",
@@ -5272,13 +4787,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 6.03,
         "raw": "$6.03"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-078-scoop-up",
@@ -5306,13 +4822,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 9.02,
         "raw": "$9.02"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-079-super-energy-removal",
@@ -5340,13 +4857,14 @@
       "provides": [],
       "rarity": "Rare",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 4.09,
         "raw": "$4.09"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-080-defender",
@@ -5374,13 +4892,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.56,
         "raw": "$1.56"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-081-energy-retrieval",
@@ -5408,13 +4927,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Standard",
       "market_price": {
         "currency": "USD",
         "value": 0.62,
         "raw": "$0.62"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-082-full-heal",
@@ -5442,13 +4962,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 2.13,
         "raw": "$2.13"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-083-maintenance",
@@ -5476,13 +4997,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 3.2,
         "raw": "$3.20"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-084-pluspower",
@@ -5510,13 +5032,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.91,
         "raw": "$0.91"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-085-pok-mon-center",
@@ -5544,13 +5067,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 2.32,
         "raw": "$2.32"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-086-pok-mon-flute",
@@ -5578,13 +5102,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 3.55,
         "raw": "$3.55"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-087-pok-dex",
@@ -5612,13 +5137,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.45,
         "raw": "$0.45"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-088-professor-oak",
@@ -5646,13 +5172,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 1.65,
         "raw": "$1.65"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-089-revive",
@@ -5680,13 +5207,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 2.47,
         "raw": "$2.47"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-090-super-potion",
@@ -5714,13 +5242,14 @@
       "provides": [],
       "rarity": "Uncommon",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Expanded",
       "market_price": {
         "currency": "USD",
         "value": 0.37,
         "raw": "$0.37"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-091-bill",
@@ -5748,13 +5277,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Ken Sugimori",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.39,
         "raw": "$0.39"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-092-energy-removal",
@@ -5782,13 +5312,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.42,
         "raw": "$0.42"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-093-gust-of-wind",
@@ -5816,13 +5347,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 0.33,
         "raw": "$0.33"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-094-potion",
@@ -5850,13 +5382,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Standard",
       "market_price": {
         "currency": "USD",
         "value": 0.31,
         "raw": "$0.31"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-095-switch",
@@ -5884,13 +5417,14 @@
       "provides": [],
       "rarity": "Common",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Standard",
       "market_price": {
         "currency": "USD",
         "value": 0.36,
         "raw": "$0.36"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-096-double-colorless-energy",
@@ -5916,17 +5450,19 @@
       "retreat_cost": [],
       "rules_text": "Provides Colorless Colorless energy. Doesn't count as a basic Energy card.",
       "provides": [
-        "Rarity"
+        "Colorless",
+        "Colorless"
       ],
       "rarity": "Uncommon",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Unlimited",
       "market_price": {
         "currency": "USD",
         "value": 5.81,
         "raw": "$5.81"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-097-fighting-energy",
@@ -5952,17 +5488,18 @@
       "retreat_cost": [],
       "rules_text": "",
       "provides": [
-        "Rarity"
+        "Fighting"
       ],
       "rarity": "",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Standard",
       "market_price": {
         "currency": "USD",
         "value": 0.41,
         "raw": "$0.41"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-098-fire-energy",
@@ -5988,17 +5525,18 @@
       "retreat_cost": [],
       "rules_text": "",
       "provides": [
-        "Rarity"
+        "Fire"
       ],
       "rarity": "",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Standard",
       "market_price": {
         "currency": "USD",
         "value": 0.36,
         "raw": "$0.36"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-099-grass-energy",
@@ -6024,17 +5562,18 @@
       "retreat_cost": [],
       "rules_text": "",
       "provides": [
-        "Rarity"
+        "Grass"
       ],
       "rarity": "",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Standard",
       "market_price": {
         "currency": "USD",
         "value": 0.36,
         "raw": "$0.36"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-100-lightning-energy",
@@ -6060,17 +5599,18 @@
       "retreat_cost": [],
       "rules_text": "",
       "provides": [
-        "Rarity"
+        "Lightning"
       ],
       "rarity": "",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Standard",
       "market_price": {
         "currency": "USD",
         "value": 0.44,
         "raw": "$0.44"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-101-psychic-energy",
@@ -6096,17 +5636,18 @@
       "retreat_cost": [],
       "rules_text": "",
       "provides": [
-        "Rarity"
+        "Psychic"
       ],
       "rarity": "",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Standard",
       "market_price": {
         "currency": "USD",
         "value": 0.41,
         "raw": "$0.41"
-      }
+      },
+      "set_code": "BS"
     },
     {
       "id": "base-set-102-water-energy",
@@ -6132,17 +5673,18 @@
       "retreat_cost": [],
       "rules_text": "",
       "provides": [
-        "Rarity"
+        "Water"
       ],
       "rarity": "",
       "illustrator": "Keiji Kinebuchi",
-      "pokedex_number": "More",
+      "pokedex_number": "",
       "format": "Standard",
       "market_price": {
         "currency": "USD",
         "value": 0.39,
         "raw": "$0.39"
-      }
+      },
+      "set_code": "BS"
     }
   ],
   "errors": [],
@@ -6151,6 +5693,405 @@
     "updated_cards": 69,
     "unchanged_cards": 0,
     "skipped_cards": 33,
+    "errors": 0
+  },
+  "data_repair_errors": [
+    {
+      "name": "Alakazam",
+      "source_url": "https://www.tcgcollector.com/cards/18/alakazam-base-set-1-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Blastoise",
+      "source_url": "https://www.tcgcollector.com/cards/126/blastoise-base-set-2-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Chansey",
+      "source_url": "https://www.tcgcollector.com/cards/203/chansey-base-set-3-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Charizard",
+      "source_url": "https://www.tcgcollector.com/cards/211/charizard-base-set-4-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Clefairy",
+      "source_url": "https://www.tcgcollector.com/cards/241/clefairy-base-set-5-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Gyarados",
+      "source_url": "https://www.tcgcollector.com/cards/708/gyarados-base-set-6-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Hitmonchan",
+      "source_url": "https://www.tcgcollector.com/cards/731/hitmonchan-base-set-7-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Machamp",
+      "source_url": "https://www.tcgcollector.com/cards/985/machamp-base-set-8-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Magneton",
+      "source_url": "https://www.tcgcollector.com/cards/1036/magneton-base-set-9-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Mewtwo",
+      "source_url": "https://www.tcgcollector.com/cards/1116/mewtwo-base-set-10-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Nidoking",
+      "source_url": "https://www.tcgcollector.com/cards/1214/nidoking-base-set-11-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Ninetales",
+      "source_url": "https://www.tcgcollector.com/cards/1241/ninetales-base-set-12-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Poliwrath",
+      "source_url": "https://www.tcgcollector.com/cards/1379/poliwrath-base-set-13-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Raichu",
+      "source_url": "https://www.tcgcollector.com/cards/1445/raichu-base-set-14-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Venusaur",
+      "source_url": "https://www.tcgcollector.com/cards/1872/venusaur-base-set-15-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Zapdos",
+      "source_url": "https://www.tcgcollector.com/cards/1963/zapdos-base-set-16-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Beedrill",
+      "source_url": "https://www.tcgcollector.com/cards/83/beedrill-base-set-17-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Dragonair",
+      "source_url": "https://www.tcgcollector.com/cards/405/dragonair-base-set-18-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Dugtrio",
+      "source_url": "https://www.tcgcollector.com/cards/427/dugtrio-base-set-19-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Electabuzz",
+      "source_url": "https://www.tcgcollector.com/cards/452/electabuzz-base-set-20-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Electrode",
+      "source_url": "https://www.tcgcollector.com/cards/465/electrode-base-set-21-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Pidgeotto",
+      "source_url": "https://www.tcgcollector.com/cards/1312/pidgeotto-base-set-22-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Arcanine",
+      "source_url": "https://www.tcgcollector.com/cards/48/arcanine-base-set-23-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Charmeleon",
+      "source_url": "https://www.tcgcollector.com/cards/223/charmeleon-base-set-24-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Dewgong",
+      "source_url": "https://www.tcgcollector.com/cards/383/dewgong-base-set-25-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Dratini",
+      "source_url": "https://www.tcgcollector.com/cards/414/dratini-base-set-26-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Farfetch'd",
+      "source_url": "https://www.tcgcollector.com/cards/542/farfetchd-base-set-27-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Growlithe",
+      "source_url": "https://www.tcgcollector.com/cards/699/growlithe-base-set-28-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Haunter",
+      "source_url": "https://www.tcgcollector.com/cards/717/haunter-base-set-29-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Ivysaur",
+      "source_url": "https://www.tcgcollector.com/cards/794/ivysaur-base-set-30-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Jynx",
+      "source_url": "https://www.tcgcollector.com/cards/815/jynx-base-set-31-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Kadabra",
+      "source_url": "https://www.tcgcollector.com/cards/832/kadabra-base-set-32-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Kakuna",
+      "source_url": "https://www.tcgcollector.com/cards/836/kakuna-base-set-33-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Machoke",
+      "source_url": "https://www.tcgcollector.com/cards/992/machoke-base-set-34-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Magikarp",
+      "source_url": "https://www.tcgcollector.com/cards/1013/magikarp-base-set-35-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Magmar",
+      "source_url": "https://www.tcgcollector.com/cards/1019/magmar-base-set-36-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Nidorino",
+      "source_url": "https://www.tcgcollector.com/cards/1234/nidorino-base-set-37-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Poliwhirl",
+      "source_url": "https://www.tcgcollector.com/cards/1374/poliwhirl-base-set-38-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Porygon",
+      "source_url": "https://www.tcgcollector.com/cards/1393/porygon-base-set-39-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Raticate",
+      "source_url": "https://www.tcgcollector.com/cards/1472/raticate-base-set-40-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Seel",
+      "source_url": "https://www.tcgcollector.com/cards/1590/seel-base-set-41-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Wartortle",
+      "source_url": "https://www.tcgcollector.com/cards/1916/wartortle-base-set-42-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Abra",
+      "source_url": "https://www.tcgcollector.com/cards/2/abra-base-set-43-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Bulbasaur",
+      "source_url": "https://www.tcgcollector.com/cards/172/bulbasaur-base-set-44-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Caterpie",
+      "source_url": "https://www.tcgcollector.com/cards/191/caterpie-base-set-45-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Charmander",
+      "source_url": "https://www.tcgcollector.com/cards/217/charmander-base-set-46-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Diglett",
+      "source_url": "https://www.tcgcollector.com/cards/386/diglett-base-set-47-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Doduo",
+      "source_url": "https://www.tcgcollector.com/cards/396/doduo-base-set-48-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Drowzee",
+      "source_url": "https://www.tcgcollector.com/cards/420/drowzee-base-set-49-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Gastly",
+      "source_url": "https://www.tcgcollector.com/cards/605/gastly-base-set-50-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Koffing",
+      "source_url": "https://www.tcgcollector.com/cards/856/koffing-base-set-51-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Machop",
+      "source_url": "https://www.tcgcollector.com/cards/996/machop-base-set-52-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Magnemite",
+      "source_url": "https://www.tcgcollector.com/cards/1028/magnemite-base-set-53-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Metapod",
+      "source_url": "https://www.tcgcollector.com/cards/1106/metapod-base-set-54-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Nidoran ♂",
+      "source_url": "https://www.tcgcollector.com/cards/1228/nidoran-male-base-set-55-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Onix",
+      "source_url": "https://www.tcgcollector.com/cards/1279/onix-base-set-56-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Pidgey",
+      "source_url": "https://www.tcgcollector.com/cards/1315/pidgey-base-set-57-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Pikachu",
+      "source_url": "https://www.tcgcollector.com/cards/1323/pikachu-base-set-58-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Poliwag",
+      "source_url": "https://www.tcgcollector.com/cards/1370/poliwag-base-set-59-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Ponyta",
+      "source_url": "https://www.tcgcollector.com/cards/1385/ponyta-base-set-60-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Rattata",
+      "source_url": "https://www.tcgcollector.com/cards/1475/rattata-base-set-61-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Sandshrew",
+      "source_url": "https://www.tcgcollector.com/cards/1552/sandshrew-base-set-62-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Squirtle",
+      "source_url": "https://www.tcgcollector.com/cards/1690/squirtle-base-set-63-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Starmie",
+      "source_url": "https://www.tcgcollector.com/cards/1703/starmie-base-set-64-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Staryu",
+      "source_url": "https://www.tcgcollector.com/cards/1705/staryu-base-set-65-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Tangela",
+      "source_url": "https://www.tcgcollector.com/cards/1752/tangela-base-set-66-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Voltorb",
+      "source_url": "https://www.tcgcollector.com/cards/1897/voltorb-base-set-67-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Vulpix",
+      "source_url": "https://www.tcgcollector.com/cards/1902/vulpix-base-set-68-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Weedle",
+      "source_url": "https://www.tcgcollector.com/cards/1925/weedle-base-set-69-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Double Colorless Energy",
+      "source_url": "https://www.tcgcollector.com/cards/402/double-colorless-energy-base-set-96-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Fighting Energy",
+      "source_url": "https://www.tcgcollector.com/cards/557/fighting-energy-base-set-97-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Fire Energy",
+      "source_url": "https://www.tcgcollector.com/cards/564/fire-energy-base-set-98-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Grass Energy",
+      "source_url": "https://www.tcgcollector.com/cards/678/grass-energy-base-set-99-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Lightning Energy",
+      "source_url": "https://www.tcgcollector.com/cards/937/lightning-energy-base-set-100-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Psychic Energy",
+      "source_url": "https://www.tcgcollector.com/cards/1419/psychic-energy-base-set-101-102",
+      "error": "unhashable type: 'list'"
+    },
+    {
+      "name": "Water Energy",
+      "source_url": "https://www.tcgcollector.com/cards/1919/water-energy-base-set-102-102",
+      "error": "unhashable type: 'list'"
+    }
+  ],
+  "data_repair_last_run": {
+    "fields": [
+      "attacks",
+      "energy_provides",
+      "hp",
+      "metadata_cleanup",
+      "pokemon_type",
+      "powers",
+      "rules_text",
+      "stage",
+      "wrr"
+    ],
+    "changed_cards": 76,
+    "unchanged_cards": 26,
+    "skipped_cards": 0,
     "errors": 0
   }
 }
