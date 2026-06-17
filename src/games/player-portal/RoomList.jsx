@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+// /src/games/player-portal/RoomList.jsx
+
+import { useEffect, useMemo, useState } from "react";
 import {
   collection,
   deleteDoc,
@@ -7,8 +9,17 @@ import {
   query,
   where,
 } from "firebase/firestore";
+
 import { db } from "../../firebase.js";
 import "./PlayerPortal.css";
+
+const FINISHED_STATUSES = new Set([
+  "archived",
+  "complete",
+  "completed",
+  "deleted",
+  "finished",
+]);
 
 function formatDate(value) {
   if (!value) {
@@ -22,89 +33,163 @@ function formatDate(value) {
   return String(value);
 }
 
-function getJoinUrl(joinCode) {
-  const url = new URL(window.location.href);
-  url.search = "";
-  url.hash = "";
-  url.searchParams.set("join", joinCode);
-  return url.toString();
+function getDateMillis(value) {
+  if (!value) {
+    return 0;
+  }
+
+  if (typeof value.toMillis === "function") {
+    return value.toMillis();
+  }
+
+  const parsed = new Date(value).getTime();
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function isSuperuser(player) {
-  return player?.isSuperuser || player?.isSuperUser || false;
+  return player.isSuperuser || player.isSuperUser || false;
 }
 
-function getUpdatedAtMillis(room) {
-  if (room.updatedAt?.toMillis) {
-    return room.updatedAt.toMillis();
+function getPlayersText(room) {
+  if (Array.isArray(room.players) && room.players.length > 0) {
+    return room.players
+      .map((player) => player.name || player.displayName || player.playerId)
+      .filter(Boolean)
+      .join(" + ");
   }
 
-  if (room.updatedAt?.toDate) {
-    return room.updatedAt.toDate().getTime();
+  if (Array.isArray(room.playerIds) && room.playerIds.length > 0) {
+    return room.playerIds.join(" + ");
   }
 
-  if (typeof room.updatedAt === "number") {
-    return room.updatedAt;
-  }
-
-  if (typeof room.updatedAt === "string") {
-    const parsedDate = Date.parse(room.updatedAt);
-    return Number.isNaN(parsedDate) ? 0 : parsedDate;
-  }
-
-  return 0;
+  return "No players yet";
 }
 
-export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
+function getGenericTurnPlayerId(room) {
+  const gameState = room.gameState || {};
+  const gameSetup = room.gameSetup || {};
+
+  return (
+    room.currentPlayerId ||
+    room.currentTurnPlayerId ||
+    room.activePlayerId ||
+    room.turnPlayerId ||
+    gameState.currentPlayerId ||
+    gameState.currentTurnPlayerId ||
+    gameState.activePlayerId ||
+    gameState.turnPlayerId ||
+    gameState.turn?.playerId ||
+    gameState.activeTurn?.playerId ||
+    gameSetup.currentPlayerId ||
+    gameSetup.activePlayerId ||
+    null
+  );
+}
+
+function getGameBadge(room, playerId) {
+  const status = String(room.status || "active").toLowerCase();
+
+  if (FINISHED_STATUSES.has(status)) {
+    return "Finished";
+  }
+
+  const turnPlayerId = getGenericTurnPlayerId(room);
+
+  if (turnPlayerId && turnPlayerId === playerId) {
+    return "Your Turn";
+  }
+
+  if (turnPlayerId && turnPlayerId !== playerId) {
+    return "Waiting";
+  }
+
+  if (status === "setup") {
+    return "Setup";
+  }
+
+  if (status === "invited") {
+    return "Invited";
+  }
+
+  return "Continue";
+}
+
+function isFinishedRoom(room) {
+  return FINISHED_STATUSES.has(String(room.status || "").toLowerCase());
+}
+
+function buildSubtitle(room) {
+  const gameName = room.gameTitle || room.gameId || "Game";
+  const players = getPlayersText(room);
+  return `${gameName} · ${players}`;
+}
+
+export default function RoomList({
+  player,
+  refreshKey = 0,
+  onOpenRoom,
+  onRoomsLoaded,
+}) {
   const [rooms, setRooms] = useState([]);
   const [message, setMessage] = useState("");
   const [loadingRooms, setLoadingRooms] = useState(true);
-
-  const superuser = isSuperuser(player);
+  const [showFinished, setShowFinished] = useState(false);
 
   useEffect(() => {
     loadRooms();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [player.id, player.isSuperuser, player.isSuperUser, refreshKey]);
+  }, [player.id, refreshKey]);
+
+  const activeRooms = useMemo(
+    () => rooms.filter((room) => !isFinishedRoom(room)),
+    [rooms]
+  );
+
+  const finishedRooms = useMemo(
+    () => rooms.filter((room) => isFinishedRoom(room)),
+    [rooms]
+  );
 
   async function loadRooms() {
     setLoadingRooms(true);
     setMessage("");
 
     try {
-      const roomsQuery = superuser
-        ? query(collection(db, "rooms"))
-        : query(
-            collection(db, "rooms"),
-            where("playerIds", "array-contains", player.id)
-          );
-
-      const roomsSnapshot = await getDocs(roomsQuery);
+      const roomsSnapshot = await getDocs(
+        query(
+          collection(db, "rooms"),
+          where("playerIds", "array-contains", player.id)
+        )
+      );
 
       const loadedRooms = roomsSnapshot.docs
         .map((roomDoc) => ({
           id: roomDoc.id,
           ...roomDoc.data(),
         }))
-        .sort((a, b) => getUpdatedAtMillis(b) - getUpdatedAtMillis(a));
+        .sort((a, b) => getDateMillis(b.updatedAt) - getDateMillis(a.updatedAt));
 
       setRooms(loadedRooms);
+
+      if (onRoomsLoaded) {
+        onRoomsLoaded(loadedRooms.filter((room) => !isFinishedRoom(room)));
+      }
     } catch (error) {
       console.error(error);
-      setMessage(`Could not load rooms: ${error.message}`);
+      setMessage(`Could not load games: ${error.message}`);
     } finally {
       setLoadingRooms(false);
     }
   }
 
   async function deleteRoom(room) {
-    if (room.createdBy !== player.id && !superuser) {
-      setMessage("Only the room creator or a superuser can delete this room.");
+    if (room.createdBy !== player.id && !isSuperuser(player)) {
+      setMessage("Only the game creator or a superuser can delete this game.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Delete room "${room.title || room.id}"? This cannot be undone.`
+      `Delete game "${room.title || room.id}"? This cannot be undone.`
     );
 
     if (!confirmed) {
@@ -113,106 +198,103 @@ export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
 
     try {
       await deleteDoc(doc(db, "rooms", room.id));
-      setMessage(`Deleted room ${room.title || room.id}.`);
+      setMessage(`Deleted game ${room.title || room.id}.`);
       await loadRooms();
     } catch (error) {
       console.error(error);
-      setMessage(`Could not delete room: ${error.message}`);
+      setMessage(`Could not delete game: ${error.message}`);
     }
   }
 
-  async function copyJoinLink(room) {
-    if (!room.joinCode) {
-      setMessage("This room does not have a join code.");
-      return;
-    }
+  function renderGameCard(room) {
+    const badge = getGameBadge(room, player.id);
+    const canDelete = room.createdBy === player.id || isSuperuser(player);
 
-    try {
-      await navigator.clipboard.writeText(getJoinUrl(room.joinCode));
-      setMessage("Join link copied.");
-    } catch (error) {
-      console.error(error);
-      setMessage(
-        "Could not copy link. Your browser may have blocked clipboard access."
-      );
-    }
+    return (
+      <div className="game-card" key={room.id}>
+        <button
+          type="button"
+          className="game-card-button"
+          onClick={() => onOpenRoom(room)}
+        >
+          <div className="game-card-main-text">
+            <span className="game-status-badge">{badge}</span>
+            <h3>{room.title || "Untitled Game"}</h3>
+            <p className="muted">{buildSubtitle(room)}</p>
+            <p className="small-muted">
+              Updated: {formatDate(room.updatedAt) || "Not available"}
+            </p>
+          </div>
+
+          <span className="game-card-chevron" aria-hidden="true">
+            ›
+          </span>
+        </button>
+
+        {canDelete && (
+          <button
+            type="button"
+            className="danger-button compact-button game-card-delete"
+            onClick={() => deleteRoom(room)}
+          >
+            Delete
+          </button>
+        )}
+      </div>
+    );
   }
 
   return (
-    <article className="card">
-      <div className="section-heading-row">
-        <div>
-          <h2>{superuser ? "All Rooms" : "Active Rooms"}</h2>
-          {superuser && (
+    <section className="dashboard-section">
+      <article className="card wide-card games-dashboard-card">
+        <div className="section-heading-row">
+          <div>
+            <h2>Your Games</h2>
             <p className="muted">
-              Superuser view: all rooms sorted by last used.
+              Tap a game card to continue. Finished games stay hidden unless you need them.
             </p>
-          )}
+          </div>
+
+          <button
+            type="button"
+            className="secondary-button compact-button"
+            onClick={loadRooms}
+            disabled={loadingRooms}
+          >
+            Refresh
+          </button>
         </div>
 
-        <button type="button" className="secondary-button" onClick={loadRooms}>
-          Refresh
-        </button>
-      </div>
+        {loadingRooms ? (
+          <p className="muted">Loading games...</p>
+        ) : activeRooms.length === 0 ? (
+          <p className="muted">You are not currently playing any games.</p>
+        ) : (
+          <div className="game-list">{activeRooms.map(renderGameCard)}</div>
+        )}
 
-      {loadingRooms ? (
-        <p className="muted">Loading rooms...</p>
-      ) : rooms.length === 0 ? (
-        <p className="muted">
-          {superuser
-            ? "There are no rooms in the system."
-            : "You are not in any active rooms yet."}
-        </p>
-      ) : (
-        <div className="room-list">
-          {rooms.map((room) => (
-            <div className="room-card" key={room.id}>
-              <div>
-                <h3>{room.title || "Untitled Room"}</h3>
-                <p className="muted">
-                  {room.gameTitle || room.gameId} · Created by{" "}
-                  {room.createdByName || room.createdBy}
-                </p>
-                <p className="muted">Updated: {formatDate(room.updatedAt)}</p>
-                {superuser && (
-                  <p className="small-muted">Room ID: {room.id}</p>
-                )}
-                {room.joinCode && (
-                  <p className="small-muted">Join Code: {room.joinCode}</p>
-                )}
+        {finishedRooms.length > 0 && (
+          <div className="finished-games-panel">
+            <button
+              type="button"
+              className="secondary-button compact-button"
+              onClick={() => setShowFinished((currentValue) => !currentValue)}
+            >
+              {showFinished
+                ? "Hide Finished Games"
+                : `Show Finished Games (${finishedRooms.length})`}
+            </button>
+
+            {showFinished && (
+              <div className="game-list finished-game-list">
+                {finishedRooms.map(renderGameCard)}
               </div>
+            )}
+          </div>
+        )}
 
-              <div className="room-actions">
-                <button type="button" onClick={() => onOpenRoom(room)}>
-                  Rejoin
-                </button>
-
-                {room.joinCode && (
-                  <button
-                    type="button"
-                    className="secondary-button"
-                    onClick={() => copyJoinLink(room)}
-                  >
-                    Copy Link
-                  </button>
-                )}
-
-                {(room.createdBy === player.id || superuser) && (
-                  <button
-                    type="button"
-                    className="danger-button"
-                    onClick={() => deleteRoom(room)}
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {message && <p className="message">{message}</p>}
-    </article>
+        {message && <p className="message">{message}</p>}
+      </article>
+    </section>
   );
 }

@@ -10,6 +10,14 @@ import JoinRoom from "./JoinRoom.jsx";
 import RoomList from "./RoomList.jsx";
 import "./PlayerPortal.css";
 
+function uniqueArray(value) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return Array.from(new Set(value.filter(Boolean))).sort();
+}
+
 export default function Dashboard({
   player,
   authUser,
@@ -23,14 +31,17 @@ export default function Dashboard({
   const [showChangePin, setShowChangePin] = useState(false);
   const [showDevices, setShowDevices] = useState(false);
   const [roomRefreshKey, setRoomRefreshKey] = useState(0);
+  const [latestRoom, setLatestRoom] = useState(null);
 
   const isSuperuser = player.isSuperuser || player.isSuperUser || false;
 
-  const authorizedGames =
-    player.authorizedGames ||
-    player.authorizedToCreate ||
-    player.authorizedToPlay ||
-    [];
+  const authorizedToCreate = uniqueArray(
+    player.authorizedToCreate || player.authorizedGames || []
+  );
+
+  const authorizedToPlay = uniqueArray(
+    player.authorizedToPlay || player.authorizedGames || authorizedToCreate
+  );
 
   function refreshRooms() {
     setRoomRefreshKey((currentValue) => currentValue + 1);
@@ -63,18 +74,14 @@ export default function Dashboard({
   }
 
   return (
-    <main className="player-portal portal-shell">
-      <header className="portal-header">
+    <main className="player-portal portal-shell dashboard-shell">
+      <header className="portal-header dashboard-header">
         <div>
           <h1>Kuhlware Games</h1>
 
           <p className="muted">
-            Logged in as{" "}
+            Playing as{" "}
             <strong>{player.displayName || player.name || player.id}</strong>
-          </p>
-
-          <p className="small-muted">
-            Device session: {authUser?.uid || "not available"}
           </p>
         </div>
 
@@ -87,7 +94,7 @@ export default function Dashboard({
 
           <button
             type="button"
-            className="secondary-button"
+            className="secondary-button compact-button"
             onClick={() => setShowChangePin(true)}
           >
             Change PIN
@@ -95,13 +102,17 @@ export default function Dashboard({
 
           <button
             type="button"
-            className="secondary-button"
+            className="secondary-button compact-button"
             onClick={() => setShowDevices(true)}
           >
             Devices
           </button>
 
-          <button type="button" className="secondary-button" onClick={onLogout}>
+          <button
+            type="button"
+            className="secondary-button compact-button"
+            onClick={onLogout}
+          >
             Log out
           </button>
         </div>
@@ -132,11 +143,25 @@ export default function Dashboard({
         </section>
       )}
 
-      <section className="portal-grid">
+      <section className="portal-stack">
+        {latestRoom && (
+          <section className="dashboard-section resume-section">
+            <button
+              type="button"
+              className="resume-game-button"
+              onClick={() => onOpenRoom(latestRoom)}
+            >
+              <span>Resume Last Game</span>
+              <strong>{latestRoom.title || latestRoom.gameTitle || "Untitled Game"}</strong>
+            </button>
+          </section>
+        )}
+
         <RoomList
           player={player}
           refreshKey={roomRefreshKey}
           onOpenRoom={onOpenRoom}
+          onRoomsLoaded={(rooms) => setLatestRoom(rooms[0] || null)}
         />
 
         <CreateRoom
@@ -144,9 +169,9 @@ export default function Dashboard({
             ...player,
             isSuperuser,
             isSuperUser: isSuperuser,
-            authorizedGames,
-            authorizedToCreate: authorizedGames,
-            authorizedToPlay: authorizedGames,
+            authorizedGames: authorizedToPlay,
+            authorizedToCreate,
+            authorizedToPlay,
           }}
           onRoomCreated={(room) => {
             refreshRooms();
@@ -155,17 +180,21 @@ export default function Dashboard({
         />
 
         {isSuperuser && (
-          <article className="card">
-            <h2>Admin</h2>
+          <section className="dashboard-section admin-dashboard-section">
+            <article className="card wide-card admin-card">
+              <div>
+                <h2>Admin</h2>
 
-            <p className="muted">
-              Manage players, games, permissions, and setup data.
-            </p>
+                <p className="muted">
+                  Manage players, games, permissions, and setup data.
+                </p>
+              </div>
 
-            <button type="button" onClick={() => setShowAdmin(true)}>
-              Open Admin
-            </button>
-          </article>
+              <button type="button" onClick={() => setShowAdmin(true)}>
+                Open Admin
+              </button>
+            </article>
+          </section>
         )}
       </section>
     </main>

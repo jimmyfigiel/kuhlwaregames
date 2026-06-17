@@ -23,6 +23,21 @@ function getJoinUrl(joinCode) {
   return url.toString();
 }
 
+function getPlayersText(room) {
+  if (Array.isArray(room.players) && room.players.length > 0) {
+    return room.players
+      .map((player) => player.name || player.displayName || player.playerId)
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  return (room.playerIds || []).join(", ") || "None";
+}
+
+function isSuperuser(player) {
+  return player.isSuperuser || player.isSuperUser || false;
+}
+
 export default function RoomScreen({
   room,
   player,
@@ -32,11 +47,10 @@ export default function RoomScreen({
 }) {
   const [currentRoom, setCurrentRoom] = useState(room);
   const [message, setMessage] = useState("");
-  const [syncMessage, setSyncMessage] = useState("Connecting to room...");
+  const [syncMessage, setSyncMessage] = useState("Connecting to game...");
 
   const isCreator = currentRoom.createdBy === player.id;
-  const canManage =
-    isCreator || player.isSuperuser || player.isSuperUser || false;
+  const canManage = isCreator || isSuperuser(player);
 
   useEffect(() => {
     if (!room?.id) {
@@ -49,7 +63,7 @@ export default function RoomScreen({
       roomRef,
       (roomSnap) => {
         if (!roomSnap.exists()) {
-          setSyncMessage("This room no longer exists.");
+          setSyncMessage("This game no longer exists.");
           return;
         }
 
@@ -74,7 +88,7 @@ export default function RoomScreen({
       const roomSnap = await getDoc(doc(db, "rooms", currentRoom.id));
 
       if (!roomSnap.exists()) {
-        setMessage("This room no longer exists.");
+        setMessage("This game no longer exists.");
         return;
       }
 
@@ -83,22 +97,22 @@ export default function RoomScreen({
         ...roomSnap.data(),
       });
 
-      setMessage("Room refreshed.");
+      setMessage("Game refreshed.");
     } catch (error) {
       console.error(error);
-      setMessage(`Could not refresh room: ${error.message}`);
+      setMessage(`Could not refresh game: ${error.message}`);
     }
   }
 
   async function copyJoinLink() {
     if (!currentRoom.joinCode) {
-      setMessage("This room does not have a join code.");
+      setMessage("This game does not have an invite code.");
       return;
     }
 
     try {
       await navigator.clipboard.writeText(getJoinUrl(currentRoom.joinCode));
-      setMessage("Join link copied.");
+      setMessage("Invite link copied.");
     } catch (error) {
       console.error(error);
       setMessage("Could not copy link.");
@@ -107,13 +121,11 @@ export default function RoomScreen({
 
   async function leaveRoom() {
     if (isCreator) {
-      setMessage(
-        "Room creators cannot leave their own room. Delete it instead."
-      );
+      setMessage("Game creators cannot leave their own game. Delete it instead.");
       return;
     }
 
-    const confirmed = window.confirm("Leave this room?");
+    const confirmed = window.confirm("Leave this game?");
 
     if (!confirmed) {
       return;
@@ -128,18 +140,18 @@ export default function RoomScreen({
       onBack();
     } catch (error) {
       console.error(error);
-      setMessage(`Could not leave room: ${error.message}`);
+      setMessage(`Could not leave game: ${error.message}`);
     }
   }
 
   async function deleteRoom() {
     if (!canManage) {
-      setMessage("Only the room creator or a superuser can delete this room.");
+      setMessage("Only the game creator or a superuser can delete this game.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Delete room "${
+      `Delete game "${
         currentRoom.title || currentRoom.id
       }"? This cannot be undone.`
     );
@@ -153,82 +165,28 @@ export default function RoomScreen({
       onRoomDeleted();
     } catch (error) {
       console.error(error);
-      setMessage(`Could not delete room: ${error.message}`);
+      setMessage(`Could not delete game: ${error.message}`);
     }
   }
 
   return (
     <main className="player-portal portal-shell">
-      <header
-        className="portal-header"
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "8px",
-          padding: "4px 6px",
-          marginBottom: "6px",
-          minHeight: "32px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            minWidth: 0,
-            flex: 1,
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-          }}
-        >
-          <strong
-            style={{
-              fontSize: "14px",
-              lineHeight: 1,
-              color: "#fff",
-              flexShrink: 0,
-            }}
-          >
-            Kuhlware Games
-          </strong>
-
-          <span
-            style={{
-              fontSize: "12px",
-              lineHeight: 1,
-              color: "#ddd",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            Playing as {player.displayName || player.name || player.id}
-          </span>
+      <header className="portal-header compact-game-header">
+        <div className="compact-game-title-row">
+          <strong>Kuhlware Games</strong>
+          <span>Playing as {player.displayName || player.name || player.id}</span>
         </div>
 
         <button
           type="button"
-          className="secondary-button"
+          className="secondary-button compact-button"
           onClick={onBack}
-          style={{
-            fontSize: "12px",
-            padding: "4px 8px",
-            lineHeight: 1.1,
-            flexShrink: 0,
-          }}
         >
-          Back
+          Back to Games
         </button>
       </header>
 
-      <section
-        className="game-loader-layout"
-        style={{
-          marginTop: 0,
-          paddingTop: 0,
-        }}
-      >
+      <section className="game-loader-layout compact-game-loader">
         <GameLoader
           room={currentRoom}
           player={player}
@@ -239,15 +197,11 @@ export default function RoomScreen({
 
       <section className="single-card-layout room-details-layout">
         <article className="card">
-          <h2>{currentRoom.title || "Untitled Room"}</h2>
+          <h2>{currentRoom.title || "Untitled Game"}</h2>
 
           <p className="muted">
-            {currentRoom.gameTitle || currentRoom.gameId} · Room screen
+            {currentRoom.gameTitle || currentRoom.gameId} · Game screen
           </p>
-
-          {currentRoom.joinCode && (
-            <p className="small-muted">Join Code: {currentRoom.joinCode}</p>
-          )}
 
           <p className="small-muted">{syncMessage}</p>
         </article>
@@ -255,7 +209,7 @@ export default function RoomScreen({
 
       <section className="single-card-layout room-details-layout">
         <article className="card">
-          <h2>Room Details</h2>
+          <h2>Game Details</h2>
 
           <p>
             <strong>Created by:</strong>{" "}
@@ -267,15 +221,12 @@ export default function RoomScreen({
           </p>
 
           <p>
-            <strong>Players:</strong>{" "}
-            {(currentRoom.playerIds || []).join(", ") || "None"}
+            <strong>Players:</strong> {getPlayersText(currentRoom)}
           </p>
 
           {currentRoom.joinCode && (
-            <p>
-              <strong>Invite Link:</strong>
-              <br />
-              {getJoinUrl(currentRoom.joinCode)}
+            <p className="small-muted">
+              Backup Invite Code: {currentRoom.joinCode}
             </p>
           )}
 
@@ -290,7 +241,7 @@ export default function RoomScreen({
                 className="secondary-button"
                 onClick={copyJoinLink}
               >
-                Copy Join Link
+                Copy Backup Invite Link
               </button>
             )}
 
@@ -300,7 +251,7 @@ export default function RoomScreen({
                 className="secondary-button"
                 onClick={leaveRoom}
               >
-                Leave Room
+                Leave Game
               </button>
             )}
 
@@ -310,7 +261,7 @@ export default function RoomScreen({
                 className="danger-button"
                 onClick={deleteRoom}
               >
-                Delete Room
+                Delete Game
               </button>
             )}
           </div>
