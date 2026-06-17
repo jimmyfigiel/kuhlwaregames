@@ -58,7 +58,7 @@ export default function JoinRoom({
 
       if (roomSnapshot.empty) {
         setRoom(null);
-        setMessage("No game was found for that invite link.");
+        setMessage("No room was found for that join link.");
         return;
       }
 
@@ -70,7 +70,7 @@ export default function JoinRoom({
       });
     } catch (error) {
       console.error(error);
-      setMessage(`Could not find game: ${error.message}`);
+      setMessage(`Could not find room: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -87,15 +87,14 @@ export default function JoinRoom({
     }
 
     setJoining(true);
-    setMessage("Joining game...");
+    setMessage("Joining room...");
 
     try {
       const playerIds = Array.isArray(room.playerIds) ? room.playerIds : [];
       const alreadyInRoom = playerIds.includes(player.id);
-      const maxPlayers = Number(room.maxPlayers || room.gameSetup?.maxPlayers || 2);
 
-      if (maxPlayers > 0 && playerIds.length >= maxPlayers && !alreadyInRoom) {
-        setMessage("This game already has the maximum number of players.");
+      if (playerIds.length >= 2 && !alreadyInRoom) {
+        setMessage("This room already has two players.");
         setJoining(false);
         return;
       }
@@ -120,7 +119,6 @@ export default function JoinRoom({
           name: playerName,
           slotId: null,
           joinedAt: Date.now(),
-          invited: false,
         }),
         updatedAt: serverTimestamp(),
       });
@@ -140,7 +138,7 @@ export default function JoinRoom({
       }
     } catch (error) {
       console.error(error);
-      setMessage(`Could not join game: ${error.message}`);
+      setMessage(`Could not join room: ${error.message}`);
     } finally {
       setJoining(false);
     }
@@ -148,14 +146,14 @@ export default function JoinRoom({
 
   return (
     <article className="card wide-card">
-      <h2>Join Game</h2>
+      <h2>Join Room</h2>
 
       {loading ? (
-        <p className="muted">Looking up game...</p>
+        <p className="muted">Looking up room...</p>
       ) : room ? (
         <>
           <p>
-            Join <strong>{room.title || "Untitled Game"}</strong>?
+            Join <strong>{room.title || "Untitled Room"}</strong>?
           </p>
 
           <p className="muted">
@@ -165,7 +163,7 @@ export default function JoinRoom({
 
           <div className="button-list">
             <button type="button" onClick={joinRoom} disabled={joining}>
-              {joining ? "Joining..." : "Join Game"}
+              {joining ? "Joining..." : "Join Room"}
             </button>
 
             <button
@@ -179,7 +177,7 @@ export default function JoinRoom({
         </>
       ) : (
         <button type="button" className="secondary-button" onClick={onCancel}>
-          Back to Games
+          Back to Portal
         </button>
       )}
 

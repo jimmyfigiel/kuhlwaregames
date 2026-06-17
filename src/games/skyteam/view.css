@@ -1634,3 +1634,139 @@
     padding-top: 0;
   }
 }
+
+
+/* Solo-mode phone layout refinements */
+.skyteam-mode-solo .sky-briefing-chat {
+  display: none;
+}
+
+.skyteam-mode-solo .sky-dice-dock-solo {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.skyteam-mode-solo .sky-dice-dock-title,
+.skyteam-mode-solo .sky-dice-token-strip {
+  grid-column: 1 / -1;
+}
+
+.skyteam-mode-solo .sky-dice-rack {
+  min-width: 0;
+}
+
+.skyteam-mode-solo .sky-rack-label {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.skyteam-mode-solo .sky-dice-row {
+  justify-content: center;
+  gap: 6px;
+}
+
+.skyteam-mode-solo .sky-route-panel {
+  max-height: none;
+  overflow: visible;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.skyteam-mode-solo .sky-route-header {
+  display: none;
+}
+
+.skyteam-mode-solo .sky-route-column {
+  gap: 4px;
+}
+
+.skyteam-mode-solo .sky-route-space {
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 6px;
+}
+
+.skyteam-mode-solo .sky-route-left {
+  gap: 2px;
+}
+
+.skyteam-mode-solo .sky-route-number {
+  width: 34px;
+  height: 20px;
+  font-size: 10px;
+}
+
+.skyteam-mode-solo .sky-route-line {
+  min-height: 18px;
+  width: 3px;
+}
+
+.skyteam-mode-solo .sky-route-screen {
+  min-height: 34px;
+  border-radius: 9px;
+}
+
+.skyteam-mode-solo .sky-route-screen small {
+  font-size: 10px;
+  right: 6px;
+  bottom: 4px;
+}
+
+.skyteam-mode-solo .sky-traffic-icons,
+.skyteam-mode-solo .sky-runway-icon,
+.skyteam-mode-solo .sky-clear-dot {
+  font-size: 22px;
+}
+
+.sky-own-plane {
+  position: relative;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+}
+
+.sky-own-plane .sky-plane-svg {
+  width: 100%;
+  height: 100%;
+  fill: #111827;
+  filter: drop-shadow(0 1px 2px rgba(255,255,255,0.55));
+}
+
+@media (max-width: 720px) {
+  .skyteam-mode-solo .sky-dice-dock-solo {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .skyteam-mode-solo .sky-dice-rack {
+    padding: 7px 5px;
+  }
+
+  .skyteam-mode-solo .sky-die-button {
+    width: clamp(34px, 10.5vw, 44px);
+    height: clamp(34px, 10.5vw, 44px);
+    border-radius: 10px !important;
+    padding: 4px !important;
+  }
+
+  .skyteam-mode-solo .sky-pip-face {
+    width: 26px;
+    height: 26px;
+  }
+
+  .skyteam-mode-solo .sky-dice-row {
+    gap: 5px;
+  }
+
+  .skyteam-mode-solo .sky-rack-label strong {
+    font-size: 13px;
+  }
+
+  .skyteam-mode-solo .sky-rack-label button,
+  .skyteam-mode-solo .sky-turn-pill,
+  .skyteam-mode-solo .sky-wait-pill {
+    font-size: 11px;
+    padding: 4px 6px;
+  }
+}

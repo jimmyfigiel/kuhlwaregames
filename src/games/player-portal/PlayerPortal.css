@@ -10,10 +10,6 @@
   padding: 24px;
 }
 
-.player-portal.dashboard-shell {
-  padding: 18px;
-}
-
 .player-portal .card {
   width: min(100%, 560px);
   background: #2d3340;
@@ -32,11 +28,6 @@
   gap: 16px;
 }
 
-.player-portal .dashboard-header {
-  width: min(100%, 900px);
-  margin-bottom: 16px;
-}
-
 .player-portal .header-actions {
   display: flex;
   align-items: center;
@@ -51,24 +42,9 @@
   gap: 20px;
 }
 
-.player-portal .portal-stack {
-  width: min(100%, 900px);
-  margin: 0 auto;
-  display: grid;
-  gap: 16px;
-}
-
-.player-portal .dashboard-section {
-  width: 100%;
-}
-
 .player-portal h1,
 .player-portal h2 {
   margin-top: 0;
-}
-
-.player-portal h1 {
-  margin-bottom: 8px;
 }
 
 .player-portal .muted {
@@ -105,27 +81,9 @@
   filter: brightness(1.08);
 }
 
-.player-portal button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .player-portal .secondary-button {
   background: #566174;
   color: #ffffff;
-}
-
-.player-portal .compact-button {
-  margin-top: 0;
-  padding: 9px 12px;
-  font-size: 0.9rem;
-}
-
-.player-portal .primary-action-button {
-  width: 100%;
-  margin-top: 18px;
-  padding: 15px 18px;
-  font-size: 1.05rem;
 }
 
 .player-portal .message {
@@ -264,6 +222,33 @@
   width: auto;
 }
 
+@media (max-width: 760px) {
+  .player-portal .portal-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .player-portal .portal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .player-portal .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 900px) {
+  .player-portal .admin-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .player-portal .section-heading-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
 .player-portal .admin-layout .card {
   width: 100%;
 }
@@ -288,8 +273,12 @@
   font: inherit;
 }
 
-.player-portal .room-list,
-.player-portal .game-list {
+.player-portal button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.player-portal .room-list {
   display: grid;
   gap: 12px;
 }
@@ -323,6 +312,12 @@
   margin-top: 0;
 }
 
+@media (max-width: 700px) {
+  .player-portal .room-card {
+    flex-direction: column;
+  }
+}
+
 .player-portal .small-muted {
   color: #8f98aa;
   font-size: 0.8rem;
@@ -349,11 +344,6 @@
   margin: 20px auto 0;
 }
 
-.player-portal .compact-game-loader {
-  margin-top: 0;
-  padding-top: 0;
-}
-
 .player-portal .room-details-layout {
   width: min(100%, 1100px);
 }
@@ -373,262 +363,8 @@
   color: #d9deea;
 }
 
-.player-portal .resume-game-button {
-  width: 100%;
-  margin-top: 0;
-  display: grid;
-  gap: 4px;
-  text-align: left;
-  border: 1px solid #86b7ff;
-  border-radius: 18px;
-  padding: 18px;
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.25);
-}
-
-.player-portal .resume-game-button span {
-  font-size: 0.85rem;
-  opacity: 0.85;
-}
-
-.player-portal .resume-game-button strong {
-  font-size: 1.15rem;
-}
-
-.player-portal .games-dashboard-card,
-.player-portal .start-game-card {
-  display: grid;
-  gap: 16px;
-}
-
-.player-portal .game-card {
-  border: 1px solid #444c5f;
-  border-radius: 16px;
-  background: #242936;
-  overflow: hidden;
-}
-
-.player-portal .game-card-button {
-  width: 100%;
-  margin-top: 0;
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
-  background: transparent;
-  color: #ffffff;
-  text-align: left;
-  border-radius: 0;
-  padding: 16px;
-}
-
-.player-portal .game-card-button:hover {
-  background: #2f3747;
-}
-
-.player-portal .game-card-main-text {
-  min-width: 0;
-}
-
-.player-portal .game-card h3 {
-  margin: 8px 0 6px;
-  font-size: 1.08rem;
-}
-
-.player-portal .game-card p {
-  margin: 4px 0;
-}
-
-.player-portal .game-status-badge {
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
-  border-radius: 999px;
-  padding: 4px 9px;
-  background: #566174;
-  color: #ffffff;
-  font-size: 0.78rem;
-  font-weight: 800;
-}
-
-.player-portal .game-card-chevron {
-  font-size: 2rem;
-  line-height: 1;
-  opacity: 0.7;
-}
-
-.player-portal .game-card-delete {
-  margin: 0 12px 12px;
-}
-
-.player-portal .finished-games-panel {
-  display: grid;
-  gap: 12px;
-  margin-top: 6px;
-}
-
-.player-portal .finished-game-list {
-  opacity: 0.82;
-}
-
-.player-portal .create-game-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-}
-
-.player-portal .create-game-option {
-  margin-top: 0;
-  min-height: 76px;
-  display: grid;
-  align-content: center;
-  gap: 5px;
-  text-align: left;
-  background: #242936;
-  color: #ffffff;
-  border: 1px solid #444c5f;
-}
-
-.player-portal .create-game-option span {
-  color: #b9c0cf;
-  font-size: 0.85rem;
-}
-
-.player-portal .create-game-option.selected-button {
-  background: #ffd479;
-  color: #1e1e1e;
-  border-color: #ffd479;
-}
-
-.player-portal .create-game-option.selected-button strong,
-.player-portal .create-game-option.selected-button span {
-  color: #1e1e1e;
-}
-
-.player-portal .start-game-form {
-  display: grid;
-  gap: 12px;
-}
-
-.player-portal .advanced-toggle {
-  justify-self: start;
-}
-
-.player-portal .advanced-setup-panel {
-  border: 1px solid #444c5f;
-  border-radius: 14px;
-  padding: 14px;
-  background: #242936;
-}
-
-.player-portal .admin-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.player-portal .compact-game-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 4px 6px;
-  margin-bottom: 6px;
-  min-height: 32px;
-}
-
-.player-portal .compact-game-title-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.player-portal .compact-game-title-row strong {
-  font-size: 14px;
-  line-height: 1;
-  color: #fff;
-  flex-shrink: 0;
-}
-
-.player-portal .compact-game-title-row span {
-  font-size: 12px;
-  line-height: 1;
-  color: #ddd;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 @media (max-width: 760px) {
-  .player-portal.portal-shell,
-  .player-portal.dashboard-shell {
-    padding: 12px;
-  }
-
-  .player-portal .portal-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .player-portal .dashboard-header {
-    gap: 10px;
-  }
-
-  .player-portal .portal-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .player-portal .header-actions {
-    width: 100%;
-    justify-content: flex-start;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .player-portal .badge {
-    margin-bottom: 0;
-  }
-
-  .player-portal .section-heading-row {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .player-portal .card {
-    padding: 18px;
-    border-radius: 16px;
-  }
-
-  .player-portal .create-game-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .player-portal .admin-card {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
   .player-portal .game-test-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 700px) {
-  .player-portal .room-card {
-    flex-direction: column;
-  }
-
-  .player-portal .game-card-button {
-    align-items: flex-start;
-  }
-}
-
-@media (max-width: 900px) {
-  .player-portal .admin-layout {
     grid-template-columns: 1fr;
   }
 }

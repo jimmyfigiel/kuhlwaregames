@@ -49,7 +49,7 @@ export default function SkyTeamView({ room, gameState, player, submitAction, ini
 
   if (!state || state.gameId !== "skyteam") {
     return (
-      <main className="skyteam-shell">
+      <main className={`skyteam-shell skyteam-mode-${state.mode}`}>
         <section className="sky-card">
           <h2>Sky Team</h2>
           <p>The Sky Team game state has not been initialized.</p>
@@ -70,7 +70,7 @@ export default function SkyTeamView({ room, gameState, player, submitAction, ini
   }
 
   return (
-    <main className="skyteam-shell">
+    <main className={`skyteam-shell skyteam-mode-${state.mode}`}>
       <header className="sky-hero sky-hero-compact">
         <h1>Sky Team - {state.scenarioName}</h1>
       </header>
@@ -88,7 +88,7 @@ export default function SkyTeamView({ room, gameState, player, submitAction, ini
             setRerollSelection={setRerollSelection}
             onSelectDie={setSelectedDie}
           />
-          {(state.phase === "briefing" || state.phase === "rolling") && <BriefingChat state={state} act={act} />}
+          {state.mode !== "solo" && (state.phase === "briefing" || state.phase === "rolling") && <BriefingChat state={state} act={act} />}
           <section className="sky-layout sky-layout-cockpit-only">
             <CockpitPanel state={state} />
           </section>
@@ -190,7 +190,7 @@ function PlayerDiceDock({ state, player, myRoles, act, rerollSelection, setRerol
   }
 
   return (
-    <section className="sky-card sky-dice-dock">
+    <section className={`sky-card sky-dice-dock ${state.mode === "solo" ? "sky-dice-dock-solo" : ""}`}>
       <div className="sky-dice-dock-title">
         <h2>Your Dice</h2>
         <p className="sky-muted">Click a die to place it.</p>
@@ -333,7 +333,7 @@ function ApproachTrack({ state }) {
                 {!isLastRendered && <span className="sky-route-line" />}
               </div>
               <div className="sky-route-screen">
-                {isCurrent && <span className="sky-own-plane">✈</span>}
+                {isCurrent && <span className="sky-own-plane"><AxisPlaneSvg /></span>}
                 {!isCurrent && space.kind === "airport" && <span className="sky-runway-icon">▰▰▰</span>}
                 {!isCurrent && space.kind !== "airport" && space.traffic > 0 && <span className="sky-traffic-icons">{"✈".repeat(space.traffic)}</span>}
                 {!isCurrent && space.kind !== "airport" && space.traffic === 0 && <span className="sky-clear-dot">•</span>}
