@@ -1,0 +1,4777 @@
+{
+  "set": {
+    "name": "Jungle",
+    "slug": "jungle",
+    "code": "JU",
+    "release_date_raw": "",
+    "card_count": 64,
+    "source_url": "https://www.tcgcollector.com/sets/112/jungle?setCardCountMode=anyCardVariant&releaseDateOrder=newToOld&displayAs=images"
+  },
+  "cards": [
+    {
+      "id": "jungle-001-clefable",
+      "name": "Clefable",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "1/64",
+      "collector_number": 1,
+      "source_url": "https://www.tcgcollector.com/cards/237/clefable-jungle-1-64",
+      "image_url": "https://static.tcgcollector.com/content/images/d6/94/5c/d6945c5a52db841643d7b6267d57bf1a8c2d8788dcbf8d80d78f0ef41b0eaac9.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/001-clefable.jpg",
+      "image_path": "/card-images/pokemon/jungle/001-clefable.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Clefairy"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Metronome",
+          "damage": "",
+          "text": "Choose 1 of the Defending Pokémon's attacks. Metronome copies that attack except for its Energy costs and anything else required in order to use that attack, such as discarding Energy cards. (No matter what type the Defending Pokémon is, Clefable's type is still Colorless.)"
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Minimize",
+          "damage": "",
+          "text": "All damage done by attacks to Clefable during your opponent's next turn is reduced by 20 (after applying Weakness and Resistance)."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 35.06,
+        "raw": "$35.06"
+      }
+    },
+    {
+      "id": "jungle-002-electrode",
+      "name": "Electrode",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "2/64",
+      "collector_number": 2,
+      "source_url": "https://www.tcgcollector.com/cards/461/electrode-jungle-2-64",
+      "image_url": "https://static.tcgcollector.com/content/images/5a/8b/e4/5a8be49e9aa26821712bf1c0b02a163fd7e6ac22a6b81c221d201046cc06d993.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/002-electrode.jpg",
+      "image_path": "/card-images/pokemon/jungle/002-electrode.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 90,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Lightning"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Voltorb"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Tackle",
+          "damage": "20",
+          "text": ""
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Lightning",
+            "Lightning",
+            "Lightning"
+          ],
+          "name": "Chain Lightning",
+          "damage": "20",
+          "text": "If the Defending Pokémon isn't Colorless, this attack does 10 damage to each Benched Pokémon of the same type as the Defending Pokémon (including your own)."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 25.3,
+        "raw": "$25.30"
+      }
+    },
+    {
+      "id": "jungle-003-flareon",
+      "name": "Flareon",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "3/64",
+      "collector_number": 3,
+      "source_url": "https://www.tcgcollector.com/cards/575/flareon-jungle-3-64",
+      "image_url": "https://static.tcgcollector.com/content/images/d1/36/72/d13672ea4c27949ee800a8c3e1638fae0d29ae8b70c73ecdbced1c48531dc5fa.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/003-flareon.jpg",
+      "image_path": "/card-images/pokemon/jungle/003-flareon.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Fire"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Eevee"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Quick Attack",
+          "damage": "10+",
+          "text": "Flip a coin. If heads, this attack does 10 damage plus 20 more damage; if tails, this attack does 10 damage."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Fire",
+            "Fire",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Flamethrower",
+          "damage": "60",
+          "text": "Discard 1 Fire Energy card attached to Flareon in order to use this attack."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Water",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=11&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 92.25,
+        "raw": "$92.25"
+      }
+    },
+    {
+      "id": "jungle-004-jolteon",
+      "name": "Jolteon",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "4/64",
+      "collector_number": 4,
+      "source_url": "https://www.tcgcollector.com/cards/802/jolteon-jungle-4-64",
+      "image_url": "https://static.tcgcollector.com/content/images/00/33/a0/0033a00a5efab33be333b06eb1d23cf806686fdff02f9d195d38f772f3156aa0.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/004-jolteon.jpg",
+      "image_path": "/card-images/pokemon/jungle/004-jolteon.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Lightning"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Eevee"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Quick Attack",
+          "damage": "10+",
+          "text": "Flip a coin. If heads, this attack does 10 damage plus 20 more damage; if tails, this attack does 10 damage."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Lightning",
+            "Lightning",
+            "Colorless"
+          ],
+          "name": "Pin Missile",
+          "damage": "20×",
+          "text": "Flip 4 coins. This attack does 20 damage times the number of heads."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 91.08,
+        "raw": "$91.08"
+      }
+    },
+    {
+      "id": "jungle-005-kangaskhan",
+      "name": "Kangaskhan",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "5/64",
+      "collector_number": 5,
+      "source_url": "https://www.tcgcollector.com/cards/840/kangaskhan-jungle-5-64",
+      "image_url": "https://static.tcgcollector.com/content/images/a0/e1/26/a0e1269624f49abb0ca3aad64550c33145492ded3a6edc5eb011b23ab8678496.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/005-kangaskhan.jpg",
+      "image_path": "/card-images/pokemon/jungle/005-kangaskhan.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 90,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Fetch",
+          "damage": "",
+          "text": "Draw a card."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Comet Punch",
+          "damage": "20×",
+          "text": "Flip 4 coins. This attack does 20 damage times the number of heads."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 17.98,
+        "raw": "$17.98"
+      }
+    },
+    {
+      "id": "jungle-006-mr-mime",
+      "name": "Mr. Mime",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "6/64",
+      "collector_number": 6,
+      "source_url": "https://www.tcgcollector.com/cards/1180/mr-mime-jungle-6-64",
+      "image_url": "https://static.tcgcollector.com/content/images/fb/2d/bd/fb2dbdf65721f86ed7919a31a07533f9af8ff805285df6c69080572b2f16d83d.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/006-mr-mime.jpg",
+      "image_path": "/card-images/pokemon/jungle/006-mr-mime.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 40,
+      "evolves_from": "",
+      "powers": [
+        {
+          "sort_order": 1,
+          "kind": "Pokémon Power",
+          "name": "Invisible Wall",
+          "text": "Whenever an attack (including your own) does 30 or more damage to Mr. Mime (after applying Weakness and Resistance), prevent that damage. (Any other effects of attacks still happen.) This power can't be used if Mr. Mime is Asleep, Confused, or Paralyzed."
+        }
+      ],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Psychic"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Psychic",
+            "Colorless"
+          ],
+          "name": "Meditate",
+          "damage": "10+",
+          "text": "Does 10 damage plus 10 more damage for each damage counter on the Defending Pokémon."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Psychic",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=10&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 29.65,
+        "raw": "$29.65"
+      }
+    },
+    {
+      "id": "jungle-007-nidoqueen",
+      "name": "Nidoqueen",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "7/64",
+      "collector_number": 7,
+      "source_url": "https://www.tcgcollector.com/cards/1219/nidoqueen-jungle-7-64",
+      "image_url": "https://static.tcgcollector.com/content/images/cf/5b/ee/cf5beed16c4423c0fde23f322ae0c7a3d955900cf7bcf81fb7184d2d753b0009.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/007-nidoqueen.jpg",
+      "image_path": "/card-images/pokemon/jungle/007-nidoqueen.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 90,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 2 — Evolves from Nidorina"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass",
+            "Colorless"
+          ],
+          "name": "Boyfriends",
+          "damage": "20+",
+          "text": "Does 20 damage plus 20 more damage for each Nidoking you have in play."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Grass",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Mega Punch",
+          "damage": "50",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Psychic",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=10&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 54.87,
+        "raw": "$54.87"
+      }
+    },
+    {
+      "id": "jungle-008-pidgeot",
+      "name": "Pidgeot",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "8/64",
+      "collector_number": 8,
+      "source_url": "https://www.tcgcollector.com/cards/1307/pidgeot-jungle-8-64",
+      "image_url": "https://static.tcgcollector.com/content/images/43/a2/25/43a2253af155e73673fc2d1294a06e65c61b1b8462efe76801278c44bc459247.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/008-pidgeot.jpg",
+      "image_path": "/card-images/pokemon/jungle/008-pidgeot.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 80,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 2 — Evolves from Pidgeotto"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Wing Attack",
+          "damage": "20",
+          "text": ""
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Hurricane",
+          "damage": "30",
+          "text": "Unless this attack Knocks Out the Defending Pokémon, return the Defending Pokémon and all cards attached to it to your opponent's hand."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Lightning",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=8&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Fighting",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=5&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 48.35,
+        "raw": "$48.35"
+      }
+    },
+    {
+      "id": "jungle-009-pinsir",
+      "name": "Pinsir",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "9/64",
+      "collector_number": 9,
+      "source_url": "https://www.tcgcollector.com/cards/1340/pinsir-jungle-9-64",
+      "image_url": "https://static.tcgcollector.com/content/images/2e/f0/2e/2ef02e8e2400a85bb44735d07fdf33da4d1e8676d72a51555d8d602da78fe3a3.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/009-pinsir.jpg",
+      "image_path": "/card-images/pokemon/jungle/009-pinsir.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 60,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass",
+            "Grass"
+          ],
+          "name": "Irongrip",
+          "damage": "20",
+          "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Grass",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Guillotine",
+          "damage": "50",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 30.43,
+        "raw": "$30.43"
+      }
+    },
+    {
+      "id": "jungle-010-scyther",
+      "name": "Scyther",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "10/64",
+      "collector_number": 10,
+      "source_url": "https://www.tcgcollector.com/cards/1569/scyther-jungle-10-64",
+      "image_url": "https://static.tcgcollector.com/content/images/12/38/2b/12382bb43ee4356f62bc688496e55f3f767a008f1e222f0d51b7acc5dfd7934a.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/010-scyther.jpg",
+      "image_path": "/card-images/pokemon/jungle/010-scyther.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Swords Dance",
+          "damage": "",
+          "text": "During your next turn, Scyther's Slash attack's base damage is 60 instead of 30."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Slash",
+          "damage": "30",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Fighting",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=5&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 60.71,
+        "raw": "$60.71"
+      }
+    },
+    {
+      "id": "jungle-011-snorlax",
+      "name": "Snorlax",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "11/64",
+      "collector_number": 11,
+      "source_url": "https://www.tcgcollector.com/cards/1669/snorlax-jungle-11-64",
+      "image_url": "https://static.tcgcollector.com/content/images/3c/1e/6b/3c1e6b64a806804d22ea62471dc2bfcb67fe568a0cf75da72364538aa261842d.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/011-snorlax.jpg",
+      "image_path": "/card-images/pokemon/jungle/011-snorlax.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 90,
+      "evolves_from": "",
+      "powers": [
+        {
+          "sort_order": 1,
+          "kind": "Pokémon Power",
+          "name": "Thick Skinned",
+          "text": "Snorlax can't become Asleep, Confused, Paralyzed, or Poisoned. This power can't be used if Snorlax is already Asleep, Confused, or Paralyzed."
+        }
+      ],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Body Slam",
+          "damage": "30",
+          "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 140.0,
+        "raw": "$140"
+      }
+    },
+    {
+      "id": "jungle-012-vaporeon",
+      "name": "Vaporeon",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "12/64",
+      "collector_number": 12,
+      "source_url": "https://www.tcgcollector.com/cards/1860/vaporeon-jungle-12-64",
+      "image_url": "https://static.tcgcollector.com/content/images/2c/33/82/2c338250037b5dd3975576894e371ce8cb775f176c7730deecadf97e73aa07d1.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/012-vaporeon.jpg",
+      "image_path": "/card-images/pokemon/jungle/012-vaporeon.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 80,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Water"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Eevee"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Quick Attack",
+          "damage": "10+",
+          "text": "Flip a coin. If heads, this attack does 10 damage plus 20 more damage; if tails, this attack does 10 damage."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Water",
+            "Water",
+            "Colorless"
+          ],
+          "name": "Water Gun",
+          "damage": "30+",
+          "text": "Does 30 damage plus 10 more damage for each Water Energy attached to Vaporeon but not used to pay for this attack's Energy cost. Extra Water Energy after the 2nd doesn't count."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Lightning",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=8&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 44.66,
+        "raw": "$44.66"
+      }
+    },
+    {
+      "id": "jungle-013-venomoth",
+      "name": "Venomoth",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "13/64",
+      "collector_number": 13,
+      "source_url": "https://www.tcgcollector.com/cards/1865/venomoth-jungle-13-64",
+      "image_url": "https://static.tcgcollector.com/content/images/51/2b/03/512b039765803134e59729b2b57efc707d54c1f94e80c9717dcb235e9c147331.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/013-venomoth.jpg",
+      "image_path": "/card-images/pokemon/jungle/013-venomoth.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [
+        {
+          "sort_order": 1,
+          "kind": "Pokémon Power",
+          "name": "Shift",
+          "text": "Once during your turn (before your attack), you may change the type of Venomoth to the type of any other Pokémon in play other than Colorless. This power can't be used if Venomoth is Asleep, Confused, or Paralyzed."
+        }
+      ],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Venonat"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass",
+            "Grass"
+          ],
+          "name": "Venom Powder",
+          "damage": "10",
+          "text": "Flip a coin. If heads, the Defending Pokémon is now Confused and Poisoned."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Fighting",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=5&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 31.34,
+        "raw": "$31.34"
+      }
+    },
+    {
+      "id": "jungle-014-victreebel",
+      "name": "Victreebel",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "14/64",
+      "collector_number": 14,
+      "source_url": "https://www.tcgcollector.com/cards/1881/victreebel-jungle-14-64",
+      "image_url": "https://static.tcgcollector.com/content/images/f8/6a/74/f86a74cb84d870e3d24d4adac47e470963dcd81c66177b09cea04e23854dbec0.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/014-victreebel.jpg",
+      "image_path": "/card-images/pokemon/jungle/014-victreebel.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 80,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 2 — Evolves from Weepinbell"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Lure",
+          "damage": "",
+          "text": "If your opponent has any Benched Pokémon, choose 1 of them and switch it with his or her Active Pokémon."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Grass"
+          ],
+          "name": "Acid",
+          "damage": "20",
+          "text": "Flip a coin. If heads, the Defending Pokémon can't retreat during your opponent's next turn."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 32.64,
+        "raw": "$32.64"
+      }
+    },
+    {
+      "id": "jungle-015-vileplume",
+      "name": "Vileplume",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "15/64",
+      "collector_number": 15,
+      "source_url": "https://www.tcgcollector.com/cards/1887/vileplume-jungle-15-64",
+      "image_url": "https://static.tcgcollector.com/content/images/ea/92/5e/ea925ec229b28bab1c6d4a61977a0d55df813b3756e1856e706129d41741ceca.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/015-vileplume.jpg",
+      "image_path": "/card-images/pokemon/jungle/015-vileplume.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 80,
+      "evolves_from": "",
+      "powers": [
+        {
+          "sort_order": 1,
+          "kind": "Pokémon Power",
+          "name": "Heal",
+          "text": "Once during your turn (before your attack), you may flip a coin. If heads, remove 1 damage counter from 1 of your Pokémon. This power can't be used if Vileplume is Asleep, Confused, or Paralyzed."
+        }
+      ],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 2 — Evolves from Gloom"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass",
+            "Grass",
+            "Grass"
+          ],
+          "name": "Petal Dance",
+          "damage": "40×",
+          "text": "Flip 3 coins. This attack does 40 damage times the number of heads. Vileplume is now Confused (after doing damage)."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Keiji Kinebuchi",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 43.22,
+        "raw": "$43.22"
+      }
+    },
+    {
+      "id": "jungle-016-wigglytuff",
+      "name": "Wigglytuff",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "16/64",
+      "collector_number": 16,
+      "source_url": "https://www.tcgcollector.com/cards/1937/wigglytuff-jungle-16-64",
+      "image_url": "https://static.tcgcollector.com/content/images/c6/54/98/c6549877e2eee4de254da601198f7d11498a079a852c79f5af6a7d3bd640c7a2.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/016-wigglytuff.jpg",
+      "image_path": "/card-images/pokemon/jungle/016-wigglytuff.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 80,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Jigglypuff"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Lullaby",
+          "damage": "",
+          "text": "The Defending Pokémon is now Asleep."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Do the Wave",
+          "damage": "10+",
+          "text": "Does 10 damage plus 10 more damage for each of your Benched Pokémon."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare Holo",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 45.95,
+        "raw": "$45.95"
+      }
+    },
+    {
+      "id": "jungle-017-clefable",
+      "name": "Clefable",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "17/64",
+      "collector_number": 17,
+      "source_url": "https://www.tcgcollector.com/cards/239/clefable-jungle-17-64",
+      "image_url": "https://static.tcgcollector.com/content/images/4a/f7/6d/4af76dab16bd3dc0f8c0e6e7ce803bbab15ac20c2131282c313971c2a7e47125.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/017-clefable.jpg",
+      "image_path": "/card-images/pokemon/jungle/017-clefable.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Clefairy"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Metronome",
+          "damage": "",
+          "text": "Choose 1 of the Defending Pokémon's attacks. Metronome copies that attack except for its Energy costs and anything else required in order to use that attack, such as discarding Energy cards. (No matter what type the Defending Pokémon is, Clefable's type is still Colorless.)"
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Minimize",
+          "damage": "",
+          "text": "All damage done by attacks to Clefable during your opponent's next turn is reduced by 20 (after applying Weakness and Resistance)."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 6.85,
+        "raw": "$6.85"
+      }
+    },
+    {
+      "id": "jungle-018-electrode",
+      "name": "Electrode",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "18/64",
+      "collector_number": 18,
+      "source_url": "https://www.tcgcollector.com/cards/464/electrode-jungle-18-64",
+      "image_url": "https://static.tcgcollector.com/content/images/af/c0/e8/afc0e8c829bec40e3845deddca2c316128f34cf16cd2559f4d275baae9a4e3d4.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/018-electrode.jpg",
+      "image_path": "/card-images/pokemon/jungle/018-electrode.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 90,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Lightning"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Voltorb"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Tackle",
+          "damage": "20",
+          "text": ""
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Lightning",
+            "Lightning",
+            "Lightning"
+          ],
+          "name": "Chain Lightning",
+          "damage": "20",
+          "text": "If the Defending Pokémon isn't Colorless, this attack does 10 damage to each Benched Pokémon of the same type as the Defending Pokémon (including your own)."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 7.3,
+        "raw": "$7.30"
+      }
+    },
+    {
+      "id": "jungle-019-flareon",
+      "name": "Flareon",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "19/64",
+      "collector_number": 19,
+      "source_url": "https://www.tcgcollector.com/cards/580/flareon-jungle-19-64",
+      "image_url": "https://static.tcgcollector.com/content/images/5a/2d/f1/5a2df19fe8edd63b3a0696e839274a1a73b01f69246f4ee2d1f80b6fce44ca23.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/019-flareon.jpg",
+      "image_path": "/card-images/pokemon/jungle/019-flareon.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Fire"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Eevee"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Quick Attack",
+          "damage": "10+",
+          "text": "Flip a coin. If heads, this attack does 10 damage plus 20 more damage; if tails, this attack does 10 damage."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Fire",
+            "Fire",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Flamethrower",
+          "damage": "60",
+          "text": "Discard 1 Fire Energy card attached to Flareon in order to use this attack."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Water",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=11&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 15.66,
+        "raw": "$15.66"
+      }
+    },
+    {
+      "id": "jungle-020-jolteon",
+      "name": "Jolteon",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "20/64",
+      "collector_number": 20,
+      "source_url": "https://www.tcgcollector.com/cards/807/jolteon-jungle-20-64",
+      "image_url": "https://static.tcgcollector.com/content/images/b4/62/82/b46282aa45151a22cce6220fd7f3ef8d16f30d06b5921eede2b091686028a8ce.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/020-jolteon.jpg",
+      "image_path": "/card-images/pokemon/jungle/020-jolteon.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Lightning"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Eevee"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Quick Attack",
+          "damage": "10+",
+          "text": "Flip a coin. If heads, this attack does 10 damage plus 20 more damage; if tails, this attack does 10 damage."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Lightning",
+            "Lightning",
+            "Colorless"
+          ],
+          "name": "Pin Missile",
+          "damage": "20×",
+          "text": "Flip 4 coins. This attack does 20 damage times the number of heads."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 18.33,
+        "raw": "$18.33"
+      }
+    },
+    {
+      "id": "jungle-021-kangaskhan",
+      "name": "Kangaskhan",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "21/64",
+      "collector_number": 21,
+      "source_url": "https://www.tcgcollector.com/cards/841/kangaskhan-jungle-21-64",
+      "image_url": "https://static.tcgcollector.com/content/images/ff/08/37/ff0837834722db39a12f17a8640ed3f4cf73c092fc813f39114d2cc8db8c9077.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/021-kangaskhan.jpg",
+      "image_path": "/card-images/pokemon/jungle/021-kangaskhan.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 90,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Fetch",
+          "damage": "",
+          "text": "Draw a card."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Comet Punch",
+          "damage": "20×",
+          "text": "Flip 4 coins. This attack does 20 damage times the number of heads."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 5.96,
+        "raw": "$5.96"
+      }
+    },
+    {
+      "id": "jungle-022-mr-mime",
+      "name": "Mr. Mime",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "22/64",
+      "collector_number": 22,
+      "source_url": "https://www.tcgcollector.com/cards/1181/mr-mime-jungle-22-64",
+      "image_url": "https://static.tcgcollector.com/content/images/a1/40/ed/a140eddecb6a3dc40230b9aad02d9401267fb056f4d5d1cd396447c6613f8458.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/022-mr-mime.jpg",
+      "image_path": "/card-images/pokemon/jungle/022-mr-mime.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 40,
+      "evolves_from": "",
+      "powers": [
+        {
+          "sort_order": 1,
+          "kind": "Pokémon Power",
+          "name": "Invisible Wall",
+          "text": "Whenever an attack (including your own) does 30 or more damage to Mr. Mime (after applying Weakness and Resistance), prevent that damage. (Any other effects of attacks still happen.) This power can't be used if Mr. Mime is Asleep, Confused, or Paralyzed."
+        }
+      ],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Psychic"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Psychic",
+            "Colorless"
+          ],
+          "name": "Meditate",
+          "damage": "10+",
+          "text": "Does 10 damage plus 10 more damage for each damage counter on the Defending Pokémon."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Psychic",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=10&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 8.47,
+        "raw": "$8.47"
+      }
+    },
+    {
+      "id": "jungle-023-nidoqueen",
+      "name": "Nidoqueen",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "23/64",
+      "collector_number": 23,
+      "source_url": "https://www.tcgcollector.com/cards/1222/nidoqueen-jungle-23-64",
+      "image_url": "https://static.tcgcollector.com/content/images/65/32/76/6532767e45d60f74ffa9d1b33f4027dd8f9a44feaa1c789419b1ea72b1baeec7.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/023-nidoqueen.jpg",
+      "image_path": "/card-images/pokemon/jungle/023-nidoqueen.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 90,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 2 — Evolves from Nidorina"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass",
+            "Colorless"
+          ],
+          "name": "Boyfriends",
+          "damage": "20+",
+          "text": "Does 20 damage plus 20 more damage for each Nidoking you have in play."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Grass",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Mega Punch",
+          "damage": "50",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Psychic",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=10&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 8.56,
+        "raw": "$8.56"
+      }
+    },
+    {
+      "id": "jungle-024-pidgeot",
+      "name": "Pidgeot",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "24/64",
+      "collector_number": 24,
+      "source_url": "https://www.tcgcollector.com/cards/1311/pidgeot-jungle-24-64",
+      "image_url": "https://static.tcgcollector.com/content/images/7a/cb/f8/7acbf8505cfc8fd53a0e22a25962cee8dcc493b266360396159eeb5373b2ddbd.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/024-pidgeot.jpg",
+      "image_path": "/card-images/pokemon/jungle/024-pidgeot.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 80,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 2 — Evolves from Pidgeotto"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Wing Attack",
+          "damage": "20",
+          "text": ""
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Hurricane",
+          "damage": "30",
+          "text": "Unless this attack Knocks Out the Defending Pokémon, return the Defending Pokémon and all cards attached to it to your opponent's hand."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Lightning",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=8&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Fighting",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=5&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 6.56,
+        "raw": "$6.56"
+      }
+    },
+    {
+      "id": "jungle-025-pinsir",
+      "name": "Pinsir",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "25/64",
+      "collector_number": 25,
+      "source_url": "https://www.tcgcollector.com/cards/1341/pinsir-jungle-25-64",
+      "image_url": "https://static.tcgcollector.com/content/images/2f/9d/70/2f9d7049280047fe41a6648dae87049d4348056c9c4ee88ad44e8a80cf4e8506.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/025-pinsir.jpg",
+      "image_path": "/card-images/pokemon/jungle/025-pinsir.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 60,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass",
+            "Grass"
+          ],
+          "name": "Irongrip",
+          "damage": "20",
+          "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Grass",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Guillotine",
+          "damage": "50",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 5.19,
+        "raw": "$5.19"
+      }
+    },
+    {
+      "id": "jungle-026-scyther",
+      "name": "Scyther",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "26/64",
+      "collector_number": 26,
+      "source_url": "https://www.tcgcollector.com/cards/1570/scyther-jungle-26-64",
+      "image_url": "https://static.tcgcollector.com/content/images/46/5c/04/465c045646a205b53218d8648ef0208b5e4622cb07fae6478a417d8bda2ec1e5.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/026-scyther.jpg",
+      "image_path": "/card-images/pokemon/jungle/026-scyther.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Swords Dance",
+          "damage": "",
+          "text": "During your next turn, Scyther's Slash attack's base damage is 60 instead of 30."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Slash",
+          "damage": "30",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Fighting",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=5&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 14.43,
+        "raw": "$14.43"
+      }
+    },
+    {
+      "id": "jungle-027-snorlax",
+      "name": "Snorlax",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "27/64",
+      "collector_number": 27,
+      "source_url": "https://www.tcgcollector.com/cards/1670/snorlax-jungle-27-64",
+      "image_url": "https://static.tcgcollector.com/content/images/e7/c7/c7/e7c7c7aa3374f6b5dde3339d832ef710f20ec87206fcdf2f31faf80eaec947e0.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/027-snorlax.jpg",
+      "image_path": "/card-images/pokemon/jungle/027-snorlax.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 90,
+      "evolves_from": "",
+      "powers": [
+        {
+          "sort_order": 1,
+          "kind": "Pokémon Power",
+          "name": "Thick Skinned",
+          "text": "Snorlax can't become Asleep, Confused, Paralyzed, or Poisoned. This power can't be used if Snorlax is already Asleep, Confused, or Paralyzed."
+        }
+      ],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Body Slam",
+          "damage": "30",
+          "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 24.14,
+        "raw": "$24.14"
+      }
+    },
+    {
+      "id": "jungle-028-vaporeon",
+      "name": "Vaporeon",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "28/64",
+      "collector_number": 28,
+      "source_url": "https://www.tcgcollector.com/cards/1862/vaporeon-jungle-28-64",
+      "image_url": "https://static.tcgcollector.com/content/images/0b/07/9b/0b079b0089ff7f8d42a79928941a938d1dde6fc08bd0c5ef5a88ad955f6cfb77.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/028-vaporeon.jpg",
+      "image_path": "/card-images/pokemon/jungle/028-vaporeon.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 80,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Water"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Eevee"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Quick Attack",
+          "damage": "10+",
+          "text": "Flip a coin. If heads, this attack does 10 damage plus 20 more damage; if tails, this attack does 10 damage."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Water",
+            "Water",
+            "Colorless"
+          ],
+          "name": "Water Gun",
+          "damage": "30+",
+          "text": "Does 30 damage plus 10 more damage for each Water Energy attached to Vaporeon but not used to pay for this attack's Energy cost. Extra Water Energy after the 2nd doesn't count."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Lightning",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=8&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 15.52,
+        "raw": "$15.52"
+      }
+    },
+    {
+      "id": "jungle-029-venomoth",
+      "name": "Venomoth",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "29/64",
+      "collector_number": 29,
+      "source_url": "https://www.tcgcollector.com/cards/1866/venomoth-jungle-29-64",
+      "image_url": "https://static.tcgcollector.com/content/images/b9/d9/9d/b9d99dcd7d29eb7549f3a15866446d30551056082ce5d1f7c1e80fa06ae927bb.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/029-venomoth.jpg",
+      "image_path": "/card-images/pokemon/jungle/029-venomoth.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [
+        {
+          "sort_order": 1,
+          "kind": "Pokémon Power",
+          "name": "Shift",
+          "text": "Once during your turn (before your attack), you may change the type of Venomoth to the type of any other Pokémon in play other than Colorless. This power can't be used if Venomoth is Asleep, Confused, or Paralyzed."
+        }
+      ],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Venonat"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass",
+            "Grass"
+          ],
+          "name": "Venom Powder",
+          "damage": "10",
+          "text": "Flip a coin. If heads, the Defending Pokémon is now Confused and Poisoned."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Fighting",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=5&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 5.34,
+        "raw": "$5.34"
+      }
+    },
+    {
+      "id": "jungle-030-victreebel",
+      "name": "Victreebel",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "30/64",
+      "collector_number": 30,
+      "source_url": "https://www.tcgcollector.com/cards/1882/victreebel-jungle-30-64",
+      "image_url": "https://static.tcgcollector.com/content/images/53/bc/24/53bc24ce7505811b765e34b8d99523c566266e10830c94fae08c59a1c7631a14.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/030-victreebel.jpg",
+      "image_path": "/card-images/pokemon/jungle/030-victreebel.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 80,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 2 — Evolves from Weepinbell"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Lure",
+          "damage": "",
+          "text": "If your opponent has any Benched Pokémon, choose 1 of them and switch it with his or her Active Pokémon."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Grass"
+          ],
+          "name": "Acid",
+          "damage": "20",
+          "text": "Flip a coin. If heads, the Defending Pokémon can't retreat during your opponent's next turn."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 6.31,
+        "raw": "$6.31"
+      }
+    },
+    {
+      "id": "jungle-031-vileplume",
+      "name": "Vileplume",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "31/64",
+      "collector_number": 31,
+      "source_url": "https://www.tcgcollector.com/cards/1889/vileplume-jungle-31-64",
+      "image_url": "https://static.tcgcollector.com/content/images/2e/bb/61/2ebb619c479e75265448cac64b01a3b5e8222555fd7c5960d8d803e5c4f794cb.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/031-vileplume.jpg",
+      "image_path": "/card-images/pokemon/jungle/031-vileplume.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 80,
+      "evolves_from": "",
+      "powers": [
+        {
+          "sort_order": 1,
+          "kind": "Pokémon Power",
+          "name": "Heal",
+          "text": "Once during your turn (before your attack), you may flip a coin. If heads, remove 1 damage counter from 1 of your Pokémon. This power can't be used if Vileplume is Asleep, Confused, or Paralyzed."
+        }
+      ],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 2 — Evolves from Gloom"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass",
+            "Grass",
+            "Grass"
+          ],
+          "name": "Petal Dance",
+          "damage": "40×",
+          "text": "Flip 3 coins. This attack does 40 damage times the number of heads. Vileplume is now Confused (after doing damage)."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Keiji Kinebuchi",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 7.64,
+        "raw": "$7.64"
+      }
+    },
+    {
+      "id": "jungle-032-wigglytuff",
+      "name": "Wigglytuff",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "32/64",
+      "collector_number": 32,
+      "source_url": "https://www.tcgcollector.com/cards/1938/wigglytuff-jungle-32-64",
+      "image_url": "https://static.tcgcollector.com/content/images/7a/e3/22/7ae322ca2eb2644a7c15c5223c83df5da17aa86255c1251e4823dbb47a934031.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/032-wigglytuff.jpg",
+      "image_path": "/card-images/pokemon/jungle/032-wigglytuff.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 80,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Jigglypuff"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Lullaby",
+          "damage": "",
+          "text": "The Defending Pokémon is now Asleep."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Do the Wave",
+          "damage": "10+",
+          "text": "Does 10 damage plus 10 more damage for each of your Benched Pokémon."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Rare",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 6.95,
+        "raw": "$6.95"
+      }
+    },
+    {
+      "id": "jungle-033-butterfree",
+      "name": "Butterfree",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "33/64",
+      "collector_number": 33,
+      "source_url": "https://www.tcgcollector.com/cards/181/butterfree-jungle-33-64",
+      "image_url": "https://static.tcgcollector.com/content/images/51/b5/7f/51b57f442465b12b153611db5a98985b8f02f4b50b10cf14e619fbf3a2741be6.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/033-butterfree.jpg",
+      "image_path": "/card-images/pokemon/jungle/033-butterfree.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 2 — Evolves from Metapod"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Whirlwind",
+          "damage": "20",
+          "text": "If your opponent has any Benched Pokémon, he or she chooses 1 of them and switches it with the Defending Pokémon. (Do the damage before switching the Pokémon.)"
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Grass",
+            "Grass",
+            "Grass"
+          ],
+          "name": "Mega Drain",
+          "damage": "40",
+          "text": "Remove a number of damage counters from Butterfree equal to half the damage done to the Defending Pokémon (after applying Weakness and Resistance) (rounded up to the nearest 10)."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Fighting",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=5&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 1.69,
+        "raw": "$1.69"
+      }
+    },
+    {
+      "id": "jungle-034-dodrio",
+      "name": "Dodrio",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "34/64",
+      "collector_number": 34,
+      "source_url": "https://www.tcgcollector.com/cards/393/dodrio-jungle-34-64",
+      "image_url": "https://static.tcgcollector.com/content/images/b8/0f/d8/b80fd8e8e76b618d2b913eb5313cea974d880ba8ed87478e6b78f6278b34a715.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/034-dodrio.jpg",
+      "image_path": "/card-images/pokemon/jungle/034-dodrio.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [
+        {
+          "sort_order": 1,
+          "kind": "Pokémon Power",
+          "name": "Retreat Aid",
+          "text": "As long as Dodrio is Benched, pay Colorless less to retreat your Active Pokémon."
+        }
+      ],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Doduo"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Rage",
+          "damage": "10+",
+          "text": "Does 10 damage plus 10 more damage for each damage counter on Dodrio."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Lightning",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=8&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Fighting",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=5&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 1.43,
+        "raw": "$1.43"
+      }
+    },
+    {
+      "id": "jungle-035-exeggutor",
+      "name": "Exeggutor",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "35/64",
+      "collector_number": 35,
+      "source_url": "https://www.tcgcollector.com/cards/540/exeggutor-jungle-35-64",
+      "image_url": "https://static.tcgcollector.com/content/images/8f/49/5a/8f495a74b6973fb7a163f2c70aa6d75840ee152ef78ab3b9a96a7189255a37f8.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/035-exeggutor.jpg",
+      "image_path": "/card-images/pokemon/jungle/035-exeggutor.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 80,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Exeggcute"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Psychic"
+          ],
+          "name": "Teleport",
+          "damage": "",
+          "text": "Switch Exeggutor with 1 of your Benched Pokémon."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Big Eggsplosion",
+          "damage": "20×",
+          "text": "Flip a number of coins equal to the number of Energy attached to Exeggutor. This attack does 20 damage times the number of heads."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 1.56,
+        "raw": "$1.56"
+      }
+    },
+    {
+      "id": "jungle-036-fearow",
+      "name": "Fearow",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "36/64",
+      "collector_number": 36,
+      "source_url": "https://www.tcgcollector.com/cards/547/fearow-jungle-36-64",
+      "image_url": "https://static.tcgcollector.com/content/images/d6/19/b5/d619b5c66ee609ebf199d5d88f5971e4a80f17128b9361efd3cf3b247f8592b5.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/036-fearow.jpg",
+      "image_path": "/card-images/pokemon/jungle/036-fearow.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Spearow"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Agility",
+          "damage": "20",
+          "text": "Flip a coin. If heads, during your opponent's next turn, prevent all effects of attacks, including damage, done to Fearow."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Drill Peck",
+          "damage": "40",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Lightning",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=8&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Fighting",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=5&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 1.37,
+        "raw": "$1.37"
+      }
+    },
+    {
+      "id": "jungle-037-gloom",
+      "name": "Gloom",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "37/64",
+      "collector_number": 37,
+      "source_url": "https://www.tcgcollector.com/cards/649/gloom-jungle-37-64",
+      "image_url": "https://static.tcgcollector.com/content/images/06/33/e8/0633e8c9d6508fe7265cd7a9c9ef2d3932ef4b0fe5b85352e7339665dd32f1ff.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/037-gloom.jpg",
+      "image_path": "/card-images/pokemon/jungle/037-gloom.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 60,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Oddish"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Poisonpowder",
+          "damage": "",
+          "text": "The Defending Pokémon is now Poisoned."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Grass"
+          ],
+          "name": "Foul Odor",
+          "damage": "20",
+          "text": "Both the Defending Pokémon and Gloom are now Confused (after doing damage)."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Keiji Kinebuchi",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.71,
+        "raw": "$0.71"
+      }
+    },
+    {
+      "id": "jungle-038-lickitung",
+      "name": "Lickitung",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "38/64",
+      "collector_number": 38,
+      "source_url": "https://www.tcgcollector.com/cards/914/lickitung-jungle-38-64",
+      "image_url": "https://static.tcgcollector.com/content/images/55/92/40/5592408797285d40a99588cea4f28bb9a260009408e70354e22785beac778498.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/038-lickitung.jpg",
+      "image_path": "/card-images/pokemon/jungle/038-lickitung.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 90,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Tongue Wrap",
+          "damage": "10",
+          "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Supersonic",
+          "damage": "",
+          "text": "Flip a coin. If heads, the Defending Pokémon is now Confused."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 1.89,
+        "raw": "$1.89"
+      }
+    },
+    {
+      "id": "jungle-039-marowak",
+      "name": "Marowak",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "39/64",
+      "collector_number": 39,
+      "source_url": "https://www.tcgcollector.com/cards/1074/marowak-jungle-39-64",
+      "image_url": "https://static.tcgcollector.com/content/images/6b/4e/01/6b4e016e1d832606faa82c6fa47744881adeb162c71e3b480f9aab2168232021.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/039-marowak.jpg",
+      "image_path": "/card-images/pokemon/jungle/039-marowak.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 60,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Fighting"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Cubone"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Fighting",
+            "Fighting"
+          ],
+          "name": "Bonemerang",
+          "damage": "30×",
+          "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Fighting",
+            "Fighting",
+            "Colorless"
+          ],
+          "name": "Call for Friend",
+          "damage": "",
+          "text": "Search your deck for a Fighting Basic Pokémon card and put it onto your Bench. Shuffle your deck afterward. (You can't use this attack if your Bench is full.)"
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Grass",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=7&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Lightning",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=8&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 1.66,
+        "raw": "$1.66"
+      }
+    },
+    {
+      "id": "jungle-040-nidorina",
+      "name": "Nidorina",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "40/64",
+      "collector_number": 40,
+      "source_url": "https://www.tcgcollector.com/cards/1231/nidorina-jungle-40-64",
+      "image_url": "https://static.tcgcollector.com/content/images/05/8f/f0/058ff041edfefc961f068dd41e16c9bca519eb0e26d444e603272eebc1eb3a04.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/040-nidorina.jpg",
+      "image_path": "/card-images/pokemon/jungle/040-nidorina.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Nidoran ♀"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Supersonic",
+          "damage": "",
+          "text": "Flip a coin. If heads, the Defending Pokémon is now Confused."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Double Kick",
+          "damage": "30×",
+          "text": "Flip 2 coins. This attack does 30 damage times the number of heads."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Psychic",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=10&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.64,
+        "raw": "$0.64"
+      }
+    },
+    {
+      "id": "jungle-041-parasect",
+      "name": "Parasect",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "41/64",
+      "collector_number": 41,
+      "source_url": "https://www.tcgcollector.com/cards/1291/parasect-jungle-41-64",
+      "image_url": "https://static.tcgcollector.com/content/images/d6/50/75/d6507565b6e6c107647ae39b3d52f1ab648ae1074a4f032716da900f18889e7a.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/041-parasect.jpg",
+      "image_path": "/card-images/pokemon/jungle/041-parasect.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 60,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Paras"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass",
+            "Grass"
+          ],
+          "name": "Spore",
+          "damage": "",
+          "text": "The Defending Pokémon is now Asleep."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Slash",
+          "damage": "30",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.84,
+        "raw": "$0.84"
+      }
+    },
+    {
+      "id": "jungle-042-persian",
+      "name": "Persian",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "42/64",
+      "collector_number": 42,
+      "source_url": "https://www.tcgcollector.com/cards/1295/persian-jungle-42-64",
+      "image_url": "https://static.tcgcollector.com/content/images/5a/6f/9b/5a6f9b8e604a01842e24f2f5f1817b265c81372f79f8dd21f59e392f011dc1ae.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/042-persian.jpg",
+      "image_path": "/card-images/pokemon/jungle/042-persian.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Meowth"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Scratch",
+          "damage": "20",
+          "text": ""
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Pounce",
+          "damage": "30",
+          "text": "If the Defending Pokémon attacks Persian during your opponent's next turn, any damage done by the attack is reduced by 10 (after applying Weakness and Resistance). (Benching either Pokémon ends this effect.)"
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.91,
+        "raw": "$0.91"
+      }
+    },
+    {
+      "id": "jungle-043-primeape",
+      "name": "Primeape",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "43/64",
+      "collector_number": 43,
+      "source_url": "https://www.tcgcollector.com/cards/1410/primeape-jungle-43-64",
+      "image_url": "https://static.tcgcollector.com/content/images/a3/6b/20/a36b2070acbaad5bd62eb3526a443af1fb9a77013774df2bf5a7892d0c75ff92.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/043-primeape.jpg",
+      "image_path": "/card-images/pokemon/jungle/043-primeape.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Fighting"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Mankey"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Fighting",
+            "Fighting"
+          ],
+          "name": "Fury Swipes",
+          "damage": "20×",
+          "text": "Flip 3 coins. This attack does 20 damage times the number of heads."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Fighting",
+            "Fighting",
+            "Colorless"
+          ],
+          "name": "Tantrum",
+          "damage": "50",
+          "text": "Flip a coin. If tails, Primeape is now Confused (after doing damage)."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Psychic",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=10&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 1.46,
+        "raw": "$1.46"
+      }
+    },
+    {
+      "id": "jungle-044-rapidash",
+      "name": "Rapidash",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "44/64",
+      "collector_number": 44,
+      "source_url": "https://www.tcgcollector.com/cards/1467/rapidash-jungle-44-64",
+      "image_url": "https://static.tcgcollector.com/content/images/0d/6f/0b/0d6f0b903c00150f8ccb2df027cf77d9753ed75ecbf11aef7f7362893e147155.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/044-rapidash.jpg",
+      "image_path": "/card-images/pokemon/jungle/044-rapidash.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Fire"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Ponyta"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Stomp",
+          "damage": "20+",
+          "text": "Flip a coin. If heads, this attack does 20 damage plus 10 more damage; if tails, this attack does 20 damage."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Fire",
+            "Fire",
+            "Colorless"
+          ],
+          "name": "Agility",
+          "damage": "30",
+          "text": "Flip a coin. If heads, during your opponent's next turn, prevent all effects of attacks, including damage, done to Rapidash."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Water",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=11&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 2.06,
+        "raw": "$2.06"
+      }
+    },
+    {
+      "id": "jungle-045-rhydon",
+      "name": "Rhydon",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "45/64",
+      "collector_number": 45,
+      "source_url": "https://www.tcgcollector.com/cards/1494/rhydon-jungle-45-64",
+      "image_url": "https://static.tcgcollector.com/content/images/fd/d2/d7/fdd2d74bd373df005554b6c8bdc38c5f9b8a203cb48f154c7cca1ed6011e8974.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/045-rhydon.jpg",
+      "image_path": "/card-images/pokemon/jungle/045-rhydon.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 100,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Fighting"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Rhyhorn"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Fighting",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Horn Attack",
+          "damage": "30",
+          "text": ""
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Fighting",
+            "Fighting",
+            "Fighting",
+            "Fighting"
+          ],
+          "name": "Ram",
+          "damage": "50",
+          "text": "Rhydon does 20 damage to itself. If your opponent has any Benched Pokémon, he or she chooses 1 of them and switches it with the Defending Pokémon. (Do the damage before switching the Pokémon. Switch the Pokémon even if Rhydon is knocked out.)"
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Grass",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=7&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Lightning",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=8&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 1.51,
+        "raw": "$1.51"
+      }
+    },
+    {
+      "id": "jungle-046-seaking",
+      "name": "Seaking",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "46/64",
+      "collector_number": 46,
+      "source_url": "https://www.tcgcollector.com/cards/1585/seaking-jungle-46-64",
+      "image_url": "https://static.tcgcollector.com/content/images/1e/a1/36/1ea1361b03cc8a766b109607e72ae85b63b4fcb7eb6a69006ae7866312794bbc.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/046-seaking.jpg",
+      "image_path": "/card-images/pokemon/jungle/046-seaking.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Water"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Goldeen"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Water"
+          ],
+          "name": "Horn Attack",
+          "damage": "10",
+          "text": ""
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Water",
+            "Colorless"
+          ],
+          "name": "Waterfall",
+          "damage": "30",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Lightning",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=8&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.96,
+        "raw": "$0.96"
+      }
+    },
+    {
+      "id": "jungle-047-tauros",
+      "name": "Tauros",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "47/64",
+      "collector_number": 47,
+      "source_url": "https://www.tcgcollector.com/cards/1754/tauros-jungle-47-64",
+      "image_url": "https://static.tcgcollector.com/content/images/b8/6d/d1/b86dd17c1d430e3a2b5c394b96b33bf92cd82850d94983999ea8a5186581c7f8.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/047-tauros.jpg",
+      "image_path": "/card-images/pokemon/jungle/047-tauros.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 60,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Stomp",
+          "damage": "20+",
+          "text": "Flip a coin. If heads, this attack does 20 damage plus 10 more damage; if tails, this attack does 20 damage."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Rampage",
+          "damage": "20+",
+          "text": "Does 20 damage plus 10 more damage for each damage counter on Tauros. Flip a coin. If tails, Tauros is now Confused (after doing damage)."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 1.04,
+        "raw": "$1.04"
+      }
+    },
+    {
+      "id": "jungle-048-weepinbell",
+      "name": "Weepinbell",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "48/64",
+      "collector_number": 48,
+      "source_url": "https://www.tcgcollector.com/cards/1930/weepinbell-jungle-48-64",
+      "image_url": "https://static.tcgcollector.com/content/images/85/22/6d/85226d126933ce2c46fa08a04b5f42d46196625cde823febbfe66a07a26440d3.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/048-weepinbell.jpg",
+      "image_path": "/card-images/pokemon/jungle/048-weepinbell.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Stage 1 — Evolves from Bellsprout"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Poisonpowder",
+          "damage": "10",
+          "text": "Flip a coin. If heads, the Defending Pokémon is now Poisoned."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Grass"
+          ],
+          "name": "Razor Leaf",
+          "damage": "30",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Uncommon",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.73,
+        "raw": "$0.73"
+      }
+    },
+    {
+      "id": "jungle-049-bellsprout",
+      "name": "Bellsprout",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "49/64",
+      "collector_number": 49,
+      "source_url": "https://www.tcgcollector.com/cards/90/bellsprout-jungle-49-64",
+      "image_url": "https://static.tcgcollector.com/content/images/43/8f/43/438f43b5ae6a19a63e2891cad63a41586e33d145ccca221ea86d08a6084a8400.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/049-bellsprout.jpg",
+      "image_path": "/card-images/pokemon/jungle/049-bellsprout.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 40,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Vine Whip",
+          "damage": "10",
+          "text": ""
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Call for Family",
+          "damage": "",
+          "text": "Search your deck for a Basic Pokémon named Bellsprout and put it onto your Bench. Shuffle your deck afterward. (You can't use this attack if your Bench is full.)"
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.43,
+        "raw": "$0.43"
+      }
+    },
+    {
+      "id": "jungle-050-cubone",
+      "name": "Cubone",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "50/64",
+      "collector_number": 50,
+      "source_url": "https://www.tcgcollector.com/cards/277/cubone-jungle-50-64",
+      "image_url": "https://static.tcgcollector.com/content/images/d9/5c/aa/d95caa7ef9440b0a8e9dfa530d40753a8e2446b42a3fec2059b0e548bbe8e7dd.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/050-cubone.jpg",
+      "image_path": "/card-images/pokemon/jungle/050-cubone.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 40,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Fighting"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Snivel",
+          "damage": "",
+          "text": "If the Defending Pokémon attacks Cubone during your opponent's next turn, any damage done by the attack is reduced by 20 (after applying Weakness and Resistance). (Benching either Pokémon ends this effect.)"
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Fighting",
+            "Fighting"
+          ],
+          "name": "Rage",
+          "damage": "10+",
+          "text": "Does 10 damage plus 10 more damage for each damage counter on Cubone."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Grass",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=7&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Lightning",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=8&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 2.05,
+        "raw": "$2.05"
+      }
+    },
+    {
+      "id": "jungle-051-eevee",
+      "name": "Eevee",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "51/64",
+      "collector_number": 51,
+      "source_url": "https://www.tcgcollector.com/cards/441/eevee-jungle-51-64",
+      "image_url": "https://static.tcgcollector.com/content/images/41/85/0f/41850f84cda1d7b86fc7d965cabcdd8d95f0d76f02db2152da79b178de0f0df3.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/051-eevee.jpg",
+      "image_path": "/card-images/pokemon/jungle/051-eevee.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 50,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Tail Wag",
+          "damage": "",
+          "text": "Flip a coin. If heads, the Defending Pokémon can't attack Eevee during your opponent's next turn. (Benching either Pokémon ends this effect.)"
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Quick Attack",
+          "damage": "10+",
+          "text": "Flip a coin. If heads, this attack does 10 damage plus 20 more damage; if tails, this attack does 10 damage."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 2.28,
+        "raw": "$2.28"
+      }
+    },
+    {
+      "id": "jungle-052-exeggcute",
+      "name": "Exeggcute",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "52/64",
+      "collector_number": 52,
+      "source_url": "https://www.tcgcollector.com/cards/530/exeggcute-jungle-52-64",
+      "image_url": "https://static.tcgcollector.com/content/images/c5/0a/02/c50a02905a929454123602905a1daadca51e9cecba2c9dbb9a5db7ac1cd309c3.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/052-exeggcute.jpg",
+      "image_path": "/card-images/pokemon/jungle/052-exeggcute.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 50,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Psychic"
+          ],
+          "name": "Hypnosis",
+          "damage": "",
+          "text": "The Defending Pokémon is now Asleep."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Grass"
+          ],
+          "name": "Leech Seed",
+          "damage": "20",
+          "text": "Unless all damage from this attack is prevented, you may remove 1 damage counter from Exeggcute."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.48,
+        "raw": "$0.48"
+      }
+    },
+    {
+      "id": "jungle-053-goldeen",
+      "name": "Goldeen",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "53/64",
+      "collector_number": 53,
+      "source_url": "https://www.tcgcollector.com/cards/657/goldeen-jungle-53-64",
+      "image_url": "https://static.tcgcollector.com/content/images/3f/8b/96/3f8b969946ce78e0548d212895b3c9b2062f466f92120b33f378fe89b2832225.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/053-goldeen.jpg",
+      "image_path": "/card-images/pokemon/jungle/053-goldeen.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 40,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Water"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Water"
+          ],
+          "name": "Horn Attack",
+          "damage": "10",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Lightning",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=8&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.46,
+        "raw": "$0.46"
+      }
+    },
+    {
+      "id": "jungle-054-jigglypuff",
+      "name": "Jigglypuff",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "54/64",
+      "collector_number": 54,
+      "source_url": "https://www.tcgcollector.com/cards/800/jigglypuff-jungle-54-64",
+      "image_url": "https://static.tcgcollector.com/content/images/9a/c1/11/9ac111dd0e072fb347057765ea15ce37d0116e3bc2d6294dd657da7783b484ff.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/054-jigglypuff.jpg",
+      "image_path": "/card-images/pokemon/jungle/054-jigglypuff.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 60,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Lullaby",
+          "damage": "",
+          "text": "The Defending Pokémon is now Asleep."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Pound",
+          "damage": "20",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 1.71,
+        "raw": "$1.71"
+      }
+    },
+    {
+      "id": "jungle-055-mankey",
+      "name": "Mankey",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "55/64",
+      "collector_number": 55,
+      "source_url": "https://www.tcgcollector.com/cards/1055/mankey-jungle-55-64",
+      "image_url": "https://static.tcgcollector.com/content/images/db/7e/0f/db7e0f495f3620b17fe5f768d3f89e51f5ce2b41a25276dc6c7d768b7f93c5d5.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/055-mankey.jpg",
+      "image_path": "/card-images/pokemon/jungle/055-mankey.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 30,
+      "evolves_from": "",
+      "powers": [
+        {
+          "sort_order": 1,
+          "kind": "Pokémon Power",
+          "name": "Peek",
+          "text": "Once during your turn (before your attack), you may look at one of the following: the top card of either player's deck, a random card from your opponent's hand, or one of either player's Prizes. This power can't be used if Mankey is Asleep, Confused, or Paralyzed."
+        }
+      ],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Fighting"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Scratch",
+          "damage": "10",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Psychic",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=10&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Kagemaru Himeno",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.45,
+        "raw": "$0.45"
+      }
+    },
+    {
+      "id": "jungle-056-meowth",
+      "name": "Meowth",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "56/64",
+      "collector_number": 56,
+      "source_url": "https://www.tcgcollector.com/cards/1096/meowth-jungle-56-64",
+      "image_url": "https://static.tcgcollector.com/content/images/53/5a/b2/535ab20590eea6df2ac71a9265e805f9b71347479836351037538431ea7974ae.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/056-meowth.jpg",
+      "image_path": "/card-images/pokemon/jungle/056-meowth.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 50,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Pay Day",
+          "damage": "10",
+          "text": "Flip a coin. If heads, draw a card."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Psychic",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=10&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.98,
+        "raw": "$0.98"
+      }
+    },
+    {
+      "id": "jungle-057-nidoran-f",
+      "name": "Nidoran ♀",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "57/64",
+      "collector_number": 57,
+      "source_url": "https://www.tcgcollector.com/cards/1224/nidoran-female-jungle-57-64",
+      "image_url": "https://static.tcgcollector.com/content/images/00/7e/ca/007eca19766ddd7d849339df46122a2c341f16558d9e2370834ab3ef1226116c.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/057-nidoran-f.jpg",
+      "image_path": "/card-images/pokemon/jungle/057-nidoran-f.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 60,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Fury Swipes",
+          "damage": "10×",
+          "text": "Flip 3 coins. This attack does 10 damage times the number of heads."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Grass"
+          ],
+          "name": "Call for Family",
+          "damage": "",
+          "text": "Search your deck for a Basic Pokémon named Nidoran ♂ or Nidoran ♀ and put it onto your Bench. Shuffle your deck afterward. (You can't use this attack if your Bench is full.)"
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Psychic",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=10&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.43,
+        "raw": "$0.43"
+      }
+    },
+    {
+      "id": "jungle-058-oddish",
+      "name": "Oddish",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "58/64",
+      "collector_number": 58,
+      "source_url": "https://www.tcgcollector.com/cards/1262/oddish-jungle-58-64",
+      "image_url": "https://static.tcgcollector.com/content/images/c4/26/b3/c426b33a932c5231c4ab527ad3313e96999777a3230770468243209245ee82c1.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/058-oddish.jpg",
+      "image_path": "/card-images/pokemon/jungle/058-oddish.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 50,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Stun Spore",
+          "damage": "10",
+          "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Grass"
+          ],
+          "name": "Sprout",
+          "damage": "",
+          "text": "Search your deck for a Basic Pokémon named Oddish and put it onto your Bench. Shuffle your deck afterward. (You can't use this attack if your Bench is full.)"
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Keiji Kinebuchi",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.44,
+        "raw": "$0.44"
+      }
+    },
+    {
+      "id": "jungle-059-paras",
+      "name": "Paras",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "59/64",
+      "collector_number": 59,
+      "source_url": "https://www.tcgcollector.com/cards/1287/paras-jungle-59-64",
+      "image_url": "https://static.tcgcollector.com/content/images/77/e9/65/77e9658ddc900e8079c98e9709e07428b18abfc4297d39c7f9fe21718489530d.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/059-paras.jpg",
+      "image_path": "/card-images/pokemon/jungle/059-paras.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 40,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Scratch",
+          "damage": "20",
+          "text": ""
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Grass"
+          ],
+          "name": "Spore",
+          "damage": "",
+          "text": "The Defending Pokémon is now Asleep."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.54,
+        "raw": "$0.54"
+      }
+    },
+    {
+      "id": "jungle-060-pikachu",
+      "name": "Pikachu",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "60/64",
+      "collector_number": 60,
+      "source_url": "https://www.tcgcollector.com/cards/1324/pikachu-jungle-60-64",
+      "image_url": "https://static.tcgcollector.com/content/images/83/a7/bb/83a7bb00511a7320862622c9456277b1ab6d0f5a46fc81668552a525de124430.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/060-pikachu.jpg",
+      "image_path": "/card-images/pokemon/jungle/060-pikachu.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 50,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Lightning"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Lightning",
+            "Lightning"
+          ],
+          "name": "Spark",
+          "damage": "20",
+          "text": "If your opponent has any Benched Pokémon, choose 1 of them and this attack does 10 damage to it. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fighting",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=5&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Ken Sugimori",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 6.28,
+        "raw": "$6.28"
+      }
+    },
+    {
+      "id": "jungle-061-rhyhorn",
+      "name": "Rhyhorn",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "61/64",
+      "collector_number": 61,
+      "source_url": "https://www.tcgcollector.com/cards/1495/rhyhorn-jungle-61-64",
+      "image_url": "https://static.tcgcollector.com/content/images/e6/f6/4a/e6f64a070196a1c67b7d267a3555bb02d3124ef32489679272e85fed4364eaf2.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/061-rhyhorn.jpg",
+      "image_path": "/card-images/pokemon/jungle/061-rhyhorn.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 70,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Fighting"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Leer",
+          "damage": "",
+          "text": "Flip a coin. If heads, the Defending Pokémon can't attack Rhyhorn during your opponent's next turn. (Benching either Pokémon ends this effect.)"
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Fighting",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Horn Attack",
+          "damage": "30",
+          "text": ""
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Grass",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=7&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Lightning",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=8&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.44,
+        "raw": "$0.44"
+      }
+    },
+    {
+      "id": "jungle-062-spearow",
+      "name": "Spearow",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "62/64",
+      "collector_number": 62,
+      "source_url": "https://www.tcgcollector.com/cards/1679/spearow-jungle-62-64",
+      "image_url": "https://static.tcgcollector.com/content/images/f0/ed/83/f0ed835fe889082e9e6f0689e23020cba60502735ef634c1b1610b56e97ecdd4.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/062-spearow.jpg",
+      "image_path": "/card-images/pokemon/jungle/062-spearow.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 50,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Colorless"
+          ],
+          "name": "Peck",
+          "damage": "10",
+          "text": ""
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "name": "Mirror Move",
+          "damage": "",
+          "text": "If Spearow was attacked last turn, do the final result of that attack on Spearow to the Defending Pokémon."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Lightning",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=8&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [
+        {
+          "type": "Fighting",
+          "value": "-30",
+          "source_href": "https://www.tcgcollector.com/cards/intl?resistances=5&resistancesAnd=true"
+        }
+      ],
+      "retreat_cost": [],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.53,
+        "raw": "$0.53"
+      }
+    },
+    {
+      "id": "jungle-063-venonat",
+      "name": "Venonat",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "63/64",
+      "collector_number": 63,
+      "source_url": "https://www.tcgcollector.com/cards/1868/venonat-jungle-63-64",
+      "image_url": "https://static.tcgcollector.com/content/images/95/82/8c/95828ce31e65c71e9190555b7c5437152b2b7c1bc512cbeac0c91c223e16f58f.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/063-venonat.jpg",
+      "image_path": "/card-images/pokemon/jungle/063-venonat.jpg",
+      "supertype": "Pokemon",
+      "subtypes": [
+        "Basic"
+      ],
+      "stage": "Basic",
+      "pokemon_type": "",
+      "hp": 40,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [
+        {
+          "sort_order": 1,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Pokémon",
+          "damage": "",
+          "text": "Basic"
+        },
+        {
+          "sort_order": 2,
+          "cost": [
+            "Grass"
+          ],
+          "name": "Stun Spore",
+          "damage": "10",
+          "text": "Flip a coin. If heads, the Defending Pokémon is now Paralyzed."
+        },
+        {
+          "sort_order": 3,
+          "cost": [
+            "Grass",
+            "Colorless"
+          ],
+          "name": "Leech Life",
+          "damage": "10",
+          "text": "Remove a number of damage counters from Venonat equal to the damage done to the Defending Pokémon (after applying Weakness and Resistance)."
+        }
+      ],
+      "weakness": [
+        {
+          "type": "Fire",
+          "value": "×2",
+          "source_href": "https://www.tcgcollector.com/cards/intl?weaknesses=6&weaknessesAnd=true"
+        }
+      ],
+      "resistance": [],
+      "retreat_cost": [
+        "Colorless"
+      ],
+      "rules_text": "",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Mitsuhiro Arita",
+      "pokedex_number": "More",
+      "format": "Unlimited",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.48,
+        "raw": "$0.48"
+      }
+    },
+    {
+      "id": "jungle-064-pok-ball",
+      "name": "Poké Ball",
+      "set_slug": "jungle",
+      "set_name": "Jungle",
+      "card_number": "64/64",
+      "collector_number": 64,
+      "source_url": "https://www.tcgcollector.com/cards/1345/poke-ball-jungle-64-64",
+      "image_url": "https://static.tcgcollector.com/content/images/91/68/88/9168880760e2e6b79368bbe931ec4e555beb3e02468d0da7980f6b9e675a7306.jpg",
+      "local_image_path": "public/card-images/pokemon/jungle/064-pok-ball.jpg",
+      "image_path": "/card-images/pokemon/jungle/064-pok-ball.jpg",
+      "supertype": "Trainer",
+      "subtypes": [],
+      "stage": "",
+      "pokemon_type": "",
+      "hp": null,
+      "evolves_from": "",
+      "powers": [],
+      "attacks": [],
+      "weakness": [],
+      "resistance": [],
+      "retreat_cost": [],
+      "rules_text": "Flip a coin. If heads, you may search your deck for any Basic Pokémon or Evolution card. Show that card to your opponent, then put it into your hand. Shuffle your deck afterward.",
+      "provides": [],
+      "rarity": "Common",
+      "illustrator": "Keiji Kinebuchi",
+      "pokedex_number": "More",
+      "format": "Standard",
+      "market_price": {
+        "currency": "USD",
+        "value": 0.4,
+        "raw": "$0.40"
+      }
+    }
+  ],
+  "errors": [],
+  "hp_update_errors": [],
+  "hp_update_last_run": {
+    "updated_cards": 63,
+    "unchanged_cards": 0,
+    "skipped_cards": 1,
+    "errors": 0
+  }
+}
