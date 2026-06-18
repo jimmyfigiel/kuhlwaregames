@@ -475,24 +475,82 @@
   border-radius: 8px;
   overflow: hidden;
 }
-.sky-route-header {
+
+/* ── Header / toggle button ── */
+.sky-route-toggle {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
+  width: 100%;
+  padding: 7px 12px;
   background: var(--sky-surface);
+  border: none;
   border-bottom: 1px solid var(--sky-border);
+  border-radius: 0;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--sky-muted);
+  cursor: pointer;
+  text-align: left;
 }
-.sky-route-header strong { color: var(--sky-text); }
+.sky-route-toggle:hover { background: var(--sky-border); }
+.sky-route-header-scenario { color: var(--sky-text); font-weight: 600; }
+.sky-route-chevron {
+  font-size: 10px;
+  transition: transform 0.2s;
+  color: var(--sky-muted);
+}
+.sky-route-chevron.open { transform: rotate(180deg); }
+
+/* ── Collapsed summary strip ── */
+.sky-route-summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-wrap: nowrap;
+}
+.sky-route-summary::-webkit-scrollbar { display: none; }
+.sky-route-arrow { color: var(--sky-border); font-size: 14px; flex-shrink: 0; }
+.sky-route-sum-space {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  flex-shrink: 0;
+}
+.sky-route-sum-space.current .sky-route-sum-icon {
+  color: var(--sky-blue);
+}
+.sky-route-sum-space.warn .sky-route-sum-icon { color: var(--sky-yellow); }
+.sky-route-sum-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  letter-spacing: -3px;
+  color: var(--sky-muted);
+}
+.sky-route-sum-icon .sky-plane-svg { width: 16px; height: 16px; }
+.sky-route-sum-text {
+  font-size: 9px;
+  color: var(--sky-muted);
+  white-space: nowrap;
+}
+.sky-route-sum-space.current .sky-route-sum-text { color: var(--sky-blue); font-weight: 600; }
+.sky-route-sum-space.warn    .sky-route-sum-text { color: var(--sky-yellow); }
+.sky-route-sum-more { font-size: 10px; color: var(--sky-muted); }
+
+/* ── Expanded full track ── */
 .sky-route-track {
   display: flex;
   flex-direction: column;
   padding: 6px 12px;
-  /* No max-height, no overflow — all remaining spaces visible */
 }
 .sky-route-space {
   display: flex;

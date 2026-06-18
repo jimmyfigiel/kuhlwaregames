@@ -563,43 +563,93 @@ function CockpitPanel({ state, validTargets, onPlace }) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+function approachSpaceLabel(space) {
+  if (space.kind === "airport") return { icon: "▰▰▰", text: "RWY" };
+  if (space.traffic > 0)        return { icon: "✈".repeat(space.traffic), text: `×${space.traffic}` };
+  return { icon: "•", text: "Clear" };
+}
+
 function ApproachTrack({ state }) {
-  const renderedSpaces = state.approach.spaces
+  const [expanded, setExpanded] = useState(false);
+
+  const spaces       = state.approach.spaces;
+  const currentIndex = state.approach.currentIndex;
+  const currentSpace = spaces[currentIndex];
+
+  // Summary strip: current space + up to 5 upcoming
+  const summarySpaces = spaces
+    .slice(currentIndex)
+    .slice(0, 6)
+    .map((space, i) => ({ space, isCurrent: i === 0, step: i }));
+
+  // Full expanded list (current → runway, reversed so runway is at top)
+  const renderedSpaces = spaces
     .map((space, index) => ({ space, index }))
-    .filter(({ index }) => index >= state.approach.currentIndex)
+    .filter(({ index }) => index >= currentIndex)
     .reverse();
 
   return (
     <section className="sky-route-panel">
-      <div className="sky-route-header">
-        <span>Approach</span>
-        <strong>{state.scenarioName}</strong>
-      </div>
-      <div className="sky-route-track">
-        {renderedSpaces.map(({ space, index }, renderIndex) => {
-          const isCurrent = index === state.approach.currentIndex;
-          const aheadBy   = index - state.approach.currentIndex + 1;
-          const isLast    = renderIndex === renderedSpaces.length - 1;
-          return (
-            <div
-              className={`sky-route-space ${isCurrent ? "current" : ""} ${space.kind === "airport" ? "airport" : ""}`}
-              key={space.id}
-            >
-              <div className="sky-route-left">
-                <span className="sky-route-number">{space.kind === "airport" ? "RWY" : Math.max(1, aheadBy)}</span>
-                {!isLast && <span className="sky-route-line" />}
+      {/* Tap header to toggle */}
+      <button
+        type="button"
+        className="sky-route-header sky-route-toggle"
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+      >
+        <span className="sky-route-header-scenario">{state.scenarioName}</span>
+        <span className={`sky-route-chevron${expanded ? " open" : ""}`}>▼</span>
+      </button>
+
+      {/* Collapsed: one-line summary */}
+      {!expanded && (
+        <div className="sky-route-summary">
+          {summarySpaces.map(({ space, isCurrent, step }, i) => {
+            const { icon, text } = approachSpaceLabel(space);
+            return (
+              <React.Fragment key={step}>
+                {i > 0 && <span className="sky-route-arrow">›</span>}
+                <span className={`sky-route-sum-space${isCurrent ? " current" : ""}${space.traffic > 0 && !isCurrent ? " warn" : ""}`}>
+                  <span className="sky-route-sum-icon">{isCurrent ? <AxisPlaneSvg /> : icon}</span>
+                  <span className="sky-route-sum-text">{text}</span>
+                </span>
+              </React.Fragment>
+            );
+          })}
+          {spaces.length - currentIndex > 6 && (
+            <><span className="sky-route-arrow">›</span><span className="sky-route-sum-more">+{spaces.length - currentIndex - 6}</span></>
+          )}
+        </div>
+      )}
+
+      {/* Expanded: full track */}
+      {expanded && (
+        <div className="sky-route-track">
+          {renderedSpaces.map(({ space, index }, renderIndex) => {
+            const isCurrent = index === currentIndex;
+            const aheadBy   = index - currentIndex + 1;
+            const isLast    = renderIndex === renderedSpaces.length - 1;
+            return (
+              <div
+                className={`sky-route-space${isCurrent ? " current" : ""}${space.kind === "airport" ? " airport" : ""}`}
+                key={space.id}
+              >
+                <div className="sky-route-left">
+                  <span className="sky-route-number">{space.kind === "airport" ? "RWY" : Math.max(1, aheadBy)}</span>
+                  {!isLast && <span className="sky-route-line" />}
+                </div>
+                <div className="sky-route-screen">
+                  {isCurrent && <span className="sky-own-plane"><AxisPlaneSvg /></span>}
+                  {!isCurrent && space.kind === "airport" && <span className="sky-runway-icon">▰▰▰</span>}
+                  {!isCurrent && space.kind !== "airport" && space.traffic > 0 && <span className="sky-traffic-icons">{"✈".repeat(space.traffic)}</span>}
+                  {!isCurrent && space.kind !== "airport" && space.traffic === 0 && <span className="sky-clear-dot">•</span>}
+                  <small>{space.kind === "airport" ? "Airport" : space.traffic > 0 ? `${space.traffic} traffic` : "Clear"}</small>
+                </div>
               </div>
-              <div className="sky-route-screen">
-                {isCurrent && <span className="sky-own-plane"><AxisPlaneSvg /></span>}
-                {!isCurrent && space.kind === "airport" && <span className="sky-runway-icon">▰▰▰</span>}
-                {!isCurrent && space.kind !== "airport" && space.traffic > 0 && <span className="sky-traffic-icons">{"✈".repeat(space.traffic)}</span>}
-                {!isCurrent && space.kind !== "airport" && space.traffic === 0 && <span className="sky-clear-dot">•</span>}
-                <small>{space.kind === "airport" ? "Airport" : space.traffic > 0 ? `${space.traffic} traffic` : "Clear"}</small>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }
