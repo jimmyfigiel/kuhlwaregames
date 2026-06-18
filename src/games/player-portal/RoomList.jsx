@@ -8,6 +8,7 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../../firebase.js";
+import ConfirmModal from "./ConfirmModal.jsx";
 import "./PlayerPortal.css";
 
 function formatDate(value) {
@@ -59,6 +60,7 @@ export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
   const [rooms, setRooms] = useState([]);
   const [message, setMessage] = useState("");
   const [loadingRooms, setLoadingRooms] = useState(true);
+  const [confirmProps, setConfirmProps] = useState(null);
 
   const superuser = isSuperuser(player);
 
@@ -97,28 +99,27 @@ export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
     }
   }
 
-  async function deleteRoom(room) {
+  function deleteRoom(room) {
     if (room.createdBy !== player.id && !superuser) {
       setMessage("Only the room creator or a superuser can delete this room.");
       return;
     }
 
-    const confirmed = window.confirm(
-      `Delete room "${room.title || room.id}"? This cannot be undone.`
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      await deleteDoc(doc(db, "rooms", room.id));
-      setMessage(`Deleted room ${room.title || room.id}.`);
-      await loadRooms();
-    } catch (error) {
-      console.error(error);
-      setMessage(`Could not delete room: ${error.message}`);
-    }
+    setConfirmProps({
+      message: `Delete "${room.title || room.id}"? This cannot be undone.`,
+      confirmLabel: "Delete Game",
+      onConfirm: async () => {
+        setConfirmProps(null);
+        try {
+          await deleteDoc(doc(db, "rooms", room.id));
+          setMessage(`Deleted game ${room.title || room.id}.`);
+          await loadRooms();
+        } catch (error) {
+          console.error(error);
+          setMessage(`Could not delete room: ${error.message}`);
+        }
+      },
+    });
   }
 
   async function copyJoinLink(room) {
@@ -142,10 +143,10 @@ export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
     <article className="card">
       <div className="section-heading-row">
         <div>
-          <h2>{superuser ? "All Rooms" : "Active Rooms"}</h2>
+          <h2>{superuser ? "All Games" : "My Games"}</h2>
           {superuser && (
             <p className="muted">
-              Superuser view: all rooms sorted by last used.
+              Superuser view: all games sorted by last played.
             </p>
           )}
         </div>
@@ -160,8 +161,8 @@ export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
       ) : rooms.length === 0 ? (
         <p className="muted">
           {superuser
-            ? "There are no rooms in the system."
-            : "You are not in any active rooms yet."}
+            ? "There are no games in the system."
+            : "You have no active games. Create one or get an invite link!"}
         </p>
       ) : (
         <div className="room-list">
@@ -175,7 +176,7 @@ export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
                 </p>
                 <p className="muted">Updated: {formatDate(room.updatedAt)}</p>
                 {superuser && (
-                  <p className="small-muted">Room ID: {room.id}</p>
+                  <p className="small-muted">ID: {room.id}</p>
                 )}
                 {room.joinCode && (
                   <p className="small-muted">Join Code: {room.joinCode}</p>
@@ -184,7 +185,7 @@ export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
 
               <div className="room-actions">
                 <button type="button" onClick={() => onOpenRoom(room)}>
-                  Rejoin
+                  Play
                 </button>
 
                 {room.joinCode && (
@@ -213,6 +214,15 @@ export default function RoomList({ player, refreshKey = 0, onOpenRoom }) {
       )}
 
       {message && <p className="message">{message}</p>}
+
+      {confirmProps && (
+        <ConfirmModal
+          message={confirmProps.message}
+          confirmLabel={confirmProps.confirmLabel}
+          onConfirm={confirmProps.onConfirm}
+          onCancel={() => setConfirmProps(null)}
+        />
+      )}
     </article>
   );
 }

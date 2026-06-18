@@ -58,12 +58,44 @@ export default function Login({
   const [inviteRoom, setInviteRoom] = useState(null);
   const [loadingInvite, setLoadingInvite] = useState(false);
 
+  // Dev auto-login — only active when env vars are set, running locally,
+  // not after a manual logout, and no ?noauto param in the URL
+  const devPlayerCode = import.meta.env.VITE_DEV_PLAYER_CODE;
+  const devPin = import.meta.env.VITE_DEV_PIN;
+  const noAutoLogin = new URLSearchParams(window.location.search).has("noauto")
+    || sessionStorage.getItem("kuhlware_logged_out") === "1";
+  const isDevAutoLogin = import.meta.env.DEV && devPlayerCode && devPin && !noAutoLogin;
+
   useEffect(() => {
     if (pendingJoinCode) {
       loadInviteRoom();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingJoinCode]);
+
+  useEffect(() => {
+    if (isDevAutoLogin && authUser?.uid) {
+      devAutoLogin();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDevAutoLogin, authUser?.uid]);
+
+  async function devAutoLogin() {
+    const cleanCode = normalizePlayerCode(devPlayerCode);
+    try {
+      const playerRef = doc(db, "players", cleanCode);
+      const playerSnap = await getDoc(playerRef);
+      if (!playerSnap.exists() || playerSnap.data().pin !== devPin) {
+        setMessage(`[Dev] Auto-login failed — check VITE_DEV_PLAYER_CODE / VITE_DEV_PIN`);
+        return;
+      }
+      const playerData = playerSnap.data();
+      await updateDoc(playerRef, { authUids: arrayUnion(authUser.uid), updatedAt: serverTimestamp() });
+      onLoginSuccess({ id: playerSnap.id, ...playerData, authUids: [...(playerData.authUids || []), authUser.uid] });
+    } catch (error) {
+      setMessage(`[Dev] Auto-login error: ${error.message}`);
+    }
+  }
 
   async function loadInviteRoom() {
     setLoadingInvite(true);
@@ -165,6 +197,7 @@ export default function Login({
         });
       }
 
+      sessionStorage.removeItem("kuhlware_logged_out");
       onLoginSuccess({
         id: playerSnap.id,
         ...playerData,

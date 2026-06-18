@@ -62,6 +62,7 @@ export default function App() {
   }
 
   function handleLogout() {
+    sessionStorage.setItem("kuhlware_logged_out", "1");
     setCurrentRoom(null);
     setCurrentPlayer(null);
   }

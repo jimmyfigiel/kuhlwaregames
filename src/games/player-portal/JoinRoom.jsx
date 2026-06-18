@@ -58,7 +58,7 @@ export default function JoinRoom({
 
       if (roomSnapshot.empty) {
         setRoom(null);
-        setMessage("No room was found for that join link.");
+        setMessage("No game was found for that invite link.");
         return;
       }
 
@@ -146,14 +146,14 @@ export default function JoinRoom({
 
   return (
     <article className="card wide-card">
-      <h2>Join Room</h2>
+      <h2>Join Game</h2>
 
       {loading ? (
-        <p className="muted">Looking up room...</p>
+        <p className="muted">Looking up game...</p>
       ) : room ? (
         <>
           <p>
-            Join <strong>{room.title || "Untitled Room"}</strong>?
+            Join <strong>{room.title || "Untitled Game"}</strong>?
           </p>
 
           <p className="muted">
@@ -163,7 +163,7 @@ export default function JoinRoom({
 
           <div className="button-list">
             <button type="button" onClick={joinRoom} disabled={joining}>
-              {joining ? "Joining..." : "Join Room"}
+              {joining ? "Joining..." : "Join Game"}
             </button>
 
             <button
@@ -177,7 +177,7 @@ export default function JoinRoom({
         </>
       ) : (
         <button type="button" className="secondary-button" onClick={onCancel}>
-          Back to Portal
+          Back
         </button>
       )}
 

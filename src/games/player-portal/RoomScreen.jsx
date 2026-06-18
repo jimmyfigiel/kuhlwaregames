@@ -9,10 +9,11 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import GameLoader from "../../GameLoader.jsx";
 import { db } from "../../firebase.js";
+import ConfirmModal from "./ConfirmModal.jsx";
 import "./PlayerPortal.css";
 
 function getJoinUrl(joinCode) {
@@ -23,301 +24,194 @@ function getJoinUrl(joinCode) {
   return url.toString();
 }
 
-export default function RoomScreen({
-  room,
-  player,
-  authUser,
-  onBack,
-  onRoomDeleted,
-}) {
+function getSyncState(message) {
+  if (message.startsWith("Live sync")) return "live";
+  if (message.toLowerCase().includes("error")) return "error";
+  return "connecting";
+}
+
+function getPlayerNames(room) {
+  if (room.players?.length) {
+    return room.players.map((p) => p.name || p.playerId).join(", ");
+  }
+  return (room.playerIds || []).join(", ") || "None";
+}
+
+export default function RoomScreen({ room, player, authUser, onBack, onRoomDeleted }) {
   const [currentRoom, setCurrentRoom] = useState(room);
   const [message, setMessage] = useState("");
   const [syncMessage, setSyncMessage] = useState("Connecting to room...");
+  const [confirmProps, setConfirmProps] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
   const isCreator = currentRoom.createdBy === player.id;
-  const canManage =
-    isCreator || player.isSuperuser || player.isSuperUser || false;
+  const canManage = isCreator || player.isSuperuser || player.isSuperUser || false;
+  const syncState = getSyncState(syncMessage);
 
   useEffect(() => {
-    if (!room?.id) {
-      return undefined;
-    }
-
-    const roomRef = doc(db, "rooms", room.id);
-
+    if (!room?.id) return undefined;
     const unsubscribe = onSnapshot(
-      roomRef,
-      (roomSnap) => {
-        if (!roomSnap.exists()) {
-          setSyncMessage("This room no longer exists.");
-          return;
-        }
-
-        setCurrentRoom({
-          id: roomSnap.id,
-          ...roomSnap.data(),
-        });
-
+      doc(db, "rooms", room.id),
+      (snap) => {
+        if (!snap.exists()) { setSyncMessage("This room no longer exists."); return; }
+        setCurrentRoom({ id: snap.id, ...snap.data() });
         setSyncMessage("Live sync active.");
       },
-      (error) => {
-        console.error(error);
-        setSyncMessage(`Live sync error: ${error.message}`);
-      }
+      (error) => { console.error(error); setSyncMessage(`Live sync error: ${error.message}`); }
     );
-
     return () => unsubscribe();
   }, [room?.id]);
 
+  // Close menu on outside click
+  useEffect(() => {
+    function handleClick(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+    }
+    if (menuOpen) document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [menuOpen]);
+
   async function refreshRoom() {
     try {
-      const roomSnap = await getDoc(doc(db, "rooms", currentRoom.id));
-
-      if (!roomSnap.exists()) {
-        setMessage("This room no longer exists.");
-        return;
-      }
-
-      setCurrentRoom({
-        id: roomSnap.id,
-        ...roomSnap.data(),
-      });
-
+      const snap = await getDoc(doc(db, "rooms", currentRoom.id));
+      if (!snap.exists()) { setMessage("This room no longer exists."); return; }
+      setCurrentRoom({ id: snap.id, ...snap.data() });
       setMessage("Room refreshed.");
-    } catch (error) {
-      console.error(error);
-      setMessage(`Could not refresh room: ${error.message}`);
-    }
+    } catch (error) { setMessage(`Could not refresh: ${error.message}`); }
+    setMenuOpen(false);
   }
 
   async function copyJoinLink() {
-    if (!currentRoom.joinCode) {
-      setMessage("This room does not have a join code.");
-      return;
-    }
-
+    if (!currentRoom.joinCode) { setMessage("No join code."); return; }
     try {
       await navigator.clipboard.writeText(getJoinUrl(currentRoom.joinCode));
       setMessage("Join link copied.");
-    } catch (error) {
-      console.error(error);
-      setMessage("Could not copy link.");
-    }
+    } catch { setMessage("Could not copy link."); }
+    setMenuOpen(false);
   }
 
-  async function leaveRoom() {
-    if (isCreator) {
-      setMessage(
-        "Room creators cannot leave their own room. Delete it instead."
-      );
-      return;
-    }
-
-    const confirmed = window.confirm("Leave this room?");
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      await updateDoc(doc(db, "rooms", currentRoom.id), {
-        playerIds: arrayRemove(player.id),
-        updatedAt: serverTimestamp(),
-      });
-
-      onBack();
-    } catch (error) {
-      console.error(error);
-      setMessage(`Could not leave room: ${error.message}`);
-    }
+  function confirmLeave() {
+    if (isCreator) { setMessage("Creators cannot leave — delete instead."); setMenuOpen(false); return; }
+    setMenuOpen(false);
+    setConfirmProps({
+      message: "Leave this game? You can rejoin with the invite link.",
+      confirmLabel: "Leave Game",
+      onConfirm: async () => {
+        setConfirmProps(null);
+        try {
+          await updateDoc(doc(db, "rooms", currentRoom.id), { playerIds: arrayRemove(player.id), updatedAt: serverTimestamp() });
+          onBack();
+        } catch (error) { setMessage(`Could not leave: ${error.message}`); }
+      },
+    });
   }
 
-  async function deleteRoom() {
-    if (!canManage) {
-      setMessage("Only the room creator or a superuser can delete this room.");
-      return;
-    }
-
-    const confirmed = window.confirm(
-      `Delete room "${
-        currentRoom.title || currentRoom.id
-      }"? This cannot be undone.`
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      await deleteDoc(doc(db, "rooms", currentRoom.id));
-      onRoomDeleted();
-    } catch (error) {
-      console.error(error);
-      setMessage(`Could not delete room: ${error.message}`);
-    }
+  function confirmDelete() {
+    if (!canManage) { setMessage("Only the creator or superuser can delete."); setMenuOpen(false); return; }
+    setMenuOpen(false);
+    setConfirmProps({
+      message: `Delete "${currentRoom.title || "this game"}"? This cannot be undone.`,
+      confirmLabel: "Delete Game",
+      onConfirm: async () => {
+        setConfirmProps(null);
+        try { await deleteDoc(doc(db, "rooms", currentRoom.id)); onRoomDeleted(); }
+        catch (error) { setMessage(`Could not delete: ${error.message}`); }
+      },
+    });
   }
 
   return (
-    <main className="player-portal portal-shell">
-      <header
-        className="portal-header"
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "8px",
-          padding: "4px 6px",
-          marginBottom: "6px",
-          minHeight: "32px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            minWidth: 0,
-            flex: 1,
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-          }}
-        >
-          <strong
-            style={{
-              fontSize: "14px",
-              lineHeight: 1,
-              color: "#fff",
-              flexShrink: 0,
-            }}
-          >
-            Kuhlware Games
-          </strong>
+    <main className="player-portal room-shell">
 
-          <span
-            style={{
-              fontSize: "12px",
-              lineHeight: 1,
-              color: "#ddd",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            Playing as {player.displayName || player.name || player.id}
+      {/* ── Anchored header ── */}
+      <header className="room-header">
+        <div className="room-header-identity">
+          <span className="room-header-brand">Kuhlware Games</span>
+          <span className="room-header-player">
+            {player.displayName || player.name || player.id}
           </span>
         </div>
 
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={onBack}
-          style={{
-            fontSize: "12px",
-            padding: "4px 8px",
-            lineHeight: 1.1,
-            flexShrink: 0,
-          }}
-        >
-          Back
-        </button>
+        <div className="room-header-actions">
+          <button type="button" className="secondary-button room-header-back" onClick={onBack}>
+            ← Back
+          </button>
+
+          {/* Hamburger */}
+          <div className="room-menu-wrapper" ref={menuRef}>
+            <button
+              type="button"
+              className="room-hamburger"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label="Game menu"
+              aria-expanded={menuOpen}
+            >
+              ☰
+            </button>
+
+            {menuOpen && (
+              <div className="room-menu-dropdown">
+                {/* Info section */}
+                <div className="room-menu-info">
+                  <p className="room-menu-title">{currentRoom.title || "Untitled Game"}</p>
+                  <p className="room-menu-meta">
+                    <span className={`sync-dot ${syncState}`} />
+                    {syncState === "live" ? "Live" : syncState === "error" ? "Sync error" : "Connecting"}
+                  </p>
+                  {currentRoom.joinCode && (
+                    <p className="room-menu-meta">Code: <strong>{currentRoom.joinCode}</strong></p>
+                  )}
+                  <p className="room-menu-meta">{currentRoom.gameTitle || currentRoom.gameId}</p>
+                  <p className="room-menu-meta">Players: {getPlayerNames(currentRoom)}</p>
+                  {message && <p className="room-menu-message">{message}</p>}
+                </div>
+
+                <hr className="room-menu-divider" />
+
+                {/* Actions */}
+                <button type="button" className="room-menu-item" onClick={refreshRoom}>
+                  ↻ Refresh
+                </button>
+                {currentRoom.joinCode && (
+                  <button type="button" className="room-menu-item" onClick={copyJoinLink}>
+                    🔗 Copy Invite Link
+                  </button>
+                )}
+                {!isCreator && (
+                  <button type="button" className="room-menu-item" onClick={confirmLeave}>
+                    Leave Game
+                  </button>
+                )}
+                {canManage && (
+                  <button type="button" className="room-menu-item room-menu-danger" onClick={confirmDelete}>
+                    🗑 Delete Game
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
       </header>
 
-      <section
-        className="game-loader-layout"
-        style={{
-          marginTop: 0,
-          paddingTop: 0,
-        }}
-      >
+      {/* ── Single scroll area — no nested scroll ── */}
+      <div className="room-content">
         <GameLoader
           room={currentRoom}
           player={player}
           authUser={authUser}
           onRoomChanged={refreshRoom}
         />
-      </section>
+      </div>
 
-      <section className="single-card-layout room-details-layout">
-        <article className="card">
-          <h2>{currentRoom.title || "Untitled Room"}</h2>
-
-          <p className="muted">
-            {currentRoom.gameTitle || currentRoom.gameId} · Room screen
-          </p>
-
-          {currentRoom.joinCode && (
-            <p className="small-muted">Join Code: {currentRoom.joinCode}</p>
-          )}
-
-          <p className="small-muted">{syncMessage}</p>
-        </article>
-      </section>
-
-      <section className="single-card-layout room-details-layout">
-        <article className="card">
-          <h2>Room Details</h2>
-
-          <p>
-            <strong>Created by:</strong>{" "}
-            {currentRoom.createdByName || currentRoom.createdBy}
-          </p>
-
-          <p>
-            <strong>Status:</strong> {currentRoom.status || "active"}
-          </p>
-
-          <p>
-            <strong>Players:</strong>{" "}
-            {(currentRoom.playerIds || []).join(", ") || "None"}
-          </p>
-
-          {currentRoom.joinCode && (
-            <p>
-              <strong>Invite Link:</strong>
-              <br />
-              {getJoinUrl(currentRoom.joinCode)}
-            </p>
-          )}
-
-          <div className="button-list">
-            <button type="button" onClick={refreshRoom}>
-              Refresh
-            </button>
-
-            {currentRoom.joinCode && (
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={copyJoinLink}
-              >
-                Copy Join Link
-              </button>
-            )}
-
-            {!isCreator && (
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={leaveRoom}
-              >
-                Leave Room
-              </button>
-            )}
-
-            {canManage && (
-              <button
-                type="button"
-                className="danger-button"
-                onClick={deleteRoom}
-              >
-                Delete Room
-              </button>
-            )}
-          </div>
-
-          {message && <p className="message">{message}</p>}
-        </article>
-      </section>
+      {confirmProps && (
+        <ConfirmModal
+          message={confirmProps.message}
+          confirmLabel={confirmProps.confirmLabel}
+          onConfirm={confirmProps.onConfirm}
+          onCancel={() => setConfirmProps(null)}
+        />
+      )}
     </main>
   );
 }
