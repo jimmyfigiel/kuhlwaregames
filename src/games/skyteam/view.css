@@ -683,8 +683,12 @@
 .sky-own-plane     { display: inline-flex; align-items: center; width: 18px; height: 18px; flex-shrink: 0; }
 .sky-own-plane .sky-plane-svg { width: 18px; height: 18px; }
 .sky-runway-icon   { letter-spacing: -2px; color: var(--sky-muted); }
-.sky-traffic-icons { letter-spacing: -4px; color: var(--sky-yellow); }
-.sky-clear-dot     { color: var(--sky-border); font-size: 14px; }
+.sky-traffic-icons    { letter-spacing: -4px; color: var(--sky-yellow); }
+.sky-clear-dot        { color: var(--sky-border); font-size: 14px; }
+.sky-traffic-die-icon { font-size: 11px; line-height: 1; }
+.sky-axis-paths       { display: flex; gap: 1px; align-items: center; }
+.sky-axis-path-ok     { font-size: 10px; color: var(--sky-muted); }
+.sky-axis-path-x      { font-size: 10px; color: #e74c3c; font-weight: 700; }
 
 /* ── Attitude Gauge ────────────────────────────────────────── */
 .sky-attitude-module {

@@ -714,6 +714,20 @@ function ApproachTrack({ state }) {
                   {!isCurrent && space.kind === "airport" && <span className="sky-runway-icon">▰▰▰</span>}
                   {!isCurrent && space.kind !== "airport" && space.traffic > 0 && <span className="sky-traffic-icons">{"✈".repeat(space.traffic)}</span>}
                   {!isCurrent && space.kind !== "airport" && space.traffic === 0 && <span className="sky-clear-dot">•</span>}
+                  {space.trafficDie > 0 && (
+                    <span className="sky-traffic-die-icon" title={`Roll traffic die ${space.trafficDie}× at round start`}>
+                      {"🎲".repeat(space.trafficDie)}
+                    </span>
+                  )}
+                  {space.axisPaths && space.axisPaths.some((p) => p === false) && (
+                    <span className="sky-axis-paths" title="Axis path indicators (P2 P1 Lvl CP1 CP2)">
+                      {space.axisPaths.map((ok, pi) => (
+                        <span key={pi} className={ok ? "sky-axis-path-ok" : "sky-axis-path-x"}>
+                          {ok ? "△" : "✕"}
+                        </span>
+                      ))}
+                    </span>
+                  )}
                   <small>{space.kind === "airport" ? "Airport" : space.traffic > 0 ? `${space.traffic} traffic` : "Clear"}</small>
                 </div>
               </div>

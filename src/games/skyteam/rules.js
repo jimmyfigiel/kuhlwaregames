@@ -265,7 +265,9 @@ function startGame(state, actor) {
   state.message = state.mode === "solo"
     ? "Round 1 briefing. Solo mode: roll only the starting color shown by the altitude arrow."
     : "Round 1 briefing. Discuss your plan in chat, then each player rolls their own dice.";
-  return log(state, "START_GAME", state.message);
+  log(state, "START_GAME", state.message);
+  rollTrafficDice(state);
+  return state;
 }
 
 function startRoundRoll(state, actor) {
@@ -625,8 +627,29 @@ function advanceApproach(state, advance) {
     lose(state, "Collision! Air traffic was still in the Current Position when the plane advanced.");
     return;
   }
+  // Check axis paths for every space flown through (current + intermediate if advance=2).
+  const axisPos = state.cockpit.axis.position;
+  for (let i = 0; i < advance; i++) {
+    const spaceIdx = state.approach.currentIndex + i;
+    if (spaceIdx >= state.approach.spaces.length) break;
+    const space = state.approach.spaces[spaceIdx];
+    if (!axisPathPassed(space.axisPaths, axisPos)) {
+      const posLabel = axisPos === 0 ? "Level" : axisPos < 0 ? `Pilot ${Math.abs(axisPos)}` : `Co-Pilot ${axisPos}`;
+      lose(state, `Axis violation on space ${space.label}: the ${posLabel} path is marked X. Adjust axis before advancing.`);
+      return;
+    }
+  }
   const destinationIndex = Math.min(state.approach.currentIndex + advance, state.approach.spaces.length - 1);
   state.approach.currentIndex = destinationIndex;
+}
+
+// axisPaths is a 5-element boolean array indexed by axis position offset:
+// index 0→pos -2, 1→-1, 2→0, 3→+1, 4→+2
+function axisPathPassed(axisPaths, position) {
+  if (!axisPaths) return true;
+  const idx = position + 2; // shift -2..+2 → 0..4
+  if (idx < 0 || idx >= axisPaths.length) return true;
+  return axisPaths[idx] !== false;
 }
 
 function resolveRadio(state, value) {
@@ -692,7 +715,35 @@ function endRound(state) {
   state.message = isFinalRound(state)
     ? "Final round begins. You are at the airport and touching down. Engines are now checked against Brakes."
     : `Round ${state.round} briefing at ${state.currentAltitude} feet.`;
-  return log(state, "END_ROUND", state.message);
+  log(state, "END_ROUND", state.message);
+  rollTrafficDice(state);
+  return state;
+}
+
+// Rolls the traffic die for the current space at the start of a round.
+// Called automatically after startGame and endRound.
+function rollTrafficDice(state) {
+  const idx = state.approach.currentIndex;
+  const currentSpace = state.approach.spaces[idx];
+  const dieCount = currentSpace?.trafficDie || 0;
+  if (dieCount === 0) return;
+
+  const lastIdx = state.approach.spaces.length - 1;
+  const rolls = [];
+  for (let i = 0; i < dieCount; i++) {
+    const roll = Math.floor(Math.random() * 6) + 1;
+    const targetIdx = Math.min(idx + roll - 1, lastIdx);
+    state.approach.spaces[targetIdx].traffic += 1;
+    rolls.push(roll);
+  }
+
+  const desc = rolls.map((r, i) => {
+    const tIdx = Math.min(idx + r - 1, lastIdx);
+    const label = state.approach.spaces[tIdx].label;
+    return `${r} → ${label}`;
+  }).join(", ");
+  state.message = `Traffic die rolled (${dieCount}×): ${desc}. Extra traffic added.`;
+  log(state, "TRAFFIC_DIE_ROLLED", state.message);
 }
 
 function checkFinalLanding(state) {

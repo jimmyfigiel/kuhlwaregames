@@ -1,20 +1,37 @@
 // src/games/skyteam/scenarios.js
 //
 // All SkyTeam approach scenarios.
-// Traffic values are PLACEHOLDERS — verify each against physical cards.
-// Format: [space-0, space-1, space-2, space-3, space-4, space-5, airport]
-//         space-0 = starting position (plane begins here), airport = destination.
-// Each number = traffic count on that space (0–3).
+// All values are PLACEHOLDERS — verify each against physical cards.
+//
+// traffic[i]   = static airplane tokens on space i (0–3)
+// dies[i]      = number of traffic die icons on space i (0, 1, or 2)
+//               rolled at the start of each round the plane is on that space
+// axisPaths[i] = 5-element boolean array for the 5 axis positions on space i:
+//               index: [0,   1,   2,    3,   4  ]
+//               axis:  [-2,  -1,  0,   +1,  +2  ]
+//               label: [P2,  P1, Lvl, CP1, CP2  ]  (P=Pilot, CP=Co-Pilot)
+//               true  = triangle on card (safe to fly through)
+//               false = X on card (crash if axis is at this position when advancing)
+//               null / omit = all triangles (no restriction, used on simple approaches)
+//
+// All three arrays cover the 6 sky spaces only (not the airport).
+// Helpers for common patterns:
+const ALL_CLEAR  = [true,  true,  true,  true,  true ];  // all triangles
+const NO_CENTER  = [true,  true,  false, true,  true ];  // center X, tilts OK
+const RIGHT_ONLY = [false, false, false, true,  true ];  // only right tilts OK
+const LEFT_ONLY  = [true,  true,  false, false, false];  // only left tilts OK
 
-function makeSpaces(traffic) {
+function makeSpaces(traffic, dies = [], axisPaths = []) {
   return [
     ...traffic.map((t, i) => ({
       id: `space-${i}`,
       label: i === 0 ? "Current" : String(i),
       kind: "sky",
       traffic: t,
+      trafficDie: dies[i] || 0,
+      axisPaths: axisPaths[i] ?? ALL_CLEAR,
     })),
-    { id: "airport", label: "Airport", kind: "airport", traffic: 0 },
+    { id: "airport", label: "Airport", kind: "airport", traffic: 0, trafficDie: 0, axisPaths: ALL_CLEAR },
   ];
 }
 
