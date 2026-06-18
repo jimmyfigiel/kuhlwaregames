@@ -179,16 +179,51 @@
   padding: 14px;
 }
 
-/* ── Game Layout (replaces tabs) ──────────────────────────── */
-/* Mobile: single scrollable column — dice on top, cockpit below */
-.sky-game-layout {
+/* ── Tab Bar ───────────────────────────────────────────────── */
+.sky-tab-bar {
   display: flex;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--sky-border);
+  background: var(--sky-surface);
+}
+.sky-tab {
+  flex: 1;
+  padding: 10px 8px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--sky-muted);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.sky-tab:hover { color: var(--sky-text); }
+.sky-tab.active {
+  color: var(--sky-blue);
+  border-bottom-color: var(--sky-blue);
+}
+.sky-tab.sky-tab-pulse {
+  color: var(--sky-green);
+  animation: sky-tab-glow 1s ease-in-out infinite;
+}
+@keyframes sky-tab-glow {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+
+/* ── Tab Panels ────────────────────────────────────────────── */
+.sky-tab-panel {
+  display: none;
   flex-direction: column;
   gap: var(--sky-gap);
   padding: 14px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
-.sky-game-dice    { display: flex; flex-direction: column; gap: var(--sky-gap); }
-.sky-game-cockpit { display: flex; flex-direction: column; gap: var(--sky-gap); }
+.sky-tab-panel.active { display: flex; }
 
 /* ── Cards ─────────────────────────────────────────────────── */
 .sky-card {
@@ -272,13 +307,17 @@
 .sky-rack-label-text { font-size: 14px; font-weight: 600; }
 .sky-roll-btn { margin-left: auto; padding: 6px 14px; }
 
-.sky-dice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.sky-dice-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
 .sky-die-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 
 /* ── Die Button ────────────────────────────────────────────── */
 .sky-die-button {
-  width: 72px;
-  height: 72px;
+  width: 100%;
+  aspect-ratio: 1;
   border-radius: 18px;
   border: none;
   padding: 10px;

@@ -94,6 +94,7 @@ export default function SkyTeamView({ room, gameState, player, submitAction, ini
   const [rerollSelection, setRerollSelection] = useState({ pilot: {}, copilot: {} });
   const [selectedDie, setSelectedDie] = useState(null); // { role, dieId }
   const [coffeeDelta, setCoffeeDelta] = useState(0);
+  const [activeTab, setActiveTab] = useState("dice"); // "dice" | "board"
 
   if (!state || state.gameId !== "skyteam") {
     return (
@@ -132,6 +133,7 @@ export default function SkyTeamView({ room, gameState, player, submitAction, ini
     } else {
       setSelectedDie({ role, dieId });
       setCoffeeDelta(0);
+      setActiveTab("board"); // auto-switch to cockpit so player can tap a slot
     }
   }
 
@@ -231,9 +233,27 @@ export default function SkyTeamView({ room, gameState, player, submitAction, ini
           <SetupView state={state} player={player} act={act} />
         </div>
       ) : (
-        <div className="sky-game-layout">
-          {/* Dice section — always on top on mobile, left column on wide desktop */}
-          <div className="sky-game-dice">
+        <>
+          {/* Tab bar */}
+          <div className="sky-tab-bar">
+            <button
+              type="button"
+              className={`sky-tab${activeTab === "dice" ? " active" : ""}`}
+              onClick={() => setActiveTab("dice")}
+            >
+              🎲 Dice
+            </button>
+            <button
+              type="button"
+              className={`sky-tab${activeTab === "board" ? " active" : ""}${selectedDie ? " sky-tab-pulse" : ""}`}
+              onClick={() => setActiveTab("board")}
+            >
+              ✈ Board{selectedDie ? " ←" : ""}
+            </button>
+          </div>
+
+          {/* Tab panels — keep both mounted so state is preserved */}
+          <div className={`sky-tab-panel${activeTab === "dice" ? " active" : ""}`}>
             <PlayerDiceDock
               state={state}
               player={player}
@@ -259,15 +279,14 @@ export default function SkyTeamView({ room, gameState, player, submitAction, ini
             )}
           </div>
 
-          {/* Cockpit — scrolls on mobile below dice, right column on wide desktop */}
-          <div className="sky-game-cockpit">
+          <div className={`sky-tab-panel${activeTab === "board" ? " active" : ""}`}>
             <CockpitPanel
               state={state}
               validTargets={validTargets}
               onPlace={handlePlaceDie}
             />
           </div>
-        </div>
+        </>
       )}
     </main>
   );
