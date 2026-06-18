@@ -1,6 +1,6 @@
 // src/games/skyteam/view.jsx
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./view.css";
 
 const ROLES = ["pilot", "copilot"];
@@ -95,6 +95,7 @@ export default function SkyTeamView({ room, gameState, player, submitAction, ini
   const [selectedDie, setSelectedDie] = useState(null); // { role, dieId }
   const [coffeeDelta, setCoffeeDelta] = useState(0);
   const [activeTab, setActiveTab] = useState("dice"); // "dice" | "board"
+  const swipeRef = useRef(null);
 
   if (!state || state.gameId !== "skyteam") {
     return (
@@ -126,6 +127,18 @@ export default function SkyTeamView({ room, gameState, player, submitAction, ini
     ? new Set(getTargetsForRole(state, selectedDie.role, effectiveValue).filter((t) => t.ok).map((t) => t.id))
     : new Set();
 
+  const scrollToPanel = useCallback((panel) => {
+    if (!swipeRef.current) return;
+    const idx = panel === "dice" ? 0 : 1;
+    swipeRef.current.scrollTo({ left: idx * swipeRef.current.offsetWidth, behavior: "smooth" });
+  }, []);
+
+  function handleSwipeScroll() {
+    if (!swipeRef.current) return;
+    const { scrollLeft, offsetWidth } = swipeRef.current;
+    setActiveTab(scrollLeft < offsetWidth / 2 ? "dice" : "board");
+  }
+
   function handleSelectDie(role, dieId) {
     if (selectedDie?.dieId === dieId) {
       setSelectedDie(null);
@@ -133,7 +146,6 @@ export default function SkyTeamView({ room, gameState, player, submitAction, ini
     } else {
       setSelectedDie({ role, dieId });
       setCoffeeDelta(0);
-      setActiveTab("board"); // auto-switch to cockpit so player can tap a slot
     }
   }
 
@@ -234,57 +246,61 @@ export default function SkyTeamView({ room, gameState, player, submitAction, ini
         </div>
       ) : (
         <>
-          {/* Tab bar */}
+          {/* Nav bar — tapping scrolls to that panel */}
           <div className="sky-tab-bar">
             <button
               type="button"
               className={`sky-tab${activeTab === "dice" ? " active" : ""}`}
-              onClick={() => setActiveTab("dice")}
+              onClick={() => scrollToPanel("dice")}
             >
               🎲 Dice
             </button>
             <button
               type="button"
-              className={`sky-tab${activeTab === "board" ? " active" : ""}${selectedDie ? " sky-tab-pulse" : ""}`}
-              onClick={() => setActiveTab("board")}
+              className={`sky-tab${activeTab === "board" ? " active" : ""}`}
+              onClick={() => scrollToPanel("board")}
             >
-              ✈ Board{selectedDie ? " ←" : ""}
+              ✈ Board
             </button>
           </div>
 
-          {/* Tab panels — keep both mounted so state is preserved */}
-          <div className={`sky-tab-panel${activeTab === "dice" ? " active" : ""}`}>
-            <PlayerDiceDock
-              state={state}
-              player={player}
-              myRoles={myRoles}
-              act={act}
-              rerollSelection={rerollSelection}
-              setRerollSelection={setRerollSelection}
-              selectedDie={selectedDie}
-              onSelectDie={handleSelectDie}
-            />
-            {state.mode !== "solo" && (state.phase === "briefing" || state.phase === "rolling") && (
-              <BriefingChat state={state} act={act} />
-            )}
-            {(state.phase === "briefing" || state.phase === "rolling" || state.phase === "placement") && (
-              <p className="sky-phase-hint">
-                {state.phase === "briefing"  && (state.mode === "solo" ? "Roll the starting seat's dice." : "Talk strategy. Don't mention die values. Then roll.")}
-                {state.phase === "rolling"   && "Waiting for both crew to roll."}
-                {state.phase === "placement" && (state.mode === "solo" ? "Solo: place a die — the other seat's die is then revealed." : "Silent phase — tap a die, then tap a glowing slot to place it.")}
-              </p>
-            )}
-            {state.message && (state.phase === "briefing" || state.phase === "rolling" || state.phase === "placement" || state.phase === "endRound") && (
-              <p className="sky-game-message">{state.message}</p>
-            )}
-          </div>
+          {/* Swipe container */}
+          <div className="sky-swipe-container" ref={swipeRef} onScroll={handleSwipeScroll}>
+            {/* Panel 0 — Dice */}
+            <div className="sky-swipe-panel">
+              <PlayerDiceDock
+                state={state}
+                player={player}
+                myRoles={myRoles}
+                act={act}
+                rerollSelection={rerollSelection}
+                setRerollSelection={setRerollSelection}
+                selectedDie={selectedDie}
+                onSelectDie={handleSelectDie}
+              />
+              {state.mode !== "solo" && (state.phase === "briefing" || state.phase === "rolling") && (
+                <BriefingChat state={state} act={act} />
+              )}
+              {(state.phase === "briefing" || state.phase === "rolling" || state.phase === "placement") && (
+                <p className="sky-phase-hint">
+                  {state.phase === "briefing"  && (state.mode === "solo" ? "Roll the starting seat's dice." : "Talk strategy. Don't mention die values. Then roll.")}
+                  {state.phase === "rolling"   && "Waiting for both crew to roll."}
+                  {state.phase === "placement" && (state.mode === "solo" ? "Solo: place a die — the other seat's die is then revealed." : "Silent phase — tap a die, then tap a glowing slot to place it.")}
+                </p>
+              )}
+              {state.message && (state.phase === "briefing" || state.phase === "rolling" || state.phase === "placement" || state.phase === "endRound") && (
+                <p className="sky-game-message">{state.message}</p>
+              )}
+            </div>
 
-          <div className={`sky-tab-panel${activeTab === "board" ? " active" : ""}`}>
-            <CockpitPanel
-              state={state}
-              validTargets={validTargets}
-              onPlace={handlePlaceDie}
-            />
+            {/* Panel 1 — Cockpit board */}
+            <div className="sky-swipe-panel">
+              <CockpitPanel
+                state={state}
+                validTargets={validTargets}
+                onPlace={handlePlaceDie}
+              />
+            </div>
           </div>
         </>
       )}
