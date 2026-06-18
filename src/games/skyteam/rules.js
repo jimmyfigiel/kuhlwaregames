@@ -1,5 +1,7 @@
 // src/games/skyteam/rules.js
 
+import { SCENARIO_MAP, SCENARIOS } from "./scenarios.js";
+
 const GAME_ID = "skyteam";
 const ROLES = ["pilot", "copilot"];
 const ROLE_COLORS = { pilot: "blue", copilot: "orange" };
@@ -8,15 +10,7 @@ const STARTERS_BY_ALTITUDE_INDEX = ["pilot", "copilot", "pilot", "copilot", "pil
 const REROLL_ALTITUDE_INDEXES = new Set([0, 4]);
 const SAFE_AXIS_LIMIT = 2;
 
-const BASIC_MONTREAL_APPROACH = [
-  { id: "space-0", label: "Current", kind: "sky", traffic: 0 },
-  { id: "space-1", label: "1", kind: "sky", traffic: 1 },
-  { id: "space-2", label: "2", kind: "sky", traffic: 2 },
-  { id: "space-3", label: "3", kind: "sky", traffic: 0 },
-  { id: "space-4", label: "4", kind: "sky", traffic: 1 },
-  { id: "space-5", label: "5", kind: "sky", traffic: 0 },
-  { id: "airport", label: "Airport", kind: "airport", traffic: 0 },
-];
+const DEFAULT_SCENARIO_ID = "yul-a";
 
 const GEAR_SPACES = [
   { id: "gear-1", label: "1/2", allowed: [1, 2] },
@@ -39,12 +33,14 @@ const BRAKE_THRESHOLDS = [1.5, 2.5, 4.5, 6.5];
 export function createInitialState(options = {}) {
   const optionMode = options?.options?.mode || options?.mode || "twoPlayer";
   const mode = optionMode === "solo" || optionMode === "onePlayerTest" ? optionMode : "twoPlayer";
+  const scenarioId = options?.scenarioId || DEFAULT_SCENARIO_ID;
+  const scenario = SCENARIO_MAP[scenarioId] || SCENARIO_MAP[DEFAULT_SCENARIO_ID];
   const now = Date.now();
   const state = {
     gameId: GAME_ID,
     version: 2,
-    scenarioId: "basic-montreal",
-    scenarioName: "YUL Montréal-Trudeau",
+    scenarioId: scenario.id,
+    scenarioName: `${scenario.code} ${scenario.airport}`,
     mode,
     phase: "setup",
     status: "setup",
@@ -62,7 +58,7 @@ export function createInitialState(options = {}) {
     cockpit: createEmptyCockpit(),
     approach: {
       currentIndex: 0,
-      spaces: BASIC_MONTREAL_APPROACH.map((space) => ({ ...space })),
+      spaces: scenario.spaces.map((space) => ({ ...space })),
       lastAdvance: 0,
       pendingAdvance: 0,
     },
@@ -83,8 +79,8 @@ export function createInitialState(options = {}) {
     },
     lossReason: null,
     winReason: null,
-    message: "Choose one-player test mode or claim Pilot and Co-Pilot, then start the approach.",
-    commandLog: [createLogEntry("SYSTEM", "Sky Team loaded. Basic Montréal scenario is ready.", now)],
+    message: "Choose a scenario and game mode, then claim your seat.",
+    commandLog: [createLogEntry("SYSTEM", `Sky Team loaded. ${scenario.code} ${scenario.airport} (${scenario.difficulty}, side ${scenario.side}).`, now)],
     ruleChecks: [],
     lastAction: null,
     lastSpeed: null,
@@ -138,12 +134,14 @@ export function submitAction(input, directArg1, directArg2) {
   }
 
   if (state.phase === "won" || state.phase === "lost") {
-    if (action.type === "RESET_GAME") return createInitialState({ mode: state.mode });
+    if (action.type === "RESET_GAME") return createInitialState({ mode: state.mode, scenarioId: state.scenarioId });
     return addWarning(state, "The game is over. Reset to play again.");
   }
 
   try {
     switch (action.type) {
+      case "SET_SCENARIO":
+        return setScenario(state, action.scenarioId);
       case "SET_MODE":
         return setMode(state, action.mode, actor);
       case "CLAIM_ROLE":
@@ -174,6 +172,18 @@ export function submitAction(input, directArg1, directArg2) {
   } catch (error) {
     return addWarning(state, error.message || String(error));
   }
+}
+
+function setScenario(state, scenarioId) {
+  if (state.phase !== "setup") return addWarning(state, "Scenario can only be changed before the game starts.");
+  const scenario = SCENARIO_MAP[scenarioId];
+  if (!scenario) return addWarning(state, `Unknown scenario: ${scenarioId}`);
+  state.scenarioId = scenario.id;
+  state.scenarioName = `${scenario.code} ${scenario.airport}`;
+  state.approach.spaces = scenario.spaces.map((space) => ({ ...space }));
+  state.approach.currentIndex = 0;
+  state.message = `Scenario: ${scenario.code} ${scenario.airport} · ${scenario.difficulty} · Side ${scenario.side}`;
+  return log(state, "SET_SCENARIO", state.message);
 }
 
 function setMode(state, mode, actor) {
@@ -387,7 +397,18 @@ function placeDie(state, action, actor) {
   const placement = validateTarget(state, role, targetId, modifiedValue);
   if (!placement.ok) return addWarning(state, placement.message);
 
-  state.tokens.coffee -= Math.abs(coffeeDelta);
+  const tokensSpent = Math.abs(coffeeDelta);
+  state.tokens.coffee -= tokensSpent;
+  // Clear one concentration slot per token spent (LIFO — last filled first)
+  if (tokensSpent > 0) {
+    let remaining = tokensSpent;
+    for (let i = state.cockpit.concentration.length - 1; i >= 0 && remaining > 0; i--) {
+      if (state.cockpit.concentration[i]) {
+        state.cockpit.concentration[i] = null;
+        remaining--;
+      }
+    }
+  }
   die.placed = true;
   die.targetId = targetId;
   die.originalValue = die.value;

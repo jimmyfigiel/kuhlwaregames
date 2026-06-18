@@ -1,6 +1,7 @@
 // src/games/skyteam/view.jsx
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { DIFFICULTY_COLORS, DIFFICULTY_LABELS, DIFFICULTY_ORDER, SCENARIOS } from "./scenarios.js";
 import "./view.css";
 
 const ROLES = ["pilot", "copilot"];
@@ -316,6 +317,15 @@ const MODE_DESCRIPTIONS = {
   onePlayerTest: "One browser controls both seats with normal two-player dice rolling.",
 };
 
+// Group scenarios by airport code, sorted by difficulty within each group
+const SCENARIO_GROUPS = Object.values(
+  SCENARIOS.reduce((acc, s) => {
+    if (!acc[s.code]) acc[s.code] = { code: s.code, airport: s.airport, scenarios: [] };
+    acc[s.code].scenarios.push(s);
+    return acc;
+  }, {})
+);
+
 function SetupView({ state, player, act }) {
   const pid = player?.id;
   const isTwoPlayer = state.mode === "twoPlayer";
@@ -324,6 +334,32 @@ function SetupView({ state, player, act }) {
 
   return (
     <section className="sky-setup-grid">
+      {/* Scenario picker */}
+      <section className="sky-card sky-scenario-card">
+        <h2>Approach</h2>
+        <div className="sky-scenario-list">
+          {SCENARIO_GROUPS.map(({ code, airport, scenarios }) => (
+            <div key={code} className="sky-scenario-airport">
+              <span className="sky-scenario-code">{code}</span>
+              <span className="sky-scenario-airport-name">{airport}</span>
+              <div className="sky-scenario-sides">
+                {scenarios.map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    className={`sky-scenario-btn${state.scenarioId === s.id ? " active" : ""}`}
+                    style={{ "--diff-color": DIFFICULTY_COLORS[s.difficulty] }}
+                    onClick={() => act({ type: "SET_SCENARIO", scenarioId: s.id })}
+                  >
+                    {s.side} · {DIFFICULTY_LABELS[s.difficulty]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="sky-card sky-control-card">
         <h2>Game Mode</h2>
         <p className="sky-muted">{MODE_DESCRIPTIONS[state.mode]}</p>

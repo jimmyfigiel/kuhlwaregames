@@ -288,10 +288,64 @@
 /* ── Setup ─────────────────────────────────────────────────── */
 .sky-setup-grid { display: grid; gap: var(--sky-gap); grid-template-columns: 1fr; }
 @media (min-width: 641px) { .sky-setup-grid { grid-template-columns: repeat(2, 1fr); } }
-.sky-control-card { grid-column: 1 / -1; }
-.sky-start-card   { grid-column: 1 / -1; }
+.sky-control-card  { grid-column: 1 / -1; }
+.sky-start-card    { grid-column: 1 / -1; }
+.sky-scenario-card { grid-column: 1 / -1; }
 .sky-role-card.sky-pilot   { border-top: 3px solid var(--sky-blue); }
 .sky-role-card.sky-copilot { border-top: 3px solid var(--sky-orange); }
+
+/* ── Scenario picker ───────────────────────────────────────── */
+.sky-scenario-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sky-scenario-airport {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--sky-border);
+}
+.sky-scenario-airport:last-child { border-bottom: none; }
+.sky-scenario-code {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sky-blue);
+  width: 36px;
+  flex-shrink: 0;
+}
+.sky-scenario-airport-name {
+  font-size: 13px;
+  color: var(--sky-text);
+  flex: 1;
+  min-width: 100px;
+}
+.sky-scenario-sides {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.sky-scenario-btn {
+  border: 1px solid var(--diff-color, var(--sky-border)) !important;
+  border-radius: 6px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+  font-weight: 600;
+  color: var(--diff-color, var(--sky-muted)) !important;
+  background: transparent !important;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.sky-scenario-btn:hover {
+  background: rgba(255,255,255,0.06) !important;
+}
+.sky-scenario-btn.active {
+  background: var(--diff-color, var(--sky-border)) !important;
+  color: #fff !important;
+}
 
 /* ── Dice Dock ─────────────────────────────────────────────── */
 .sky-dice-dock { display: flex; flex-direction: column; gap: var(--sky-gap); }
