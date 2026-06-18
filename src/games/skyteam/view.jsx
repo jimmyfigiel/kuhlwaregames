@@ -494,24 +494,27 @@ function BriefingChat({ state, act }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function RadioPanel({ state, validTargets, onPlace }) {
-  const pilot   = state.cockpit.radio.pilot[0]   || null;
+  const pilot    = state.cockpit.radio.pilot[0]    || null;
   const copilotA = state.cockpit.radio.copilotA[0] || null;
   const copilotB = state.cockpit.radio.copilotB[0] || null;
   return (
     <section className="sky-module sky-radio-module">
       <h3>Radio</h3>
       <div className="sky-radio-slots">
-        <div className="sky-radio-group sky-radio-pilot">
-          <span className="sky-radio-label">Pilot</span>
+        <div className="sky-radio-slot-wrap">
+          <span className="sky-radio-label sky-radio-label-blue">Pilot</span>
           <SlotButton id="radio-pilot" validTargets={validTargets} onPlace={onPlace} className="sky-radio-slot sky-radio-slot-blue">
             <span className="sky-mini-die sky-mini-die-blue">{pilot?.value || "—"}</span>
           </SlotButton>
         </div>
-        <div className="sky-radio-group sky-radio-copilot">
-          <span className="sky-radio-label">Co-Pilot</span>
+        <div className="sky-radio-slot-wrap">
+          <span className="sky-radio-label sky-radio-label-orange">Co-Pilot</span>
           <SlotButton id="radio-copilot-a" validTargets={validTargets} onPlace={onPlace} className="sky-radio-slot sky-radio-slot-orange">
             <span className="sky-mini-die sky-mini-die-orange">{copilotA?.value || "—"}</span>
           </SlotButton>
+        </div>
+        <div className="sky-radio-slot-wrap">
+          <span className="sky-radio-label sky-radio-label-orange">Co-Pilot</span>
           <SlotButton id="radio-copilot-b" validTargets={validTargets} onPlace={onPlace} className="sky-radio-slot sky-radio-slot-orange">
             <span className="sky-mini-die sky-mini-die-orange">{copilotB?.value || "—"}</span>
           </SlotButton>

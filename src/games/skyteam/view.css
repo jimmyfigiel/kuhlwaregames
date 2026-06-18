@@ -26,7 +26,7 @@
   background: var(--sky-bg);
   color: var(--sky-text);
   font-family: system-ui, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   box-sizing: border-box;
 }
 .skyteam-shell *, .skyteam-shell *::before, .skyteam-shell *::after { box-sizing: inherit; }
@@ -53,8 +53,8 @@
 .sky-topbar-chip {
   background: var(--sky-border);
   border-radius: 20px;
-  padding: 2px 10px;
-  font-size: 12px;
+  padding: 3px 10px;
+  font-size: 13px;
   white-space: nowrap;
 }
 .sky-phase-placement { background: var(--sky-blue-dim); color: var(--sky-blue); }
@@ -89,13 +89,13 @@
   flex-wrap: wrap;
 }
 .sky-die-selected-preview {
-  width: 44px !important;
-  height: 44px !important;
+  width: 72px !important;
+  height: 72px !important;
   animation: sky-selected-pulse 1s ease-in-out infinite;
 }
 .sky-placement-hint {
   flex: 1;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--sky-blue);
   white-space: nowrap;
 }
@@ -197,10 +197,10 @@
   border-radius: var(--sky-radius);
   padding: 14px;
 }
-.sky-card h2 { margin: 0 0 10px; font-size: 15px; font-weight: 600; }
+.sky-card h2 { margin: 0 0 10px; font-size: 17px; font-weight: 600; }
 .sky-card h3 {
   margin: 0 0 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -209,9 +209,9 @@
 
 /* ── Utilities ─────────────────────────────────────────────── */
 .sky-muted      { color: var(--sky-muted); margin: 0; }
-.sky-phase-hint { color: var(--sky-muted); font-size: 13px; margin: 0; padding: 8px 12px; background: var(--sky-bg); border-radius: 8px; border: 1px solid var(--sky-border); }
-.sky-game-message { color: var(--sky-blue); font-size: 13px; margin: 0; padding: 6px 12px; background: rgba(59,130,246,0.08); border-radius: 8px; border: 1px solid rgba(59,130,246,0.25); }
-.sky-setup-message { grid-column: 1 / -1; color: var(--sky-blue); font-size: 13px; margin: 0; padding: 8px 12px; background: rgba(59,130,246,0.08); border-radius: 8px; border: 1px solid rgba(59,130,246,0.25); }
+.sky-phase-hint { color: var(--sky-muted); font-size: 14px; margin: 0; padding: 8px 12px; background: var(--sky-bg); border-radius: 8px; border: 1px solid var(--sky-border); }
+.sky-game-message { color: var(--sky-blue); font-size: 14px; margin: 0; padding: 6px 12px; background: rgba(59,130,246,0.08); border-radius: 8px; border: 1px solid rgba(59,130,246,0.25); }
+.sky-setup-message { grid-column: 1 / -1; color: var(--sky-blue); font-size: 14px; margin: 0; padding: 8px 12px; background: rgba(59,130,246,0.08); border-radius: 8px; border: 1px solid rgba(59,130,246,0.25); }
 .sky-role-mine { outline: 2px solid var(--sky-blue); outline-offset: 2px; }
 .sky-solo-waiting { font-size: 13px; color: var(--sky-muted); padding: 8px 4px; }
 .sky-button-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -224,8 +224,8 @@
   cursor: pointer;
   border: 1px solid var(--sky-border);
   border-radius: 6px;
-  padding: 7px 14px;
-  font-size: 13px;
+  padding: 8px 14px;
+  font-size: 14px;
   font-family: inherit;
   background: var(--sky-surface);
   color: var(--sky-text);
@@ -257,7 +257,7 @@
 .sky-dice-dock-header { display: flex; align-items: center; justify-content: space-between; }
 .sky-dice-dock-header h2 { margin: 0; }
 .sky-token-strip { display: flex; gap: 8px; }
-.sky-token { background: var(--sky-border); border-radius: 20px; padding: 4px 12px; font-size: 13px; }
+.sky-token { background: var(--sky-border); border-radius: 20px; padding: 4px 12px; font-size: 14px; }
 
 .sky-dice-rack {
   background: var(--sky-bg);
@@ -269,7 +269,7 @@
 .sky-dice-rack.sky-copilot { border-top: 3px solid var(--sky-orange); }
 
 .sky-rack-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-.sky-rack-label-text { font-size: 13px; font-weight: 600; }
+.sky-rack-label-text { font-size: 14px; font-weight: 600; }
 .sky-roll-btn { margin-left: auto; padding: 6px 14px; }
 
 .sky-dice-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -277,8 +277,8 @@
 
 /* ── Die Button ────────────────────────────────────────────── */
 .sky-die-button {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   border-radius: 18px;
   border: none;
   padding: 10px;
@@ -346,11 +346,13 @@
 .sky-radio-module { padding: 8px 10px; }
 .sky-radio-slots {
   display: flex;
+  flex-direction: row;
   gap: 16px;
-  align-items: flex-start;
+  justify-content: center;
+  align-items: flex-end;
   width: 100%;
 }
-.sky-radio-group {
+.sky-radio-slot-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -360,9 +362,11 @@
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  opacity: 0.6;
   letter-spacing: 0.04em;
+  opacity: 0.75;
 }
+.sky-radio-label-blue   { color: var(--sky-blue); }
+.sky-radio-label-orange { color: var(--sky-orange); }
 .sky-radio-slot { display: inline-flex; align-items: center; border-radius: 6px; }
 .sky-radio-slot-blue   { outline: 2px solid var(--sky-blue);   outline-offset: 2px; }
 .sky-radio-slot-orange { outline: 2px solid var(--sky-orange); outline-offset: 2px; }

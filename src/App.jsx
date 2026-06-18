@@ -5,12 +5,16 @@ import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
 
 import { auth } from "./firebase.js";
 import { getPlayerByAuthUid } from "./playerService.js";
+import { applyFontScale, getSavedFontScale } from "./fontScale.js";
 
 import Login from "./games/player-portal/Login.jsx";
 import Dashboard from "./games/player-portal/Dashboard.jsx";
 import RoomScreen from "./games/player-portal/RoomScreen.jsx";
 
 export default function App() {
+  // Apply saved font scale immediately on mount
+  useEffect(() => { applyFontScale(getSavedFontScale()); }, []);
+
   const [authUser, setAuthUser] = useState(null);
   const [currentPlayer, setCurrentPlayer] = useState(null);
   const [currentRoom, setCurrentRoom] = useState(null);

@@ -534,6 +534,43 @@
 .player-portal .room-menu-item:hover { background: var(--pp-bg-dark); }
 .player-portal .room-menu-danger { color: var(--pp-danger) !important; }
 
+.player-portal .room-menu-scale {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  gap: 12px;
+}
+.player-portal .room-menu-scale-label {
+  font-size: 13px;
+  color: var(--pp-text-muted);
+  white-space: nowrap;
+}
+.player-portal .room-menu-scale-btns {
+  display: flex;
+  gap: 4px;
+}
+.player-portal .room-menu-scale-btn {
+  border: 1px solid var(--pp-border);
+  background: var(--pp-bg-dark);
+  color: var(--pp-text-muted);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.player-portal .room-menu-scale-btn.active {
+  background: var(--pp-accent);
+  color: var(--pp-accent-fg);
+  border-color: var(--pp-accent);
+}
+.player-portal .room-menu-scale-btn:hover:not(.active) {
+  background: var(--pp-secondary);
+  color: var(--pp-text);
+}
+
 /* ─── In-game content — single scroll area ───────────────────────────────────── */
 .player-portal .room-content {
   flex: 1;

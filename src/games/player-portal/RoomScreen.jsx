@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 
 import GameLoader from "../../GameLoader.jsx";
 import { db } from "../../firebase.js";
+import { FONT_SCALE_OPTIONS, applyFontScale, getSavedFontScale } from "../../fontScale.js";
 import ConfirmModal from "./ConfirmModal.jsx";
 import "./PlayerPortal.css";
 
@@ -43,6 +44,7 @@ export default function RoomScreen({ room, player, authUser, onBack, onRoomDelet
   const [syncMessage, setSyncMessage] = useState("Connecting to room...");
   const [confirmProps, setConfirmProps] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [fontScale, setFontScale] = useState(getSavedFontScale);
   const menuRef = useRef(null);
 
   const isCreator = currentRoom.createdBy === player.id;
@@ -165,6 +167,25 @@ export default function RoomScreen({ room, player, authUser, onBack, onRoomDelet
                   <p className="room-menu-meta">{currentRoom.gameTitle || currentRoom.gameId}</p>
                   <p className="room-menu-meta">Players: {getPlayerNames(currentRoom)}</p>
                   {message && <p className="room-menu-message">{message}</p>}
+                </div>
+
+                <hr className="room-menu-divider" />
+
+                {/* Font scale */}
+                <div className="room-menu-scale">
+                  <span className="room-menu-scale-label">Text size</span>
+                  <div className="room-menu-scale-btns">
+                    {FONT_SCALE_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        className={`room-menu-scale-btn${fontScale === opt.value ? " active" : ""}`}
+                        onClick={() => { applyFontScale(opt.value); setFontScale(opt.value); }}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <hr className="room-menu-divider" />
