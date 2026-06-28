@@ -31,3 +31,4 @@ export { default as TerrainGeneratorCommand } from "./TerrainGeneratorCommand";
 export { default as NoMinisCombatCommand, NoMinisCombatRoundCommand, NoMinisContinueCommand } from "./NoMinisCombatCommand";
 export { default as NoMinisInitiativeCommand } from "./NoMinisInitiativeCommand";
 export { default as NoMinisFirefightCommand } from "./NoMinisFirefightCommand";
+export { default as TabletopCombatCommand, TabletopCombatRoundCommand, TabletopContinueCommand } from "./TabletopCombatCommand";

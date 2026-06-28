@@ -1783,6 +1783,324 @@ function WorldLogSheet({ worldLog, campaign }) {
   );
 }
 
+// ─── Status Bar ─────────────────────────────────────────────────────────────
+
+const PHASE_LABELS = {
+  setup: "Setup",
+  travel: "Travel",
+  world: "World",
+  tabletopBattle: "Battle",
+  postBattle: "Post-Battle",
+  complete: "Complete",
+};
+
+const COMBAT_PHASE_LABELS = {
+  "pre-battle": "Pre-Battle",
+  "reaction-roll": "Reaction Roll",
+  "quick-actions": "Quick Actions",
+  "enemy-actions": "Enemy Actions",
+  "slow-actions": "Slow Actions",
+  "end-phase": "End Phase",
+  "complete": "Complete",
+};
+
+function StatusBar({ campaign, encounter }) {
+  const turnNumber = campaign?.turnNumber ?? 0;
+  const phase = campaign?.phase ?? "setup";
+  const phaseLabel = PHASE_LABELS[phase] || phase;
+  const resolutionMode = encounter?.resolutionMode;
+  const combatPhase = encounter?.combatPhase;
+  const roundNumber = encounter?.roundNumber ?? 0;
+  const inBattle = phase === "tabletopBattle" && resolutionMode && combatPhase && combatPhase !== "pre-battle";
+  const combatPhaseLabel = COMBAT_PHASE_LABELS[combatPhase] || combatPhase;
+  const modeLabel = resolutionMode === "no-minis" ? "No-Minis" : resolutionMode === "tabletop" ? "Miniatures" : null;
+
+  return (
+    <div className="fp-status-bar">
+      <span className="fp-status-turn">Turn {turnNumber}</span>
+      <span className="fp-status-sep">·</span>
+      <span className="fp-status-phase">{phaseLabel}</span>
+      {inBattle && modeLabel && (
+        <>
+          <span className="fp-status-sep">·</span>
+          <span className="fp-status-mode">{modeLabel}</span>
+          {roundNumber > 0 && (
+            <>
+              <span className="fp-status-sep">·</span>
+              <span className="fp-status-round">Round {roundNumber}</span>
+            </>
+          )}
+          {combatPhaseLabel && (
+            <>
+              <span className="fp-status-sep">·</span>
+              <span className="fp-status-combat-phase">{combatPhaseLabel}</span>
+            </>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── Quick Reference Drawer ──────────────────────────────────────────────────
+
+const QUICK_REF_TABS = [
+  {
+    id: "shooting",
+    label: "Shooting",
+    content: [
+      { heading: "To Hit — Roll 1D6 + Combat Skill" },
+      { text: "Open target within 6\" → 3+" },
+      { text: "Open target within range → 5+" },
+      { text: "Covered target within range → 6+" },
+      { text: "Must fire at a target within 3\" if any enemies are within 3\"." },
+      { heading: "Damage — Roll 1D6 + Damage Rating" },
+      { text: "Target eliminated if die is a 6 OR modified score equals or exceeds Toughness." },
+      { text: "Survivor is pushed 1\" back and Stunned." },
+    ],
+  },
+  {
+    id: "brawling",
+    label: "Brawling",
+    content: [
+      { heading: "Brawling — Roll 1D6 + Combat Skill" },
+      { text: "+2 Melee bonus / +1 Pistol bonus" },
+      { text: "Loser takes a Hit. Both take a Hit on a draw." },
+      { text: "Inflict additional Hit if rolling a 6." },
+      { text: "Suffer additional Hit if rolling a 1." },
+    ],
+  },
+  {
+    id: "movement",
+    label: "Movement",
+    content: [
+      { heading: "Movement" },
+      { text: "Move up to Speed in inches (vertical or horizontal)." },
+      { text: "Difficult terrain costs +1\" per 2\" moved." },
+      { text: "If entering contact with enemy → Brawl." },
+      { text: "Move +2\" bonus if not firing." },
+      { heading: "Stunned Figures" },
+      { text: "May Move OR make a Combat Action (not both)." },
+      { text: "Remove 1 Stun marker after acting." },
+    ],
+  },
+  {
+    id: "morale",
+    label: "Morale",
+    content: [
+      { heading: "Enemy Morale — End of Each Round" },
+      { text: "Roll 1D6 per enemy casualty this round." },
+      { text: "Each die ≤ Panic range → 1 enemy Bails." },
+      { text: "Apply Bail starting with figure closest to enemy edge." },
+      { text: "Fearless enemies never test Morale." },
+      { heading: "Ending the Battle" },
+      { text: "All enemies slain or Bailed → you Hold the Field." },
+      { text: "Win condition: achieve your objective AND/OR Hold the Field." },
+      { text: "Player forces do NOT test Morale — you may abandon by moving crew off any edge." },
+    ],
+  },
+  {
+    id: "terrain",
+    label: "Terrain",
+    content: [
+      { heading: "Cover" },
+      { text: "Covered target → needs 6+ to hit (instead of 5+)." },
+      { text: "Difficult terrain: +1\" cost per 2\" of movement." },
+      { heading: "Snap Fire" },
+      { text: "Crew in Quick Actions may hold to fire when enemy moves, or delay to Slow Actions." },
+      { text: "Firing during Enemy Actions prevents moving this round." },
+      { text: "If moving enemy is Stunned by snap fire, they lose ability to fire this round." },
+    ],
+  },
+];
+
+function QuickRefDrawer({ open, onClose }) {
+  const [activeTab, setActiveTab] = useState("shooting");
+  const tab = QUICK_REF_TABS.find((t) => t.id === activeTab) || QUICK_REF_TABS[0];
+
+  return (
+    <>
+      {open && <div className="fp-drawer-backdrop" onClick={onClose} />}
+      <div className={`fp-quick-ref-drawer${open ? " fp-drawer-open" : ""}`} role="dialog" aria-label="Quick Reference">
+        <div className="fp-drawer-handle-bar" />
+        <div className="fp-drawer-header">
+          <span className="fp-drawer-title">Quick Reference</span>
+          <button className="fp-drawer-close" onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        <div className="fp-drawer-tabs">
+          {QUICK_REF_TABS.map((t) => (
+            <button
+              key={t.id}
+              className={`fp-drawer-tab${activeTab === t.id ? " fp-drawer-tab-active" : ""}`}
+              onClick={() => setActiveTab(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="fp-drawer-content">
+          {tab.content.map((item, i) =>
+            item.heading ? (
+              <p key={i} className="fp-drawer-heading">{item.heading}</p>
+            ) : (
+              <p key={i} className="fp-drawer-line">{item.text}</p>
+            )
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ─── Story Prompt Download ───────────────────────────────────────────────────
+
+function buildStoryPrompt({ crewLog, worldLog, campaign, logEntries, startTurn, endTurn }) {
+  const crewName = crewLog?.crewName || "the crew";
+  const worldName = worldLog?.currentWorld?.name || "Unknown World";
+  const turnNumber = campaign?.turnNumber ?? "?";
+  const difficultyLabel = campaign?.difficultyModeLabel || "Normal";
+  const crewMembers = Array.isArray(crewLog?.crewMembers) ? crewLog.crewMembers : [];
+  const crewDetails = crewLog?.crewDetails || {};
+
+  const rosterLines = crewMembers.map((m) => {
+    const detail = crewDetails[m.id] || {};
+    const stats = detail.stats || {};
+    const type = detail.characterType || detail.category || "Human";
+    return `  - ${m.name} (${type}) — Reactions ${stats.reactions ?? 1}, Speed ${stats.speed ?? 4}", Combat Skill +${stats.combatSkill ?? 0}, Toughness ${stats.toughness ?? 3}, Savvy +${stats.savvy ?? 0}`;
+  }).join("\n");
+
+  const rangeLabel = startTurn === endTurn
+    ? `Turn ${startTurn}`
+    : `Turns ${startTurn}–${endTurn}`;
+
+  const narrativeEntries = logEntries.filter((e) => {
+    const turnNum = e.turnNumber ?? e.turn ?? null;
+    if (turnNum !== null) {
+      const n = Number(turnNum);
+      if (n < startTurn || n > endTurn) return false;
+    }
+    return e.type !== "commandCompleted" || (e.text && !e.text.startsWith("Loaded") && !e.text.startsWith("Queued"));
+  });
+
+  const logLines = narrativeEntries.map((e) => {
+    const time = e.createdAt ? new Date(e.createdAt).toLocaleString() : "";
+    return `[${time}] ${e.text || e.summary || e.body || JSON.stringify(e)}`;
+  }).join("\n");
+
+  return `# Five Parsecs From Home — Story Prompt
+## Campaign: ${crewName} | ${rangeLabel} | ${worldName} | Difficulty: ${difficultyLabel}
+
+---
+
+## SYSTEM PROMPT
+
+You are a pulp science-fiction author writing a vivid, immersive short story based on actual events from a solo tabletop campaign of Five Parsecs From Home.
+
+Write in past tense, third person. Give the crew personality. Use the crew roster below to name characters. Make dice results feel consequential — a missed shot, a Bailed enemy, a rolled Battle Event should read like a story beat, not a stat. Include sensory detail (the smell of ozone, the echo of boots on metal grating). Keep it 3–5 paragraphs unless the events warrant more.
+
+Do not invent major plot events that contradict the log. Embellish tone and sensation, not facts.
+
+---
+
+## CREW ROSTER
+
+Campaign crew: ${crewName}
+Current world: ${worldName}
+Campaign turn: ${turnNumber}
+
+${rosterLines || "  (No crew data available)"}
+
+---
+
+## CAMPAIGN EVENTS LOG (${rangeLabel})
+
+${logLines || "(No log entries for this range)"}
+
+---
+
+## YOUR TASK
+
+Write the story of these campaign events. Begin in the action. End on a note that makes the reader want to know what happens next turn.
+`;
+}
+
+function StoryPromptModal({ open, onClose, campaign, crewLog, worldLog, logEntries }) {
+  const maxTurn = campaign?.turnNumber ?? 1;
+  const [startTurn, setStartTurn] = useState(maxTurn);
+  const [endTurn, setEndTurn] = useState(maxTurn);
+
+  const entryCount = useMemo(() => {
+    return logEntries.filter((e) => {
+      const t = e.turnNumber ?? e.turn ?? null;
+      if (t !== null) {
+        const n = Number(t);
+        return n >= startTurn && n <= endTurn;
+      }
+      return true;
+    }).length;
+  }, [logEntries, startTurn, endTurn]);
+
+  function handleDownload() {
+    const prompt = buildStoryPrompt({ crewLog, worldLog, campaign, logEntries, startTurn: Number(startTurn), endTurn: Number(endTurn) });
+    const blob = new Blob([prompt], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `five-parsecs-story-turn-${startTurn}${startTurn !== endTurn ? `-${endTurn}` : ""}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    onClose();
+  }
+
+  if (!open) return null;
+
+  return (
+    <div className="fp-modal-backdrop" onClick={onClose}>
+      <div className="fp-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="fp-modal-header">
+          <span className="fp-modal-title">Generate Story Prompt</span>
+          <button className="fp-drawer-close" onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        <p className="fp-modal-desc">
+          Downloads a <code>.md</code> file with your crew roster and campaign log. Paste it into any AI (Claude, ChatGPT, etc.) to generate a story.
+        </p>
+        <div className="fp-modal-row">
+          <label className="fp-modal-label">
+            Start Turn
+            <input
+              className="fp-modal-input"
+              type="number"
+              min={1}
+              max={endTurn}
+              value={startTurn}
+              onChange={(e) => setStartTurn(Math.max(1, Math.min(Number(e.target.value), endTurn)))}
+            />
+          </label>
+          <label className="fp-modal-label">
+            End Turn
+            <input
+              className="fp-modal-input"
+              type="number"
+              min={startTurn}
+              max={maxTurn}
+              value={endTurn}
+              onChange={(e) => setEndTurn(Math.max(startTurn, Math.min(Number(e.target.value), maxTurn)))}
+            />
+          </label>
+        </div>
+        <p className="fp-modal-count">{entryCount} log entries in this range</p>
+        <button className="fp-primary-button fp-modal-download-btn" onClick={handleDownload}>
+          Download Story Prompt
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main View ───────────────────────────────────────────────────────────────
+
 export default function FiveParsecsProcedureView({ gameState, submitAction, player }) {
   const safeGameState = useMemo(() => {
     return {
@@ -1820,6 +2138,9 @@ export default function FiveParsecsProcedureView({ gameState, submitAction, play
         ? "player prop was not passed into the game view"
         : "";
 
+  const [quickRefOpen, setQuickRefOpen] = useState(false);
+  const [storyModalOpen, setStoryModalOpen] = useState(false);
+
   const inspectorWindowRef = useRef(null);
   const stackInspectorPayload = useMemo(() => {
     return buildStackInspectorPayload(safeGameState, stackInspectorReason);
@@ -1848,6 +2169,11 @@ export default function FiveParsecsProcedureView({ gameState, submitAction, play
 
   return (
     <main className="fp-game-dashboard">
+      <StatusBar
+        campaign={safeGameState.campaign}
+        encounter={gameState?.encounter}
+      />
+
       <QueueManager
         gameState={safeGameState}
         submitAction={submitAction}
@@ -1861,6 +2187,37 @@ export default function FiveParsecsProcedureView({ gameState, submitAction, play
         <EncounterLogSheet encounterLog={safeGameState.encounterLog} />
         <WorldLogSheet worldLog={safeGameState.worldLog} campaign={safeGameState.campaign} />
       </section>
+
+      {/* Floating action buttons */}
+      <div className="fp-fab-group">
+        <button
+          className="fp-fab fp-fab-story"
+          onClick={() => setStoryModalOpen(true)}
+          title="Generate Story Prompt"
+          aria-label="Generate Story Prompt"
+        >
+          📖
+        </button>
+        <button
+          className="fp-fab fp-fab-ref"
+          onClick={() => setQuickRefOpen(true)}
+          title="Quick Reference"
+          aria-label="Quick Reference"
+        >
+          ?
+        </button>
+      </div>
+
+      <QuickRefDrawer open={quickRefOpen} onClose={() => setQuickRefOpen(false)} />
+
+      <StoryPromptModal
+        open={storyModalOpen}
+        onClose={() => setStoryModalOpen(false)}
+        campaign={safeGameState.campaign}
+        crewLog={safeGameState.crewLog}
+        worldLog={safeGameState.worldLog}
+        logEntries={safeGameState.logEntries}
+      />
     </main>
   );
 }

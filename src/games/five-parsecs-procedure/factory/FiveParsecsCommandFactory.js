@@ -30,6 +30,9 @@ import {
   NoMinisContinueCommand,
   NoMinisInitiativeCommand,
   NoMinisFirefightCommand,
+  TabletopCombatCommand,
+  TabletopCombatRoundCommand,
+  TabletopContinueCommand,
 } from "../commands";
 import { buildCrewMemberTableResultUpdateCommands } from "../effects";
 import { EQUIPMENT_ROLL_TABLES_BY_ID, SHIP_TABLE_DEFINITION, CAMPAIGN_TABLES } from "../data/tables";
@@ -591,6 +594,16 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     visible = true,
   } = {}) {
     return new NoMinisFirefightCommand({ id, title, roundNumber, firefightModifier, blocksBrawling, pauseAfter, visible });
+  }
+
+  tabletopCombat({
+    id,
+    title = "Tabletop Battle",
+    missionType = "opportunity",
+    pauseAfter = false,
+    visible = true,
+  } = {}) {
+    return new TabletopCombatCommand({ id, title, missionType, pauseAfter, visible });
   }
 
 
@@ -1305,6 +1318,15 @@ export class FiveParsecsCommandFactory extends CommandFactory {
 
       case "noMinisFirefight":
         return new NoMinisFirefightCommand(commandData);
+
+      case "tabletopCombat":
+        return new TabletopCombatCommand(commandData);
+
+      case "tabletopCombatRound":
+        return new TabletopCombatRoundCommand(commandData);
+
+      case "tabletopContinue":
+        return new TabletopContinueCommand(commandData);
 
       default:
         console.warn(`Unknown command type: ${commandData.type}`);

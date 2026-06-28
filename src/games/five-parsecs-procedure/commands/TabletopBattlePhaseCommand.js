@@ -1,6 +1,7 @@
 import BaseCommand from "../../../procedure-core/commands/BaseCommand";
 import { removeUndefinedValues } from "../../../procedure-core/utils";
 import NoMinisCombatCommand from "./NoMinisCombatCommand";
+import TabletopCombatCommand from "./TabletopCombatCommand";
 import TerrainGeneratorCommand from "./TerrainGeneratorCommand";
 
 export class TabletopBattlePhaseCommand extends BaseCommand {
@@ -126,11 +127,10 @@ export class TabletopBattlePhaseCommand extends BaseCommand {
             ]);
           } else {
             ctx.pushCommandsToTop([
-              f.popupMessage({
-                id: `${this.commandBaseId}-play-battle`,
+              new TabletopCombatCommand({
+                id: `${this.commandBaseId}-tabletop-combat`,
                 title: "Tabletop Battle",
-                message: "Play the tabletop battle now. When the battle is complete, click the button below to continue to the Post-Battle Sequence.",
-                buttonText: "Battle Complete",
+                missionType: this.missionType,
                 pauseAfter: false,
               }),
             ]);
