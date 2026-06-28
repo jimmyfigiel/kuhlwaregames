@@ -299,7 +299,6 @@
 
 .fp-table-roll-line {
   display: flex;
-  justify-content: space-between;
   gap: 12px;
   border-bottom: 1px solid #e5e7eb;
   padding-bottom: 6px;
