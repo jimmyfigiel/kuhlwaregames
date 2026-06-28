@@ -29,6 +29,8 @@ export class ApplyShipSetupCommand extends BaseCommand {
     sourcePath = "shipSetup.selectedShip",
     debtPath = "shipSetup.generatedDebt",
     namePath = "shipSetup.shipName",
+    // Optional: pass ship data directly so re-reading from state isn't needed
+    shipData = null,
     status = "pending",
     pauseAfter = false,
     visible = false,
@@ -45,10 +47,11 @@ export class ApplyShipSetupCommand extends BaseCommand {
     this.sourcePath = sourcePath;
     this.debtPath = debtPath;
     this.namePath = namePath;
+    this.shipData = shipData;
   }
 
   execute(engineContext) {
-    const selectedShip = engineContext.getStateValue(this.sourcePath) || {};
+    const selectedShip = this.shipData || engineContext.getStateValue(this.sourcePath) || {};
     const generatedDebt = Number(engineContext.getStateValue(this.debtPath) || 0);
     const shipName = String(engineContext.getStateValue(this.namePath) || selectedShip?.name || "").trim();
     const shipRecord = makeShipRecord({ selectedShip, shipName, generatedDebt });
@@ -93,6 +96,7 @@ export class ApplyShipSetupCommand extends BaseCommand {
       sourcePath: this.sourcePath,
       debtPath: this.debtPath,
       namePath: this.namePath,
+      shipData: this.shipData,
     });
   }
 }

@@ -118,6 +118,12 @@ export class CampaignPrepCommand extends BaseCommand {
         pauseAfter: false,
         visible: true,
       }),
+      factory.buildStartingStash({
+        id: "build-starting-stash",
+        title: "Build Starting Crew Stash",
+        pauseAfter: false,
+        visible: false,
+      }),
       factory.updateState({
         id: "finish-campaign-prep",
         title: "Finish Campaign Prep",

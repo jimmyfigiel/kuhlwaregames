@@ -23,6 +23,7 @@ import {
   ApplyShipSetupCommand,
   CampaignPrepCommand,
   ResolveStartingStoryPointsCommand,
+  BuildStartingStashCommand,
   ApplyStarshipTravelEventCommand,
   TerrainGeneratorCommand,
   NoMinisCombatCommand,
@@ -622,6 +623,22 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     });
   }
 
+  buildStartingStash({
+    id = "build-starting-stash",
+    title = "Build Starting Crew Stash",
+    crewCountPath = "crewLog.startingCrewCount",
+    pauseAfter = false,
+    visible = false,
+  } = {}) {
+    return new BuildStartingStashCommand({
+      id,
+      title,
+      crewCountPath,
+      pauseAfter,
+      visible,
+    });
+  }
+
   resolveStartingStoryPoints({
     id = "resolve-starting-story-points",
     title = "Starting Story Points",
@@ -788,6 +805,7 @@ export class FiveParsecsCommandFactory extends CommandFactory {
         sourcePath: "shipSetup.selectedShip",
         debtPath: "shipSetup.generatedDebt",
         namePath: "shipSetup.shipName",
+        shipData: selectedShip,
         pauseAfter: false,
         visible: false,
       }),
@@ -1300,6 +1318,9 @@ export class FiveParsecsCommandFactory extends CommandFactory {
 
       case "resolveStartingStoryPoints":
         return new ResolveStartingStoryPointsCommand(commandData);
+
+      case "buildStartingStash":
+        return new BuildStartingStashCommand(commandData);
 
       case "terrainGenerator":
         return new TerrainGeneratorCommand(commandData);

@@ -23,6 +23,7 @@ export { default as QueueShipTableResultUpdateCommandsCommand } from "./QueueShi
 export { ResolveShipDebtCommand, default as ResolveShipDebtCommandDefault } from "./ResolveShipDebtCommand";
 export { default as ApplyShipSetupCommand } from "./ApplyShipSetupCommand";
 export { default as CampaignPrepCommand } from "./CampaignPrepCommand";
+export { default as BuildStartingStashCommand } from "./BuildStartingStashCommand";
 export { ResolveStartingStoryPointsCommand, default as ResolveStartingStoryPointsCommandDefault } from "./ResolveStartingStoryPointsCommand";
 
 export { ApplyStarshipTravelEventCommand } from "./ApplyStarshipTravelEventCommand";
