@@ -1,0 +1,98 @@
+// Battle Flow Events table verbatim from 5PFH Compendium p.71
+export const NO_MINIS_BATTLE_FLOW_EVENTS = {
+  id: "no-minis-battle-flow-events",
+  label: "Battle Flow Events",
+  title: "Battle Flow Events",
+  dice: "D100",
+  sides: 100,
+  entries: [
+    {
+      min: 1, max: 6,
+      label: "Fleeting Shot",
+      value: "fleeting-shot",
+      text: "A randomly selected crew figure may immediately shoot at a target of your choice, if able to shoot. The shot is conducted at maximum weapon range, the firer counts as moving (if using a Heavy weapon), and the target is counted as being in Cover. The target may not return fire.",
+    },
+    {
+      min: 7, max: 14,
+      label: "Running Firefight",
+      value: "running-firefight",
+      text: "Randomly select a character from each side. They immediately fire at each other. Fire is assumed to be simultaneous and conducted at a range equal to the shortest-ranged of the two weapons. Melee-only combatants cannot fire. Both count as being in Cover and moving.",
+    },
+    {
+      min: 15, max: 22,
+      label: "Stumble Into Each Other",
+      value: "stumble-into-each-other",
+      text: "Randomly select a character from each side. Resolve a Brawl immediately.",
+    },
+    {
+      min: 23, max: 29,
+      label: "Exposed!",
+      value: "exposed",
+      text: "A random enemy figure immediately fires on a random crew member. The attack is conducted at maximum weapon range, from a stationary shooter, and versus Cover. No return fire is permitted.",
+    },
+    {
+      min: 30, max: 35,
+      label: "Spot Firing Position",
+      value: "spot-firing-position",
+      text: "Add a known Firing Position Location to the Location list. A character in a Firing Position counts all targets in ranged combat as being in the open.",
+    },
+    {
+      min: 36, max: 43,
+      label: "Find Shortcut",
+      value: "find-shortcut",
+      text: "Randomly select a crew member. They may choose to move to any known Location, if desired.",
+    },
+    {
+      min: 44, max: 50,
+      label: "Discover Location",
+      value: "discover-location",
+      text: "If any Locations are suspected, randomly discover one (add 1 known Location).",
+    },
+    {
+      min: 51, max: 58,
+      label: "Difficult Sight-lines",
+      value: "difficult-sight-lines",
+      text: "During the Firefight phase this round, select one fewer enemy figure.",
+      firefightModifier: -1,
+    },
+    {
+      min: 59, max: 65,
+      label: "Kill Zone",
+      value: "kill-zone",
+      text: "Roll 1D6+10. All gunfire this battle round takes place at this range (in inches). Weapons unable to reach cannot fire.",
+      requiresRoll: { dice: "1D6", bonus: 10 },
+    },
+    {
+      min: 66, max: 72,
+      label: "Open Ground",
+      value: "open-ground",
+      text: "All characters attempting to enter Brawling combat count as being in the open, if fired upon.",
+    },
+    {
+      min: 73, max: 80,
+      label: "Intense Fight",
+      value: "intense-fight",
+      text: "During the Firefight phase this round, select one more enemy figure.",
+      firefightModifier: +1,
+    },
+    {
+      min: 81, max: 86,
+      label: "Careful Maneuvering",
+      value: "careful-maneuvering",
+      text: "Choose an enemy figure. This figure cannot attack in the Firefight phase this round.",
+    },
+    {
+      min: 87, max: 94,
+      label: "Covered Retreat",
+      value: "covered-retreat",
+      text: "You may immediately retreat any number of crew members, if desired.",
+    },
+    {
+      min: 95, max: 100,
+      label: "Separated",
+      value: "separated",
+      text: "No Brawling combat can be attempted this battle round. Melee-only enemies will not attack.",
+      blocksBrawling: true,
+    },
+  ],
+};

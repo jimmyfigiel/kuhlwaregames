@@ -8,3 +8,6 @@ export * from "./startingEquipmentTables.js";
 export { SHIP_TABLE, SHIP_TABLE_DEFINITION, SHIP_TRAIT_DESCRIPTIONS } from "./shipTables.js";
 
 export * from "./campaignTables.js";
+export * from "./terrainGenerator.js";
+export * from "./noMinisBattleFlowEvents.js";
+export * from "./noMinisInitiativeActions.js";

@@ -24,6 +24,12 @@ import {
   CampaignPrepCommand,
   ResolveStartingStoryPointsCommand,
   ApplyStarshipTravelEventCommand,
+  TerrainGeneratorCommand,
+  NoMinisCombatCommand,
+  NoMinisCombatRoundCommand,
+  NoMinisContinueCommand,
+  NoMinisInitiativeCommand,
+  NoMinisFirefightCommand,
 } from "../commands";
 import { buildCrewMemberTableResultUpdateCommands } from "../effects";
 import { EQUIPMENT_ROLL_TABLES_BY_ID, SHIP_TABLE_DEFINITION, CAMPAIGN_TABLES } from "../data/tables";
@@ -543,6 +549,48 @@ export class FiveParsecsCommandFactory extends CommandFactory {
       pauseAfter,
       visible,
     });
+  }
+
+  terrainGenerator({
+    id,
+    title = "Terrain Generator",
+    pauseAfter = false,
+    visible = true,
+  } = {}) {
+    return new TerrainGeneratorCommand({ id, title, pauseAfter, visible });
+  }
+
+  noMinisCombat({
+    id,
+    title = "No-Minis Combat Resolution",
+    missionType = "standard",
+    pauseAfter = false,
+    visible = true,
+  } = {}) {
+    return new NoMinisCombatCommand({ id, title, missionType, pauseAfter, visible });
+  }
+
+  noMinisInitiative({
+    id,
+    title = "Initiative Action",
+    characterName = "Crew Member",
+    roundNumber = 1,
+    pauseAfter = false,
+    visible = true,
+  } = {}) {
+    return new NoMinisInitiativeCommand({ id, title, characterName, roundNumber, pauseAfter, visible });
+  }
+
+  noMinisFirefight({
+    id,
+    title = "The Firefight",
+    roundNumber = 1,
+    firefightModifier = 0,
+    blocksBrawling = false,
+    pauseAfter = false,
+    visible = true,
+  } = {}) {
+    return new NoMinisFirefightCommand({ id, title, roundNumber, firefightModifier, blocksBrawling, pauseAfter, visible });
   }
 
 
@@ -1239,6 +1287,24 @@ export class FiveParsecsCommandFactory extends CommandFactory {
 
       case "resolveStartingStoryPoints":
         return new ResolveStartingStoryPointsCommand(commandData);
+
+      case "terrainGenerator":
+        return new TerrainGeneratorCommand(commandData);
+
+      case "noMinisCombat":
+        return new NoMinisCombatCommand(commandData);
+
+      case "noMinisCombatRound":
+        return new NoMinisCombatRoundCommand(commandData);
+
+      case "noMinisContinue":
+        return new NoMinisContinueCommand(commandData);
+
+      case "noMinisInitiative":
+        return new NoMinisInitiativeCommand(commandData);
+
+      case "noMinisFirefight":
+        return new NoMinisFirefightCommand(commandData);
 
       default:
         console.warn(`Unknown command type: ${commandData.type}`);
