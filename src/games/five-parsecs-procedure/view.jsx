@@ -1637,7 +1637,7 @@ function WorldLogSheet({ worldLog, campaign }) {
   const mostRecentPreviousWorld = visitedWorlds.length > 0
     ? visitedWorlds[visitedWorlds.length - 1]
     : null;
-  const mostRecentPreviousWorldName = typeof mostRecentPreviousWorld === "object"
+  const mostRecentPreviousWorldName = mostRecentPreviousWorld && typeof mostRecentPreviousWorld === "object"
     ? mostRecentPreviousWorld.name
     : mostRecentPreviousWorld;
 
