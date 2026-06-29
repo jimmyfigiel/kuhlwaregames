@@ -579,7 +579,8 @@
 
 .fp-table-command-card {
   max-height: min(72vh, 720px);
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .fp-command-card .fp-primary-button,
