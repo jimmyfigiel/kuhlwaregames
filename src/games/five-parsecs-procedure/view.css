@@ -390,7 +390,7 @@
 }
 
 .fp-table-choice-range {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   min-height: 36px;
@@ -404,6 +404,7 @@
 .fp-table-choice-main {
   display: grid;
   gap: 3px;
+  text-align: left;
 }
 
 .fp-table-choice-main strong {
