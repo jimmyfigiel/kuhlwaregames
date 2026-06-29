@@ -15,6 +15,9 @@ export { default as DecideTravelCommand } from "./DecideTravelCommand";
 export { default as NewWorldArrivalCommand } from "./NewWorldArrivalCommand";
 export { default as ReturnToVisitedWorldCommand } from "./ReturnToVisitedWorldCommand";
 export { default as WorldPhaseCommand } from "./WorldPhaseCommand";
+export { default as WorldCrewTasksCommand } from "./WorldCrewTasksCommand";
+export { default as WorldJobOffersCommand } from "./WorldJobOffersCommand";
+export { default as WorldChooseBattleCommand } from "./WorldChooseBattleCommand";
 export { default as TabletopBattlePhaseCommand } from "./TabletopBattlePhaseCommand";
 export { default as PostBattlePhaseCommand } from "./PostBattlePhaseCommand";
 

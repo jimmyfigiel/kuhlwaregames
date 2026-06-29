@@ -10,6 +10,9 @@ import {
   NewWorldArrivalCommand,
   ReturnToVisitedWorldCommand,
   WorldPhaseCommand,
+  WorldCrewTasksCommand,
+  WorldJobOffersCommand,
+  WorldChooseBattleCommand,
   TabletopBattlePhaseCommand,
   PostBattlePhaseCommand,
   CrewMemberNameCommand,
@@ -1276,6 +1279,38 @@ export class FiveParsecsCommandFactory extends CommandFactory {
 
       case "worldPhase":
         return new WorldPhaseCommand(commandData);
+
+      case "worldCrewTasks":
+        return new WorldCrewTasksCommand(commandData);
+
+      case "worldJobOffers":
+        return new WorldJobOffersCommand(commandData);
+
+      case "worldChooseBattle":
+        return new WorldChooseBattleCommand(commandData);
+
+      case "worldUpkeep":
+      case "worldRumors":
+      case "resolveCrewTask":
+      case "calcPatronSeek":
+      case "patronJobModifiers":
+      case "missionPrepDispatch":
+        // These are inline commands whose execute logic lives in the parent command.
+        // On page refresh they are re-hydrated as plain passthrough objects.
+        // The engine will skip them if already complete; if pending they will be a no-op.
+        return {
+          ...commandData,
+          execute(ctx) {
+            ctx.addLogEntry({
+              type: "warning",
+              text: `Inline command "${commandData.type}" (${commandData.id}) could not be re-hydrated after page refresh. Please continue from the current step.`,
+              commandId: commandData.id,
+            });
+            this.status = "complete";
+            ctx.setStatus("running");
+          },
+          toJSON() { return { ...commandData }; },
+        };
 
       case "tabletopBattlePhase":
         return new TabletopBattlePhaseCommand(commandData);
