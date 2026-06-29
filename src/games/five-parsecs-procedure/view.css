@@ -410,6 +410,9 @@
   flex-direction: column;
   gap: 3px;
   text-align: left;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
 }
 
 .fp-table-choice-main strong {
