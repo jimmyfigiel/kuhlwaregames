@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Deadball Team Builder</title>
+  <style>
+    /* ── Reset & Base ─────────────────────────── */
+    :root {
+      --primary:   #8b2020;
+      --secondary: #555555;
+      --ton:       #ffffff;
+      --bar-bg:    #1a1a1a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      background: #f2f2f2;
+      color: #1a1a1a;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      padding-bottom: calc(72px + env(safe-area-inset-bottom));
+    }
+
+    /* ── Status bar ───────────────────────────── */
+    #statusBar {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0.4rem 1rem;
+      font-size: 0.8rem;
+      color: #777;
+      font-style: italic;
+      min-height: 2rem;
+      display: flex;
+      align-items: center;
+    }
+
+    /* ── Welcome screen ───────────────────────── */
+    #welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      text-align: center;
+      gap: 1rem;
+    }
+    #welcome h1 {
+      font-size: 2.2rem; font-weight: 900; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--primary); transition: color 0.4s;
+    }
+    #welcome p { color: #666; line-height: 1.6; max-width: 360px; }
+    #welcome .arrow { font-size: 2rem; color: var(--primary); animation: bounce 1.5s infinite; transition: color 0.4s; }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+
+    /* ── Team Banner ──────────────────────────── */
+    #teamBanner {
+      background: var(--primary); color: var(--ton);
+      padding: 1.25rem 1.25rem 1rem; transition: background 0.4s;
+      display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+    }
+    .banner-top { display: flex; align-items: center; gap: 1rem; width: 100%; justify-content: center; }
+    #teamLogo { width: 64px; height: 64px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); display: none; flex-shrink: 0; }
+    .banner-name h2 { font-size: 1.6rem; font-weight: 900; letter-spacing: 0.05em; text-transform: uppercase; line-height: 1.1; }
+    .banner-name p { font-size: 0.85rem; opacity: 0.8; margin-top: 0.15rem; }
+    .banner-scores { display: flex; gap: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 0.5rem 1.25rem; }
+    .score-item { text-align: center; }
+    .score-item .sl { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.8; }
+    .score-item .sv { font-size: 1.3rem; font-weight: 700; color: var(--ton); }
+
+    /* ── Section chrome ───────────────────────── */
+    .section-wrap { background: #fff; margin: 0.75rem; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .section-head {
+      background: var(--primary); color: var(--ton);
+      padding: 0.6rem 1rem; font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; transition: background 0.4s;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .section-body { padding: 0.75rem 1rem; }
+
+    /* ── Scorecard cards ──────────────────────── */
+    .sc-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+    @media (min-width: 640px) { .sc-grid { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 1024px) { .sc-grid { grid-template-columns: 1fr 1fr 1fr; } }
+
+    .sc-card {
+      border: 1px solid #e8e8e8;
+      border-left: 4px solid var(--primary);
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      background: #fafafa;
+      transition: border-color 0.4s;
+    }
+    .sc-card.sc-pitcher { border-left-color: #777; }
+    .sc-card-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 0.35rem;
+    }
+    .sc-card-name-wrap { display: flex; align-items: baseline; gap: 0.4rem; }
+    .sc-card-num { font-size: 0.75rem; font-weight: 700; color: var(--primary); min-width: 1rem; transition: color 0.4s; }
+    .sc-card-name { font-weight: 700; font-size: 0.92rem; }
+    .sc-card-badges { display: flex; gap: 0.2rem; flex-shrink: 0; }
+
+    .sc-stats { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; font-size: 0.78rem; margin-bottom: 0.35rem; }
+    .sc-stat-lbl { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: #aaa; display: block; }
+    .sc-stat-val { font-weight: 700; font-family: 'Courier New', monospace; }
+    .sc-stat-val.bt   { color: #1a1a1a; font-size: 1rem; }
+    .sc-stat-val.walk { color: #1a4a9a; }
+    .sc-stat-val.crit { color: #8a1a1a; }
+    .sc-stat-val.mod  { color: #444; }
+    .sc-stat-val.mod.pos { color: #2a7a10; }
+    .sc-stat-val.mod.neg { color: #b02020; }
+
+    .sc-hit-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: #bbb; margin-bottom: 0.2rem; }
+    .sc-card-divider { border: none; border-top: 1px solid #eee; margin: 0.35rem 0; }
+
+    /* ── Traits key ───────────────────────────── */
+    .traits-key { padding: 0.75rem 1rem; }
+    .traits-key h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #999; margin-bottom: 0.5rem; }
+    .traits-key-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 1rem; font-size: 0.75rem; }
+    @media (min-width: 640px) { .traits-key-grid { grid-template-columns: 1fr 1fr 1fr; } }
+    .trait-key-row { display: flex; gap: 0.4rem; align-items: baseline; padding: 0.15rem 0; border-bottom: 1px dotted #f0f0f0; }
+    .trait-key-code { font-weight: 700; min-width: 2.8rem; flex-shrink: 0; }
+    .trait-key-desc { color: #555; font-size: 0.72rem; line-height: 1.3; }
+    .rule-text { font-size: 0.74rem; line-height: 1.5; color: #444; }
+    .rule-text p { margin-bottom: 0.45rem; }
+    .rule-text .trait { font-size: 0.7rem; margin-right: 0.2rem; }
+
+    /* ── Lineup builder ───────────────────────── */
+    .lineup-slots { display: flex; flex-direction: column; gap: 0.5rem; }
+    .lineup-slot {
+      border: 1px solid #e8e8e8; border-left: 4px solid var(--primary);
+      border-radius: 6px; padding: 0.6rem 0.75rem; background: #fafafa; transition: border-color 0.4s, opacity 0.15s;
+    }
+    .lineup-slot.drag-src  { opacity: 0.4; }
+    .lineup-slot.drag-over { background: #e8f0ff; border-left-color: #5566cc; }
+    .slot-top { display: grid; grid-template-columns: 1rem 1.4rem 4.5rem 1fr; gap: 0.4rem; align-items: center; }
+    .drag-handle { cursor: grab; color: #bbb; font-size: 1rem; line-height: 1; user-select: none; touch-action: none; padding: 0 0.1rem; }
+    .drag-handle:hover { color: #888; }
+    .slot-num { font-size: 1.1rem; font-weight: 700; color: var(--primary); text-align: center; transition: color 0.4s; }
+    .slot-player, .slot-pos { width: 100%; font-size: 0.88rem; }
+    .slot-preview { margin-top: 0.3rem; font-size: 0.72rem; color: #777; font-family: 'Courier New', monospace; padding-left: 2.2rem; line-height: 1.5; }
+    .pitcher-slot { border: 1px solid #e8e8e8; border-left: 4px solid #777; border-radius: 6px; padding: 0.6rem 0.75rem; background: #fafafa; }
+    .pitcher-slot-top { display: grid; grid-template-columns: 5rem 1fr; gap: 0.5rem; align-items: center; }
+    .pitcher-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #555; }
+
+    select, button {
+      border-radius: 6px; border: 1px solid #ccc; padding: 0.4rem 0.5rem;
+      font-size: 0.9rem; background: #fff; color: #1a1a1a; font-family: inherit;
+      cursor: pointer; min-height: 36px;
+    }
+    select:focus, button:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+    select:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--primary); border-color: var(--primary); color: #fff;
+      font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 0.5rem 1.25rem; width: 100%; font-size: 0.9rem; margin-top: 0.75rem;
+      transition: filter 0.15s;
+    }
+    .btn-primary:hover:not(:disabled) { filter: brightness(1.12); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary {
+      background: #fff; border-color: var(--primary); color: var(--primary);
+      font-weight: 600; padding: 0.4rem 1rem; font-size: 0.85rem; transition: background 0.15s;
+    }
+    .btn-secondary:hover { background: #fdf0f0; }
+    .lineup-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+    .lineup-actions .btn-primary { margin-top: 0; flex: 1; }
+
+    /* ── Player cards ─────────────────────────── */
+    .card-grid { display: grid; grid-template-columns: 1fr; gap: 0.6rem; }
+    @media (min-width: 600px) { .card-grid { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 960px) { .card-grid { grid-template-columns: 1fr 1fr 1fr; } }
+
+    .player-card {
+      background: #fff; border-radius: 10px; border-left: 4px solid var(--primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 0.75rem; transition: border-color 0.4s;
+    }
+    .player-card.pitcher-card { border-left-color: #777; }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+    .card-name { font-weight: 700; font-size: 0.95rem; line-height: 1.2; }
+    .card-badges { display: flex; gap: 0.25rem; flex-shrink: 0; margin-left: 0.5rem; }
+    .badge { display: inline-block; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em; }
+    .badge-pos  { background: var(--primary); color: var(--ton); transition: background 0.4s; }
+    .badge-hand { background: #e0e0e0; color: #444; }
+    .card-stats { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.8rem; color: #555; margin-bottom: 0.5rem; }
+    .stat-val { font-weight: 700; color: #1a1a1a; }
+    .stat-lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #999; }
+    .card-divider { border: none; border-top: 1px solid #f0f0f0; margin: 0.5rem 0; }
+    .hit-table-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: #999; margin-bottom: 0.25rem; }
+    .hit-ranges { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+
+    /* ── Hit type chips ───────────────────────── */
+    .hr-chip {
+      padding: 0.15rem 0.4rem; border-radius: 4px;
+      font-size: 0.72rem; font-family: 'Courier New', monospace; font-weight: 700;
+    }
+    .hr-chip.c1b-plus { background: #bbf7d0; color: #065f46; }
+    .hr-chip.c1b      { background: #e8f5e2; color: #1a6a1a; }
+    .hr-chip.c1b-def  { background: #d0eac8; color: #1a6a1a; border: 1px dashed #3a8a1a; }
+    .hr-chip.c2b      { background: #e8eef8; color: #1a3a8a; }
+    .hr-chip.c2b-def  { background: #d0d8f0; color: #1a3a8a; border: 1px dashed #4a6aba; }
+    .hr-chip.c3b-def  { background: #fdf3e0; color: #7a4a00; border: 1px dashed #9a6a00; }
+    .hr-chip.chr      { background: #fde8e8; color: #8a1a1a; }
+
+    .card-traits { display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; }
+    .toggle-def {
+      background: none; border: 1px dashed #bbb; border-radius: 4px;
+      padding: 0.05rem 0.35rem; font-size: 0.68rem; cursor: pointer;
+      color: #888; line-height: 1.4; min-height: unset;
+    }
+    .toggle-def:hover { border-color: #888; color: #333; }
+    .trait { display: inline-block; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
+    .trait-pos { background: #e8f5e2; border: 1px solid #5a9a3a; color: #2a6a10; }
+    .trait-neg { background: #fde8e8; border: 1px solid #c05050; color: #8b1a1a; }
+    .trait-neutral { background: #f0f0f0; border: 1px solid #bbb; color: #555; }
+
+    .pitch-die { font-weight: 700; font-size: 1rem; font-family: 'Courier New', monospace; }
+    .pitch-die.good { color: #2a7a10; }
+    .pitch-die.avg  { color: #444; }
+    .pitch-die.bad  { color: #b02020; }
+
+    /* ── Bottom bar ───────────────────────────── */
+    .bottom-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--bar-bg); border-top: 3px solid var(--primary);
+      padding: 0.6rem 0.75rem; padding-bottom: calc(0.6rem + env(safe-area-inset-bottom));
+      display: flex; gap: 0.5rem; align-items: center; z-index: 100;
+      flex-wrap: wrap; transition: border-color 0.4s;
+    }
+    .bottom-bar select {
+      background: #2a2a2a; border-color: #444; color: #eee;
+      font-size: 0.85rem; min-height: 38px; flex: 1; min-width: 100px;
+    }
+    .bottom-bar .btn-build {
+      background: var(--primary); border-color: var(--primary); color: #fff;
+      font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 0 1rem; min-height: 38px; white-space: nowrap; transition: filter 0.15s; flex-shrink: 0;
+    }
+    .bottom-bar .btn-build:hover:not(:disabled) { filter: brightness(1.15); }
+    .bottom-bar .btn-build:disabled { opacity: 0.4; cursor: not-allowed; }
+    .bottom-bar .btn-print {
+      background: #2d5a1b; border-color: #2d5a1b; color: #fff;
+      font-size: 0.78rem; padding: 0 0.75rem; min-height: 38px;
+      white-space: nowrap; display: none; flex-shrink: 0;
+    }
+    .bottom-bar .btn-print:hover { filter: brightness(1.15); }
+
+    /* ── Helpers ──────────────────────────────── */
+    .hidden { display: none !important; }
+    .muted  { color: #999; font-size: 0.75rem; font-style: italic; }
+    .no-print { }
+
+    /* ── Print ────────────────────────────────── */
+    @media print {
+      body { background: #fff; padding-bottom: 0; font-size: 11px; }
+      .bottom-bar, #statusBar, #welcome, #lineupSection, #rosterSection,
+      .no-print, button { display: none !important; }
+      .section-wrap { box-shadow: none; margin: 0; border-radius: 0; }
+      #teamBanner { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .section-head { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .sc-card { page-break-inside: avoid; }
+    }
+
+    /* ── Tablet / Desktop ─────────────────────── */
+    @media (min-width: 768px) {
+      .bottom-bar { gap: 0.75rem; padding: 0.75rem 1.5rem; padding-bottom: calc(0.75rem + env(safe-area-inset-bottom)); }
+      .bottom-bar select { font-size: 0.92rem; }
+      .banner-name h2 { font-size: 2rem; }
+      #teamLogo { width: 80px; height: 80px; }
+      .section-wrap { margin: 0.75rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="statusBar">Select a season and team below to get started.</div>
+
+<main>
+
+  <div id="welcome">
+    <h1>Deadball<br>Team Builder</h1>
+    <p>Select a season and team using the controls below. We'll build a full roster with Deadball ratings from real MLB statistics.</p>
+    <div class="arrow">↓</div>
+  </div>
+
+  <div id="teamBanner" class="hidden">
+    <div class="banner-top">
+      <img id="teamLogo" src="" alt="" onerror="this.style.display='none'">
+      <div class="banner-name">
+        <h2 id="bannerName">Team</h2>
+        <p id="bannerYear">Season</p>
+      </div>
+    </div>
+    <div class="banner-scores">
+      <div class="score-item"><div class="sl">Batting</div><div class="sv" id="scoreBat">—</div></div>
+      <div class="score-item"><div class="sl">Pitching</div><div class="sv" id="scorePitch">—</div></div>
+      <div class="score-item"><div class="sl">Team Score</div><div class="sv" id="scoreTeam">—</div></div>
+    </div>
+  </div>
+
+  <!-- SCORECARD — shown above lineup once generated -->
+  <div id="scorecardSection" class="hidden">
+    <div class="section-wrap">
+      <div class="section-head">
+        <span>Scorecard</span>
+        <button class="btn-secondary no-print" id="hideScorecard" style="font-size:0.7rem;padding:0.15rem 0.6rem;min-height:unset;margin:0">Hide</button>
+      </div>
+      <div class="section-body">
+        <div class="sc-grid" id="scorecardCards"></div>
+      </div>
+    </div>
+
+    <!-- Traits key -->
+    <div class="section-wrap">
+      <div class="section-head">Trait Reference</div>
+      <div class="traits-key">
+        <h3>Advanced Hit Table (d20)</h3>
+        <div class="rule-text">
+          <p>1-2 Single+ &nbsp;|&nbsp; 3 Single, DEF (1B) &nbsp;|&nbsp; 4 Single, DEF (2B) &nbsp;|&nbsp; 5 Single, DEF (3B) &nbsp;|&nbsp; 6 Single, DEF (SS) &nbsp;|&nbsp; 7 Single, DEF (SS/2B*)</p>
+          <p>8-12 Single, runners adv. 2+ &nbsp;|&nbsp; 13 Double, DEF (LF) &nbsp;|&nbsp; 14 Double, DEF (CF) &nbsp;|&nbsp; 15 Double, DEF (RF)</p>
+          <p>16-17 Double, runners adv. 3 &nbsp;|&nbsp; 18 Triple, DEF (RF/CF**)+ &nbsp;|&nbsp; 19-20 Home Run</p>
+          <p style="color:#999">+: Players with certain traits have special results on these rolls. *: If MSS is even, shortstop fields ball; if odd, second baseman fields ball. **: If MSS is even, right fielder fields ball; if odd, center fielder fields ball.</p>
+          <p style="color:#999">Our calculator builds an equivalent d100 table per player from their real H/2B/3B/HR split, preserving these same fielder slots and ratios — see the Hit Type Legend below.</p>
+        </div>
+
+        <h3 style="margin-top:0.75rem">Batter Traits</h3>
+        <div class="rule-text">
+          <p><strong>Power Hitters (P+/P++)</strong> — P+ hitters add 1 to every roll on the Hit Table. P++ players add 2 to every roll on the Hit Table. Power Hitters can be shifted against.</p>
+          <p><strong>Weak Hitters (P-/P--)</strong> — For P- hitters, subtract 1 from any Hit Die roll. For P-- hitters, subtract 2. Rolls of less than 0 count as ordinary singles. By default, all pitchers are P-.</p>
+          <p><strong>Contact Hitters (C+)</strong> — On Hit Table rolls of 1-2, batter doubles and runners advance 2 bases; do not roll for defense. Bunting is automatically successful. Contact Hitters always convert sacrifice flies (unless the fielder catching it is a Great Defender).</p>
+          <p><strong>Free Swingers (C-)</strong> — Rolls of 11-12 on the Hit Table are strikeouts. Bunt attempts succeed only on a 1-2. Free Swingers can't hit sac flies. Can be shifted against.</p>
+          <p style="color:#999">P+/P++/P-/P-- and C+/C- aren't auto-assigned by this calculator — player-specific d100 hit tables already encode power/contact from real stats. Listed here for reference if you want to apply them as house rules at the table.</p>
+          <p><strong class="trait trait-pos">S+</strong> Speedy Runners — On a roll of 1, player doubles and runners advance 2 bases (no DEF roll). On a roll of 2, player triples (no DEF roll). Add 1 to the d8 steal roll for 2nd/3rd. Can steal home (roll of 8 on a d8, runner on 3rd). Can bunt for a hit (treat a roll of 1 as "Single, DEF (3B)"), any time, even with no runners on base. Can't be doubled up — the lead runner is out but the Speedy Runner reaches first safely, unless the fielder starting the double play is a Great Defender.</p>
+          <p><strong class="trait trait-neg">S-</strong> Slow Runners — Cannot hit triples; treat a roll of 18 as an ordinary 17 (double, runners advance 3). Subtract 3 from every stolen base roll. Easier to double up — any ground ball to the infield is a double play regardless of MSS.</p>
+          <p><strong class="trait trait-pos">D+</strong> Great Defenders — Add 1 to any DEF roll by this player. With runners on base, a modified DEF roll of 13 means the lead runner is out and the batter reaches safely. If the Great Defender is a catcher, the starting pitcher begins with an extra Pitch Die level (max d12; bonus doesn't apply to relievers). Can turn a routine grounder into a double play: in a double-play situation with MSS &lt; 70, a DEF roll of 10-12 turns it. Can throw out a runner at the plate on a would-be sac fly with a DEF roll of 10-12 (the runner may instead hold at third to avoid the challenge).</p>
+          <p><strong class="trait trait-neg">D-</strong> Poor Defenders — Subtract 1 from any DEF roll. If a catcher, any pitcher (including relievers) starts one Pitch Die level lower. Before starting a double play, must roll DEF first — a 1 or 2 means the ball is thrown away and all runners are safe. In a sac fly situation, a runner at third always scores on a ball hit to a D- outfielder, regardless of MSS. Any player playing out of position counts as a Poor Defender.</p>
+        </div>
+
+        <h3 style="margin-top:0.75rem">Pitcher Traits</h3>
+        <div class="rule-text">
+          <p>A pitcher can be a Strikeout Artist (K+), a Groundball Machine (GB+), or a Control Pitcher (CN+), or none of those — plus any pitcher can separately have Great Stamina (ST+).</p>
+          <p><strong class="trait trait-pos">K+</strong> Strikeout Artist — Add 1 to every MSS. A result of 3 on the Out Table (normally a grounder to first) is a strikeout instead.</p>
+          <p><strong class="trait trait-pos">GB+</strong> Groundball Machine — Add 1 to every MSS. A result of 2 on the Out Table (normally a strikeout) is a 6-3 grounder to short instead.</p>
+          <p><strong class="trait trait-pos">CN+</strong> Control Pitcher — Only gives up a walk when MSS is 1-2 points greater than the BT.</p>
+          <p><strong class="trait trait-pos">ST+</strong> Great Stamina — Starts losing Pitch Die levels for innings pitched past the <em>seventh</em> instead of the sixth.</p>
+          <p><strong class="trait trait-neg">P-</strong> All pitchers bat as P- by default — subtract 1 from any Hit Die roll when batting.</p>
+        </div>
+
+        <h3 style="margin-top:0.75rem">Pitcher Fatigue</h3>
+        <div class="rule-text">
+          <p><strong>Starters</strong> drop a Pitch Die level if they: allow 3+ runs in an inning; allow 4+ runs over two innings; allow any run beyond the 4th allowed; or pitch past the 6th inning (per inning beyond it).</p>
+          <p><strong>Relief pitchers</strong> lose a Pitch Die level for every run allowed, and if they pitch more than one inning.</p>
+          <p><strong>All pitchers</strong> gain a Pitch Die level if they: strike out the side; put up three straight shutout innings; or escape a bases-loaded, no-out jam without allowing a run.</p>
+        </div>
+
+        <h3 style="margin-top:0.75rem">Hit Type Legend</h3>
+        <div class="hit-ranges" style="gap:0.4rem 0.75rem;flex-wrap:wrap;align-items:baseline">
+          <span class="hr-chip c1b-plus">1B+</span><span style="font-size:0.72rem;color:#555">Single, runners advance 2</span>
+          <span class="hr-chip c1b-def">1B/1B</span><span style="font-size:0.72rem;color:#555">Single, DEF by <strong>1B</strong></span>
+          <span class="hr-chip c1b-def">1B/2B</span><span style="font-size:0.72rem;color:#555">Single, DEF by <strong>2B</strong></span>
+          <span class="hr-chip c1b-def">1B/3B</span><span style="font-size:0.72rem;color:#555">Single, DEF by <strong>3B</strong></span>
+          <span class="hr-chip c1b-def">1B/SS</span><span style="font-size:0.72rem;color:#555">Single, DEF by <strong>SS</strong></span>
+          <span class="hr-chip c1b-def">1B/MI</span><span style="font-size:0.72rem;color:#555">Single, DEF by <strong>SS or 2B</strong> (SS if MSS even, 2B if odd)</span>
+          <span class="hr-chip c1b">1B/ADV</span><span style="font-size:0.72rem;color:#555">Single, runners advance 2+</span>
+          <span class="hr-chip c2b-def">2B/LF</span><span style="font-size:0.72rem;color:#555">Double, DEF by <strong>LF</strong></span>
+          <span class="hr-chip c2b-def">2B/CF</span><span style="font-size:0.72rem;color:#555">Double, DEF by <strong>CF</strong></span>
+          <span class="hr-chip c2b-def">2B/RF</span><span style="font-size:0.72rem;color:#555">Double, DEF by <strong>RF</strong></span>
+          <span class="hr-chip c2b">2B/ADV</span><span style="font-size:0.72rem;color:#555">Double, runners advance to 3rd</span>
+          <span class="hr-chip c3b-def">3B/D</span><span style="font-size:0.72rem;color:#555">Triple, DEF by <strong>RF or CF</strong> at plate (RF if MSS even, CF if odd)</span>
+          <span class="hr-chip chr">HR</span><span style="font-size:0.72rem;color:#555">Home run — all runners score</span>
+        </div>
+        <p style="margin-top:0.5rem;font-size:0.72rem;color:#999">
+          <strong>At bat:</strong> Roll d100 + pitch die = MSS.
+          MSS ≤ 5 → Critical Hit (bump hit type up one level, no DEF).
+          5 &lt; MSS ≤ BT → Hit (roll d100 on hit type table).
+          BT &lt; MSS ≤ BT+Walk → Walk.
+          MSS &gt; BT+Walk → Out (use last digit for out table).
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LINEUP BUILDER -->
+  <div id="lineupSection" class="hidden">
+    <div class="section-wrap">
+      <div class="section-head">Build Your Lineup</div>
+      <div class="section-body">
+        <div class="lineup-slots" id="lineupSlots"></div>
+        <div style="margin-top:0.75rem">
+          <div class="pitcher-label" style="margin-bottom:0.3rem">Starting Pitcher</div>
+          <div class="pitcher-slot">
+            <div class="pitcher-slot-top">
+              <span class="pitcher-label">Pitcher</span>
+              <select id="pitcherSelect" style="width:100%;font-size:0.88rem"><option value="">— select —</option></select>
+            </div>
+            <div class="slot-preview" id="pitcherPreview" style="padding-left:0"></div>
+          </div>
+        </div>
+        <div class="lineup-actions no-print">
+          <button class="btn-primary" id="generateBtn">Generate Scorecard</button>
+          <button class="btn-secondary" id="clearBtn">Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL ROSTER -->
+  <div id="rosterSection" class="hidden">
+    <div class="section-wrap">
+      <div class="section-head">Batters</div>
+      <div class="section-body"><div class="card-grid" id="hitterCards"></div></div>
+    </div>
+    <div class="section-wrap">
+      <div class="section-head">Pitchers</div>
+      <div class="section-body"><div class="card-grid" id="pitcherCards"></div></div>
+    </div>
+  </div>
+
+</main>
+
+<div class="bottom-bar">
+  <select id="yearSelect"></select>
+  <select id="teamSelect" disabled><option>— teams —</option></select>
+  <button class="btn-build" id="buildBtn" disabled>Build Roster</button>
+  <button class="btn-print" id="printBtn" onclick="window.print()">Print</button>
+</div>
+
+<script>
+// ─── Team colors & logos ──────────────────────────────────────────────────────
+const TEAM_COLORS = {
+  108:{p:'#BA0021',s:'#003263',t:'#fff'}, 109:{p:'#A71930',s:'#E3D4AD',t:'#fff'},
+  110:{p:'#DF4601',s:'#000000',t:'#fff'}, 111:{p:'#BD3039',s:'#0D2B56',t:'#fff'},
+  112:{p:'#0E3386',s:'#CC3433',t:'#fff'}, 113:{p:'#C6011F',s:'#000000',t:'#fff'},
+  114:{p:'#00385D',s:'#E31937',t:'#fff'}, 115:{p:'#33006F',s:'#C4CED4',t:'#fff'},
+  116:{p:'#0C2340',s:'#FA4616',t:'#FA4616'}, 117:{p:'#002D62',s:'#EB6E1F',t:'#EB6E1F'},
+  118:{p:'#004687',s:'#BD9B60',t:'#BD9B60'}, 119:{p:'#005A9C',s:'#EF3E42',t:'#fff'},
+  120:{p:'#AB0003',s:'#14225A',t:'#fff'}, 121:{p:'#002D72',s:'#FF5910',t:'#fff'},
+  133:{p:'#003831',s:'#EFB21E',t:'#EFB21E'}, 134:{p:'#27251F',s:'#FDB827',t:'#FDB827'},
+  135:{p:'#2F241D',s:'#FFC425',t:'#FFC425'}, 136:{p:'#0C2C56',s:'#005C5C',t:'#fff'},
+  137:{p:'#FD5A1E',s:'#27251F',t:'#fff'}, 138:{p:'#C41E3A',s:'#0C2340',t:'#fff'},
+  139:{p:'#092C5C',s:'#8FBCE6',t:'#8FBCE6'}, 140:{p:'#003278',s:'#C0111F',t:'#fff'},
+  141:{p:'#134A8E',s:'#E8291C',t:'#fff'}, 142:{p:'#002B5C',s:'#D31145',t:'#fff'},
+  143:{p:'#E81828',s:'#002D72',t:'#fff'}, 144:{p:'#CE1141',s:'#13274F',t:'#fff'},
+  145:{p:'#27251F',s:'#C4CED4',t:'#C4CED4'}, 146:{p:'#00A3E0',s:'#EF3340',t:'#fff'},
+  147:{p:'#132448',s:'#C4CED4',t:'#C4CED4'}, 158:{p:'#12284B',s:'#FFC52F',t:'#FFC52F'},
+};
+const ESPN = {
+  WSH:'wsh',TBR:'tb',TB:'tb',KCR:'kc',KC:'kc',SDP:'sd',SD:'sd',SFG:'sf',SF:'sf',
+  CHW:'cws',NYY:'nyy',NYM:'nym',LAD:'lad',LAA:'laa',ATH:'oak',OAK:'oak',
+  ARI:'ari',ATL:'atl',BAL:'bal',BOS:'bos',CHC:'chc',CIN:'cin',CLE:'cle',
+  COL:'col',DET:'det',HOU:'hou',MIA:'mia',MIL:'mil',MIN:'min',PHI:'phi',
+  PIT:'pit',SEA:'sea',STL:'stl',TEX:'tex',TOR:'tor',
+};
+
+function applyTeamColors(teamId, abbrev) {
+  const c = TEAM_COLORS[teamId] || {p:'#8b2020',s:'#555',t:'#fff'};
+  const r = document.documentElement;
+  r.style.setProperty('--primary', c.p);
+  r.style.setProperty('--secondary', c.s === '#ffffff' ? '#aaa' : c.s);
+  r.style.setProperty('--ton', c.t);
+  const code = ESPN[abbrev?.toUpperCase()] || abbrev?.toLowerCase() || '';
+  const logo = document.getElementById('teamLogo');
+  if (code) { logo.src = `https://a.espncdn.com/i/teamlogos/mlb/500/${code}.png`; logo.style.display = ''; }
+  else logo.style.display = 'none';
+}
+
+// ─── Year dropdown ────────────────────────────────────────────────────────────
+const yearSel = document.getElementById('yearSelect');
+const NOW = new Date().getFullYear();
+for (let y = NOW; y >= 1969; y--) {
+  const o = document.createElement('option');
+  o.value = y; o.textContent = y === NOW ? `${y} (Current)` : y;
+  yearSel.appendChild(o);
+}
+yearSel.value = NOW;
+yearSel.addEventListener('change', loadTeams);
+
+// ─── State ────────────────────────────────────────────────────────────────────
+const MLB = 'https://statsapi.mlb.com/api/v1';
+let allHitters  = [];
+let allPitchers = [];
+const POSITIONS = ['C','1B','2B','3B','SS','LF','CF','RF','DH'];
+
+const POS_ELIGIBLE = {
+  'C':  h => h.pos === 'C',
+  '1B': h => ['1B','IF','INF','DH'].includes(h.pos),
+  '2B': h => ['2B','IF','INF'].includes(h.pos),
+  '3B': h => ['3B','IF','INF'].includes(h.pos),
+  'SS': h => ['SS','IF','INF'].includes(h.pos),
+  'LF': h => ['LF','CF','RF','OF'].includes(h.pos),
+  'CF': h => ['LF','CF','RF','OF'].includes(h.pos),
+  'RF': h => ['LF','CF','RF','OF'].includes(h.pos),
+  'DH': () => true,
+};
+const DEFAULT_SLOT_POS = ['C','1B','SS','2B','3B','LF','CF','RF','DH'];
+
+// ─── Local storage ────────────────────────────────────────────────────────────
+const SAVE_KEY = 'deadball_v3';
+
+function saveState() {
+  try {
+    const lineup = [];
+    for (let i = 0; i < 9; i++) {
+      const pSel  = document.querySelector(`.slot-player[data-slot="${i}"]`);
+      const poSel = document.querySelector(`.slot-pos[data-slot="${i}"]`);
+      lineup.push({ playerId: pSel?.value ? Number(pSel.value) : null, pos: poSel?.value || '' });
+    }
+    const pitSel = document.getElementById('pitcherSelect');
+    const teamSel = document.getElementById('teamSelect');
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      year:    yearSel.value,
+      teamId:  teamSel.value,
+      teamName: document.getElementById('bannerName').textContent,
+      abbrev:  teamSel.selectedOptions[0]?.dataset?.abbrev || '',
+      hitters: allHitters,
+      pitchers: allPitchers,
+      lineup,
+      pitcherId:        pitSel.value ? Number(pitSel.value) : null,
+      scorecardVisible: !document.getElementById('scorecardSection').classList.contains('hidden'),
+    }));
+  } catch(e) { /* quota exceeded or private mode */ }
+}
+
+function restoreState(state) {
+  allHitters  = (state.hitters  || []).map(h => ({dTrait: null, critThreshold: 5, ...h}));
+  allPitchers = (state.pitchers || []).map(p => ({dTrait: null, ...p}));
+  if (!allHitters.length) return;
+
+  const teamSel = document.getElementById('teamSelect');
+  if (state.teamId) teamSel.value = state.teamId;
+  applyTeamColors(Number(state.teamId), state.abbrev);
+
+  document.getElementById('bannerName').textContent = state.teamName || '';
+  document.getElementById('bannerYear').textContent = `${state.year} Season`;
+
+  const batScore  = allHitters.slice(0,9).reduce((n,h)=>n+h.bt,0);
+  const pitScore  = allPitchers.slice(0,8).reduce((n,p)=>n+pitchDieVal(p.pitchDie),0)*10;
+  document.getElementById('scoreBat').textContent   = batScore;
+  document.getElementById('scorePitch').textContent = pitScore;
+  document.getElementById('scoreTeam').textContent  = Math.round((batScore+pitScore)/10);
+
+  renderPlayerCards();
+  buildLineupUI();
+
+  // Restore lineup selections
+  (state.lineup || []).forEach(({ playerId, pos }, i) => {
+    const poSel = document.querySelector(`.slot-pos[data-slot="${i}"]`);
+    const pSel  = document.querySelector(`.slot-player[data-slot="${i}"]`);
+    if (poSel && pos) poSel.value = pos;
+    if (pSel && playerId) {
+      const opt = document.createElement('option');
+      opt.value = playerId; pSel.appendChild(opt); pSel.value = playerId;
+    }
+  });
+  refreshAllPlayerDropdowns();
+  for (let i = 0; i < 9; i++) updateSlotPreview(i);
+
+  // Restore pitcher
+  if (state.pitcherId) {
+    const pitSel = document.getElementById('pitcherSelect');
+    pitSel.value = state.pitcherId;
+    const p = allPitchers.find(x => x.id == state.pitcherId);
+    if (p) document.getElementById('pitcherPreview').textContent =
+      `Pitch Die: ${p.pitchDie} | ERA: ${isNaN(p.era)?'—':p.era.toFixed(2)} | BT: ${p.bt}`;
+  }
+
+  hide('welcome');
+  show('teamBanner'); show('lineupSection'); show('rosterSection');
+
+  if (state.scorecardVisible) generateScorecard(false);
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  initSlotDrag();
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch(e) {}
+  if (saved?.year) yearSel.value = saved.year;
+  await loadTeams();
+  if (saved?.hitters?.length) restoreState(saved);
+});
+
+// ─── Load teams ───────────────────────────────────────────────────────────────
+async function loadTeams() {
+  const ts = document.getElementById('teamSelect');
+  const bb = document.getElementById('buildBtn');
+  ts.disabled = bb.disabled = true;
+  setStatus('Loading teams…');
+  try {
+    const d = await fetch(`${MLB}/teams?sportId=1&season=${yearSel.value}&fields=teams,id,name,abbreviation`).then(r=>r.json());
+    const teams = (d.teams||[]).sort((a,b)=>a.name.localeCompare(b.name));
+    ts.innerHTML = '';
+    teams.forEach(t => {
+      const o = document.createElement('option');
+      o.value = t.id; o.dataset.abbrev = t.abbreviation; o.textContent = t.name;
+      ts.appendChild(o);
+    });
+    ts.disabled = bb.disabled = false;
+    setStatus(`${teams.length} teams loaded for ${yearSel.value}.`);
+  } catch(e) { setStatus('Error: ' + e.message); }
+}
+
+// ─── Build roster ─────────────────────────────────────────────────────────────
+document.getElementById('buildBtn').addEventListener('click', async () => {
+  const year   = yearSel.value;
+  const teamId = document.getElementById('teamSelect').value;
+  const opt    = document.getElementById('teamSelect').selectedOptions[0];
+  const tName  = opt?.textContent || '';
+  const abbrev = opt?.dataset?.abbrev || '';
+
+  applyTeamColors(Number(teamId), abbrev);
+  hide('welcome'); hide('teamBanner'); hide('lineupSection');
+  hide('scorecardSection'); hide('rosterSection');
+  document.getElementById('printBtn').style.display = 'none';
+  setStatus('Fetching stats from MLB…');
+
+  try {
+    const [hitData, pitchData, oaaData] = await Promise.all([
+      fetch(`${MLB}/stats?stats=season&season=${year}&group=hitting&teamId=${teamId}&playerPool=ALL&limit=80`).then(r=>r.json()),
+      fetch(`${MLB}/stats?stats=season&season=${year}&group=pitching&teamId=${teamId}&playerPool=ALL&limit=60`).then(r=>r.json()),
+      fetch(`${MLB}/stats?stats=outsAboveAverage&season=${year}&group=fielding&teamId=${teamId}&playerPool=ALL&limit=80`).then(r=>r.json()).catch(()=>({stats:[]})),
+    ]);
+    const oaaMap = {};
+    (oaaData.stats?.[0]?.splits || []).forEach(s => {
+      oaaMap[s.player.id] = parseInt(s.stat.totalOutsAboveAverage) || 0;
+    });
+    setStatus('Fetching player details…');
+
+    const rawH = (hitData.stats?.[0]?.splits||[]).filter(s=>parseInt(s.stat.plateAppearances||0)>=10);
+    const rawP = (pitchData.stats?.[0]?.splits||[]).filter(s=>parseFloat(s.stat.inningsPitched||0)>=1);
+    const ids  = [...new Set([...rawH,...rawP].map(s=>s.player.id))];
+    const pd   = ids.length ? await fetch(`${MLB}/people?personIds=${ids.join(',')}&fields=people,id,fullName,batSide,pitchHand,primaryPosition,abbreviation,code,name,type`).then(r=>r.json()) : {people:[]};
+    const pMap = {}; (pd.people||[]).forEach(p=>{pMap[p.id]=p;});
+    const pitcherIds = new Set(rawP.map(s=>s.player.id));
+
+    allHitters = rawH
+      .filter(s=>!pitcherIds.has(s.player.id)||parseInt(s.stat.plateAppearances||0)>=80)
+      .map(s=>{
+        const per=pMap[s.player.id]||{}, st=s.stat;
+        const avg=parseFloat(st.avg)||0, pa=parseInt(st.plateAppearances)||1;
+        const bt=avgToBT(avg);
+        const traits=batterTraits(st,pa);
+        return {
+          id:s.player.id, name:s.player.fullName,
+          pos: normalizePos(per.primaryPosition?.abbreviation||'?'),
+          hand: per.batSide?.code||'R',
+          bt, traits, dTrait: null,
+          walkWindow:   walkWindow(st,pa),
+          critThreshold: 5,
+          hitTypeTable: hitTypeTable(st),
+          pa, avg,
+          hr: parseInt(st.homeRuns)||0,
+          sb: parseInt(st.stolenBases)||0,
+        };
+      }).sort((a,b)=>b.pa-a.pa);
+
+    allPitchers = rawP.map(s=>{
+      const per=pMap[s.player.id]||{}, st=s.stat;
+      const ip=parseFloat(st.inningsPitched)||1;
+      const era=parseFloat(st.era);
+      const bt=Math.max(0,Math.round((parseFloat(st.avg)||0)*100));
+      const traits=pitcherTraits(st,ip);
+      return {
+        id:s.player.id, name:s.player.fullName,
+        hand: per.pitchHand?.code||'R',
+        era, ip, gs: parseInt(st.gamesStarted)||0,
+        pitchDie: eraToPitchDie(era), bt, traits, dTrait: null,
+      };
+    }).sort((a,b)=>b.ip-a.ip);
+
+    const batScore  = allHitters.slice(0,9).reduce((n,h)=>n+h.bt,0);
+    const pitScore  = allPitchers.slice(0,8).reduce((n,p)=>n+pitchDieVal(p.pitchDie),0)*10;
+    const teamScore = Math.round((batScore+pitScore)/10);
+    document.getElementById('bannerName').textContent  = tName;
+    document.getElementById('bannerYear').textContent  = `${year} Season`;
+    document.getElementById('scoreBat').textContent    = batScore;
+    document.getElementById('scorePitch').textContent  = pitScore;
+    document.getElementById('scoreTeam').textContent   = teamScore;
+
+    // Auto-assign D+/D- from OAA — top 2 with OAA > 0 get D+, bottom 2 with OAA < 0 get D-
+    const withOAA = allHitters
+      .filter(h => oaaMap[h.id] !== undefined)
+      .map(h => ({ h, oaa: oaaMap[h.id] }))
+      .sort((a, b) => b.oaa - a.oaa);
+    withOAA.slice(0, 2).forEach(({ h, oaa }) => { if (oaa > 0) h.dTrait = 'D+'; });
+    withOAA.slice(-2).forEach(({ h, oaa }) => { if (oaa < 0) h.dTrait = 'D-'; });
+
+    renderPlayerCards();
+    buildLineupUI();
+    prefillLineup();
+
+    show('teamBanner'); show('lineupSection'); show('rosterSection');
+    setStatus(`${tName} ${year} — ${allHitters.length} batters, ${allPitchers.length} pitchers.`);
+    document.getElementById('teamBanner').scrollIntoView({behavior:'smooth'});
+    saveState();
+  } catch(e) { setStatus('Error: ' + e.message); console.error(e); }
+});
+
+// ─── Player cards ─────────────────────────────────────────────────────────────
+function renderPlayerCards() {
+  document.getElementById('hitterCards').innerHTML = allHitters.map(h => {
+    const t = h.hitTypeTable;
+    const avgStr = '.' + String(Math.round(h.avg*1000)).padStart(3,'0');
+    return `<div class="player-card">
+      <div class="card-header">
+        <div class="card-name">${h.name}</div>
+        <div class="card-badges"><span class="badge badge-pos">${h.pos}</span><span class="badge badge-hand">${h.hand}</span></div>
+      </div>
+      <div class="card-stats">
+        <div><div class="stat-lbl">BT</div><div class="stat-val">${h.bt}</div></div>
+        <div><div class="stat-lbl">Walk</div><div class="stat-val">+${h.walkWindow}</div></div>
+        <div><div class="stat-lbl">Crit</div><div class="stat-val">≤5</div></div>
+        <div><div class="stat-lbl">Traits</div><div class="stat-val card-traits">
+          <span id="traits-${h.id}">${buildAllTraitsHtml(h)}</span>
+          <button id="def-btn-${h.id}" class="toggle-def no-print" onclick="toggleDef(${h.id})" title="Toggle Defensive trait">${defBtnLabel(h.dTrait)}</button>
+        </div></div>
+        <div><div class="stat-lbl">AVG</div><div class="stat-val">${avgStr}</div></div>
+        <div><div class="stat-lbl">HR</div><div class="stat-val">${h.hr}</div></div>
+        <div><div class="stat-lbl">SB</div><div class="stat-val">${h.sb}</div></div>
+        <div><div class="stat-lbl">PA</div><div class="stat-val">${h.pa}</div></div>
+      </div>
+      <hr class="card-divider">
+      <div class="hit-table-label">Hit Type (d100)</div>
+      <div class="hit-ranges">${buildHitChips(t)}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('pitcherCards').innerHTML = allPitchers.map(p => {
+    const eraStr = isNaN(p.era) ? '—' : p.era.toFixed(2);
+    return `<div class="player-card pitcher-card">
+      <div class="card-header">
+        <div class="card-name">${p.name}</div>
+        <div class="card-badges"><span class="badge badge-hand">${p.hand}</span></div>
+      </div>
+      <div class="card-stats">
+        <div><div class="stat-lbl">Pitch Die</div><div class="stat-val">${renderPitchDieHtml(p.pitchDie)}</div></div>
+        <div><div class="stat-lbl">ERA</div><div class="stat-val">${eraStr}</div></div>
+        <div><div class="stat-lbl">BT</div><div class="stat-val">${p.bt}</div></div>
+        <div><div class="stat-lbl">IP</div><div class="stat-val">${p.ip}</div></div>
+        ${p.gs>0?`<div><div class="stat-lbl">GS</div><div class="stat-val">${p.gs}</div></div>`:''}
+        <div><div class="stat-lbl">Traits</div><div class="stat-val card-traits">
+          <span id="traits-${p.id}">${buildAllTraitsHtml(p)}</span><span class="trait trait-neg">P-</span>
+          <button id="def-btn-${p.id}" class="toggle-def no-print" onclick="toggleDef(${p.id})" title="Toggle Defensive trait">${defBtnLabel(p.dTrait)}</button>
+        </div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── Lineup builder ───────────────────────────────────────────────────────────
+function getSelectedPlayerIds(excludeSlot = -1) {
+  const ids = new Set();
+  for (let i = 0; i < 9; i++) {
+    if (i === excludeSlot) continue;
+    const sel = document.querySelector(`.slot-player[data-slot="${i}"]`);
+    if (sel?.value) ids.add(Number(sel.value));
+  }
+  return ids;
+}
+
+function buildPlayerOpts(slotPos, excludeSlot, currentId) {
+  const usedIds = getSelectedPlayerIds(excludeSlot);
+  const eligible = POS_ELIGIBLE[slotPos] || (() => true);
+  const opts = allHitters.map(h => {
+    if (!eligible(h)) return '';
+    const isUsed = usedIds.has(h.id) && h.id !== currentId;
+    const label = h.name + ' (' + h.pos + ')' + (isUsed ? ' ✓' : '');
+    return `<option value="${h.id}"${h.id == currentId ? ' selected' : ''}${isUsed ? ' disabled' : ''}>${label}</option>`;
+  }).join('');
+  return '<option value="">— select —</option>' + opts;
+}
+
+function refreshAllPlayerDropdowns() {
+  for (let i = 0; i < 9; i++) {
+    const pSel  = document.querySelector(`.slot-player[data-slot="${i}"]`);
+    const poSel = document.querySelector(`.slot-pos[data-slot="${i}"]`);
+    if (!pSel || !poSel) continue;
+    const currentId = pSel.value ? Number(pSel.value) : null;
+    pSel.innerHTML = buildPlayerOpts(poSel.value, i, currentId);
+  }
+}
+
+function updateSlotPreview(i) {
+  const pSel = document.querySelector(`.slot-player[data-slot="${i}"]`);
+  const el   = document.getElementById(`sp-${i}`);
+  const h    = allHitters.find(x => x.id == pSel?.value);
+  if (h) {
+    el.innerHTML = `BT:${h.bt} | Walk:+${h.walkWindow} | Crit:≤5<br>${hitRangeText(h.hitTypeTable)}`;
+  } else { el.innerHTML = ''; }
+}
+
+function buildLineupUI() {
+  const container = document.getElementById('lineupSlots');
+  container.innerHTML = '';
+  const posOpts = pos => POSITIONS.map(p =>
+    `<option value="${p}"${p === pos ? ' selected' : ''}>${p}</option>`
+  ).join('');
+
+  for (let i = 0; i < 9; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'lineup-slot';
+    slot.dataset.slotIdx = i;
+    slot.innerHTML = `
+      <div class="slot-top">
+        <span class="drag-handle no-print" title="Drag to reorder">⠿</span>
+        <div class="slot-num">${i+1}</div>
+        <select class="slot-pos" data-slot="${i}">${posOpts(DEFAULT_SLOT_POS[i])}</select>
+        <select class="slot-player" data-slot="${i}"><option value="">— select —</option></select>
+      </div>
+      <div class="slot-preview" id="sp-${i}"></div>`;
+    container.appendChild(slot);
+
+    slot.querySelector('.slot-pos').addEventListener('change', () => {
+      refreshAllPlayerDropdowns(); updateSlotPreview(i); saveState();
+    });
+    slot.querySelector('.slot-player').addEventListener('change', () => {
+      refreshAllPlayerDropdowns(); updateSlotPreview(i); saveState();
+    });
+  }
+  refreshAllPlayerDropdowns();
+
+  const pitSel = document.getElementById('pitcherSelect');
+  pitSel.innerHTML = '<option value="">— select —</option>' +
+    allPitchers.map(p => `<option value="${p.id}">${p.name} (${p.pitchDie}, ERA ${isNaN(p.era)?'—':p.era.toFixed(2)})</option>`).join('');
+  pitSel.addEventListener('change', () => {
+    const p = allPitchers.find(x => x.id == pitSel.value);
+    document.getElementById('pitcherPreview').textContent = p
+      ? `Pitch Die: ${p.pitchDie} | ERA: ${isNaN(p.era)?'—':p.era.toFixed(2)} | BT: ${p.bt}` : '';
+    saveState();
+  });
+}
+
+function prefillLineup() {
+  const sorted = [...allHitters].sort((a,b)=>b.pa-a.pa||b.bt-a.bt);
+  const usedIds = new Set();
+  const assignments = [];
+
+  for (const pos of ['C','1B','SS','2B','3B','LF','CF','RF']) {
+    const eligible = POS_ELIGIBLE[pos];
+    const best = sorted.find(h => eligible(h) && !usedIds.has(h.id));
+    if (best) { assignments.push({pos, player:best}); usedIds.add(best.id); }
+  }
+  const dh = sorted.find(h => !usedIds.has(h.id));
+  if (dh) assignments.push({pos:'DH', player:dh});
+  assignments.sort((a,b)=>b.player.pa-a.player.pa);
+
+  assignments.forEach(({pos}, i) => {
+    const poSel = document.querySelector(`.slot-pos[data-slot="${i}"]`);
+    if (poSel) poSel.value = pos;
+  });
+  assignments.forEach(({player}, i) => {
+    const pSel = document.querySelector(`.slot-player[data-slot="${i}"]`);
+    if (!pSel) return;
+    const opt = document.createElement('option');
+    opt.value = player.id; pSel.appendChild(opt); pSel.value = player.id;
+  });
+  refreshAllPlayerDropdowns();
+  for (let i = 0; i < 9; i++) updateSlotPreview(i);
+}
+
+function moveSlotTo(fromIdx, toIdx) {
+  const data = [];
+  for (let i = 0; i < 9; i++) {
+    data.push({
+      pos:    document.querySelector(`.slot-pos[data-slot="${i}"]`).value,
+      player: document.querySelector(`.slot-player[data-slot="${i}"]`).value,
+    });
+  }
+  const [moved] = data.splice(fromIdx, 1);
+  data.splice(toIdx, 0, moved);
+  for (let i = 0; i < 9; i++) {
+    const poSel = document.querySelector(`.slot-pos[data-slot="${i}"]`);
+    const pSel  = document.querySelector(`.slot-player[data-slot="${i}"]`);
+    poSel.value = data[i].pos;
+    if (data[i].player && !pSel.querySelector(`option[value="${data[i].player}"]`)) {
+      const opt = document.createElement('option');
+      opt.value = data[i].player; pSel.appendChild(opt);
+    }
+    pSel.value = data[i].player || '';
+  }
+  refreshAllPlayerDropdowns();
+  for (let i = 0; i < 9; i++) updateSlotPreview(i);
+  saveState();
+}
+
+function initSlotDrag() {
+  const container = document.getElementById('lineupSlots');
+  container.addEventListener('pointerdown', e => {
+    if (!e.target.closest('.drag-handle')) return;
+    e.preventDefault();
+    const srcSlot = e.target.closest('.lineup-slot');
+    if (!srcSlot) return;
+    const srcIdx = parseInt(srcSlot.dataset.slotIdx);
+    srcSlot.classList.add('drag-src');
+
+    function onMove(e) {
+      const slots = [...container.querySelectorAll('.lineup-slot')];
+      slots.forEach(s => s.classList.remove('drag-over'));
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      for (const slot of slots) {
+        const r = slot.getBoundingClientRect();
+        if (clientY >= r.top && clientY <= r.bottom && parseInt(slot.dataset.slotIdx) !== srcIdx) {
+          slot.classList.add('drag-over'); break;
+        }
+      }
+    }
+
+    function onEnd() {
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onEnd);
+      srcSlot.classList.remove('drag-src');
+      const target = container.querySelector('.lineup-slot.drag-over');
+      const toIdx  = target ? parseInt(target.dataset.slotIdx) : null;
+      container.querySelectorAll('.lineup-slot').forEach(s => s.classList.remove('drag-over'));
+      if (toIdx !== null && toIdx !== srcIdx) moveSlotTo(srcIdx, toIdx);
+    }
+
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onEnd);
+  });
+}
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  document.querySelectorAll('.slot-player').forEach(s => { s.value = ''; });
+  document.querySelectorAll('[id^="sp-"]').forEach(el => el.innerHTML = '');
+  document.getElementById('pitcherSelect').value = '';
+  document.getElementById('pitcherPreview').textContent = '';
+  refreshAllPlayerDropdowns();
+  hide('scorecardSection');
+  document.getElementById('printBtn').style.display = 'none';
+  saveState();
+});
+
+document.getElementById('hideScorecard').addEventListener('click', () => {
+  hide('scorecardSection');
+  document.getElementById('printBtn').style.display = 'none';
+  saveState();
+});
+
+// ─── Generate scorecard ───────────────────────────────────────────────────────
+document.getElementById('generateBtn').addEventListener('click', () => generateScorecard(true));
+
+function generateScorecard(scroll) {
+  const slots = [];
+  for (let i = 0; i < 9; i++) {
+    const ps  = document.querySelector(`.slot-player[data-slot="${i}"]`);
+    const po  = document.querySelector(`.slot-pos[data-slot="${i}"]`);
+    const h   = allHitters.find(x => x.id == ps?.value);
+    if (!h) { if (scroll) setStatus('Fill all 9 lineup slots before generating.'); return; }
+    slots.push({h, pos: po?.value || h.pos});
+  }
+  const pitcher = allPitchers.find(p => p.id == document.getElementById('pitcherSelect').value) || null;
+
+  const cards = slots.map((s, i) => {
+    const h = s.h, t = h.hitTypeTable;
+    return `<div class="sc-card">
+      <div class="sc-card-top">
+        <div class="sc-card-name-wrap">
+          <span class="sc-card-num">${i+1}</span>
+          <span class="sc-card-name">${h.name}</span>
+        </div>
+        <div class="sc-card-badges">
+          <span class="badge badge-pos">${s.pos}</span>
+          <span class="badge badge-hand">${h.hand}</span>
+        </div>
+      </div>
+      <div class="sc-stats">
+        <div><span class="sc-stat-lbl">BT</span><span class="sc-stat-val bt">${h.bt}</span></div>
+        <div><span class="sc-stat-lbl">Walk</span><span class="sc-stat-val walk">+${h.walkWindow}</span></div>
+        <div><span class="sc-stat-lbl">Crit</span><span class="sc-stat-val crit">≤5</span></div>
+        <div><span class="sc-stat-lbl">Traits</span><span class="sc-stat-val card-traits">${buildAllTraitsHtml(h)}</span></div>
+      </div>
+      <hr class="sc-card-divider">
+      <div class="sc-hit-label">Hit Type (d100)</div>
+      <div class="hit-ranges">${buildHitChips(t)}</div>
+    </div>`;
+  }).join('');
+
+  const pitCard = pitcher ? `<div class="sc-card sc-pitcher">
+    <div class="sc-card-top">
+      <div class="sc-card-name-wrap">
+        <span class="sc-card-num">SP</span>
+        <span class="sc-card-name">${pitcher.name}</span>
+      </div>
+      <div class="sc-card-badges"><span class="badge badge-hand">${pitcher.hand}</span></div>
+    </div>
+    <div class="sc-stats">
+      <div><span class="sc-stat-lbl">Pitch Die</span><span class="sc-stat-val">${renderPitchDieHtml(pitcher.pitchDie)}</span></div>
+      <div><span class="sc-stat-lbl">ERA</span><span class="sc-stat-val">${isNaN(pitcher.era)?'—':pitcher.era.toFixed(2)}</span></div>
+      <div><span class="sc-stat-lbl">BT</span><span class="sc-stat-val">${pitcher.bt}</span></div>
+      <div><span class="sc-stat-lbl">Traits</span><span class="sc-stat-val card-traits">${buildAllTraitsHtml(pitcher)}<span class="trait trait-neg">P-</span></span></div>
+    </div>
+  </div>` : '';
+
+  document.getElementById('scorecardCards').innerHTML = cards + pitCard;
+  show('scorecardSection');
+  document.getElementById('printBtn').style.display = '';
+  setStatus('Scorecard ready.');
+  if (scroll) document.getElementById('scorecardSection').scrollIntoView({behavior:'smooth'});
+  saveState();
+}
+
+// ─── Deadball mechanics ───────────────────────────────────────────────────────
+function avgToBT(avg) { return isNaN(avg) ? 20 : Math.round(avg*100); }
+
+function walkWindow(stat, pa) {
+  const bb = parseInt(stat.baseOnBalls)||0;
+  return Math.max(1, Math.min(20, Math.round(bb/pa*100)));
+}
+
+
+// Hit type table — mirrors Advanced Hit Table proportions using actual player stats.
+// Singles split: 2/12 Single+, 5/12 DEF by position (1B/2B/3B/SS/MI), 5/12 runners-adv.
+// Doubles split: 3/5 DEF by position (LF/CF/RF), 2/5 runners-adv.
+// Triples: always DEF (RF/CF). Residuals absorbed into adv buckets to keep sum = 100.
+function hitTypeTable(stat) {
+  const h  = parseInt(stat.hits)||0;
+  const d  = parseInt(stat.doubles)||0;
+  const t  = parseInt(stat.triples)||0;
+  const hr = parseInt(stat.homeRuns)||0;
+  if (h===0) return {
+    singlePlus:10, defSingle1B:5, defSingle2B:5, defSingle3B:5, defSingleSS:5, defSingleMI:5,
+    singleAdv:25, defDoubleLF:5, defDoubleCF:5, defDoubleRF:5, doubleAdv:10, tripleDF:5, homeRun:10,
+  };
+  const doublesP = Math.round(d/h*100);
+  const triplesP = Math.round(t/h*100);
+  const homersP  = Math.round(hr/h*100);
+  const singlesP = Math.max(0, 100 - doublesP - triplesP - homersP);
+
+  const singlePlus  = Math.round(singlesP * 2/12);
+  const defSingle1B = Math.round(singlesP / 12);
+  const defSingle2B = Math.round(singlesP / 12);
+  const defSingle3B = Math.round(singlesP / 12);
+  const defSingleSS = Math.round(singlesP / 12);
+  const defSingleMI = Math.round(singlesP / 12);
+  const singleAdv   = singlesP - singlePlus - defSingle1B - defSingle2B - defSingle3B - defSingleSS - defSingleMI;
+
+  const defDoubleLF = Math.round(doublesP / 5);
+  const defDoubleCF = Math.round(doublesP / 5);
+  const defDoubleRF = Math.round(doublesP / 5);
+  const doubleAdv   = doublesP - defDoubleLF - defDoubleCF - defDoubleRF;
+
+  return {
+    singlePlus, defSingle1B, defSingle2B, defSingle3B, defSingleSS, defSingleMI,
+    singleAdv, defDoubleLF, defDoubleCF, defDoubleRF, doubleAdv,
+    tripleDF: triplesP, homeRun: homersP,
+  };
+}
+
+function eraToPitchDie(era) {
+  if (isNaN(era)) return 'd4';
+  if (era<1)   return 'd20'; if (era<2)   return 'd12';
+  if (era<3)   return 'd8';  if (era<3.5) return 'd4';
+  if (era<4)   return '-d4'; if (era<5)   return '-d8';
+  if (era<6)   return '-d12';if (era<7)   return '-d20';
+  if (era<8)   return '-20'; return '-25';
+}
+
+function pitchDieVal(die) {
+  return {'d20':20,'d12':12,'d8':8,'d4':4,'-d4':-4,'-d8':-8,'-d12':-12,'-d20':-20,'-20':-20,'-25':-25}[die]||0;
+}
+
+function batterTraits(stat, pa) {
+  const t = [];
+  const sb = parseInt(stat.stolenBases)||0;
+  if (sb >= 20)                t.push({code:'S+', type:'pos'});
+  else if (pa >= 100 && sb===0) t.push({code:'S-', type:'neg'});
+  return t;
+}
+
+function pitcherTraits(stat, ip) {
+  const t = [];
+  const so = parseInt(stat.strikeOuts)||0, bb = parseInt(stat.baseOnBalls)||0;
+  const k9 = ip > 0 ? (so/ip)*9 : 0;
+  const bb9 = ip > 0 ? (bb/ip)*9 : 99;
+  // K+, GB+, CN+ are mutually exclusive pitcher types
+  if      (k9 >= 9.0)  t.push({code:'K+',  type:'pos'});
+  else if (bb9 <= 2.0) t.push({code:'CN+', type:'pos'});
+  else if (k9 < 5.5)   t.push({code:'GB+', type:'pos'});
+  // ST+ stacks with any of the above (max 2 traits)
+  if (ip >= 200 && t.length < 2) t.push({code:'ST+', type:'pos'});
+  return t;
+}
+
+function normalizePos(pos) {
+  return {TWP:'OF',DH:'DH',OF:'OF',IF:'INF',SP:'P',RP:'P'}[pos]||pos||'?';
+}
+
+// ─── Rendering helpers ────────────────────────────────────────────────────────
+function buildHitChips(t) {
+  const chips = []; let cur = 0;
+  function chip(cls, label, count) {
+    if (count <= 0) return;
+    const end = cur + count;
+    chips.push(`<span class="hr-chip ${cls}">${label} ${cur+1}${end > cur+1 ? '–'+end : ''}</span>`);
+    cur = end;
+  }
+  chip('c1b-plus', '1B+',    t.singlePlus);
+  chip('c1b-def',  '1B/1B',  t.defSingle1B);
+  chip('c1b-def',  '1B/2B',  t.defSingle2B);
+  chip('c1b-def',  '1B/3B',  t.defSingle3B);
+  chip('c1b-def',  '1B/SS',  t.defSingleSS);
+  chip('c1b-def',  '1B/MI',  t.defSingleMI);
+  chip('c1b',      '1B/ADV', t.singleAdv);
+  chip('c2b-def',  '2B/LF',  t.defDoubleLF);
+  chip('c2b-def',  '2B/CF',  t.defDoubleCF);
+  chip('c2b-def',  '2B/RF',  t.defDoubleRF);
+  chip('c2b',      '2B/ADV', t.doubleAdv);
+  chip('c3b-def',  '3B/D',   t.tripleDF);
+  chip('chr',      'HR',     t.homeRun);
+  return chips.join('');
+}
+
+function hitRangeText(t) {
+  const parts=[]; let cur=0;
+  function add(label, count) {
+    if (count<=0) return;
+    const end=cur+count;
+    parts.push(`${label}:${cur+1}${end>cur+1?'-'+end:''}`);
+    cur=end;
+  }
+  const defS = t.defSingle1B+t.defSingle2B+t.defSingle3B+t.defSingleSS+t.defSingleMI;
+  const defD = t.defDoubleLF+t.defDoubleCF+t.defDoubleRF;
+  add('1B+', t.singlePlus);
+  add('1B/D', defS);
+  add('1B/ADV', t.singleAdv);
+  add('2B/D', defD);
+  add('2B/ADV', t.doubleAdv);
+  add('3B/D', t.tripleDF);
+  add('HR',  t.homeRun);
+  return parts.join(' | ');
+}
+
+function renderTraits(traits) {
+  if (!traits||!traits.length) return '';
+  return traits.map(t=>`<span class="trait trait-${t.type}">${t.code}</span>`).join('');
+}
+
+function buildAllTraitsHtml(player) {
+  const base = renderTraits(player.traits);
+  const d = player.dTrait
+    ? `<span class="trait ${player.dTrait==='D+'?'trait-pos':'trait-neg'}">${player.dTrait}</span>`
+    : '';
+  return base + d;
+}
+
+function defBtnLabel(dTrait) {
+  return dTrait === null ? '+D' : dTrait === 'D+' ? '→D-' : '✕D';
+}
+
+function toggleDef(id) {
+  const player = allHitters.find(p=>p.id===id) || allPitchers.find(p=>p.id===id);
+  if (!player) return;
+  player.dTrait = player.dTrait === null ? 'D+' : player.dTrait === 'D+' ? 'D-' : null;
+  const traitsEl = document.getElementById(`traits-${id}`);
+  if (traitsEl) traitsEl.innerHTML = buildAllTraitsHtml(player);
+  const btnEl = document.getElementById(`def-btn-${id}`);
+  if (btnEl) btnEl.textContent = defBtnLabel(player.dTrait);
+  saveState();
+}
+
+function renderPitchDieHtml(die) {
+  const cls = die.startsWith('-')?'bad':(die==='d20'||die==='d12')?'good':'avg';
+  return `<span class="pitch-die ${cls}">${die}</span>`;
+}
+
+// ─── Utility ──────────────────────────────────────────────────────────────────
+function setStatus(msg) { document.getElementById('statusBar').textContent = msg; }
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+function hide(id) { document.getElementById(id).classList.add('hidden'); }
+</script>
+</body>
+</html>

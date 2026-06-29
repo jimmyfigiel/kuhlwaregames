@@ -157,6 +157,25 @@ export default function Dashboard({
             />
           </div>
 
+          {/* Tools tab */}
+          <div className={`portal-tab-panel ${activeTab === "tools" ? "tab-panel--active" : ""}`}>
+            <article className="card">
+              <h2>Tools</h2>
+              <p className="muted">Standalone utilities for tabletop gaming.</p>
+              <a
+                href="/deadball-builder.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: "inline-block", marginTop: "0.75rem" }}
+              >
+                <button type="button">Deadball Team Builder</button>
+              </a>
+              <p className="muted" style={{ marginTop: "0.5rem", fontSize: "0.8rem" }}>
+                Build a Deadball baseball roster from real MLB stats. Select a season and team to generate Deadball ratings, hit type tables, and a printable scorecard.
+              </p>
+            </article>
+          </div>
+
           {/* Admin tab (superuser only) */}
           {isSuperuser && (
             <div className={`portal-tab-panel ${activeTab === "admin" ? "tab-panel--active" : ""}`}>
@@ -191,6 +210,15 @@ export default function Dashboard({
         >
           <span className="tab-icon">＋</span>
           New Game
+        </button>
+
+        <button
+          type="button"
+          className={activeTab === "tools" ? "tab-active" : ""}
+          onClick={() => setActiveTab("tools")}
+        >
+          <span className="tab-icon">🔧</span>
+          Tools
         </button>
 
         {isSuperuser && (
