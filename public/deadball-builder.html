@@ -142,7 +142,7 @@
     .drag-handle:hover { color: #888; }
 
     /* ── Player modal ─────────────────────────────── */
-    .player-card { cursor: pointer; transition: box-shadow 0.15s; }
+    .player-card { cursor: pointer; transition: box-shadow 0.15s; user-select: none; -webkit-user-select: none; }
     .player-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.13); }
     .modal-overlay {
       position: fixed; inset: 0; z-index: 1000;
@@ -625,16 +625,6 @@ function restoreState(state) {
 document.addEventListener('DOMContentLoaded', async () => {
   initSlotDrag();
 
-  // Card click → player modal (event delegation, avoids inline onclick scope issues)
-  ['hitterCards', 'pitcherCards'].forEach(containerId => {
-    document.getElementById(containerId).addEventListener('click', e => {
-      if (e.target.closest('.toggle-def')) return; // let toggle button handle its own click
-      const card = e.target.closest('.player-card');
-      if (!card) return;
-      const id = parseInt(card.dataset.playerId);
-      if (id) openPlayerModal(id);
-    });
-  });
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch(e) {}
   if (saved?.year) yearSel.value = saved.year;
@@ -804,6 +794,14 @@ function renderPlayerCards() {
       </div>
     </div>`;
   }).join('');
+
+  // Attach tap/click handlers directly on each card (delegation misses taps on mobile)
+  document.querySelectorAll('.player-card[data-player-id]').forEach(card => {
+    card.addEventListener('click', e => {
+      if (e.target.closest('.toggle-def')) return;
+      openPlayerModal(parseInt(card.dataset.playerId));
+    });
+  });
 }
 
 // ─── Lineup builder ───────────────────────────────────────────────────────────
