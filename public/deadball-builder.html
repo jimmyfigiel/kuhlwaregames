@@ -343,6 +343,7 @@
 <body>
 
 <div id="statusBar">Select a season and team below to get started.</div>
+<div style="font-size:0.6rem;color:#bbb;text-align:right;padding:0.1rem 0.75rem 0;user-select:none">v7-2026-07-01</div>
 
 <main>
 
@@ -795,20 +796,18 @@ function renderPlayerCards() {
     </div>`;
   }).join('');
 
-  // Attach tap handlers directly on each card using pointer events (reliable on Android + iOS)
+  // Attach click handlers on each card
   document.querySelectorAll('.player-card[data-player-id]').forEach(card => {
-    let startX, startY;
-    card.addEventListener('pointerdown', e => {
+    const id = parseInt(card.dataset.playerId);
+    card.addEventListener('click', e => {
       if (e.target.closest('.toggle-def')) return;
-      startX = e.clientX; startY = e.clientY;
+      try { openPlayerModal(id); } catch(err) { alert('Modal error: ' + err.message); }
     });
-    card.addEventListener('pointerup', e => {
+    card.addEventListener('touchend', e => {
       if (e.target.closest('.toggle-def')) return;
-      if (startX === undefined) return;
-      const dx = Math.abs(e.clientX - startX), dy = Math.abs(e.clientY - startY);
-      startX = undefined;
-      if (dx < 10 && dy < 10) openPlayerModal(parseInt(card.dataset.playerId));
-    });
+      e.preventDefault();
+      try { openPlayerModal(id); } catch(err) { alert('Modal error: ' + err.message); }
+    }, { passive: false });
   });
 }
 
