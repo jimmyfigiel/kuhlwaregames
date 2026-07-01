@@ -63,7 +63,6 @@
     #teamLogo { width: 64px; height: 64px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); display: none; flex-shrink: 0; }
     .banner-name h2 { font-size: 1.6rem; font-weight: 900; letter-spacing: 0.05em; text-transform: uppercase; line-height: 1.1; }
     .banner-name p { font-size: 0.85rem; opacity: 0.8; margin-top: 0.15rem; }
-    .banner-scores { display: flex; gap: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 0.5rem 1.25rem; }
     .score-item { text-align: center; }
     .score-item .sl { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.8; }
     .score-item .sv { font-size: 1.3rem; font-weight: 700; color: var(--ton); }
@@ -361,11 +360,6 @@
         <p id="bannerYear">Season</p>
       </div>
     </div>
-    <div class="banner-scores">
-      <div class="score-item"><div class="sl">Batting</div><div class="sv" id="scoreBat">—</div></div>
-      <div class="score-item"><div class="sl">Pitching</div><div class="sv" id="scorePitch">—</div></div>
-      <div class="score-item"><div class="sl">Team Score</div><div class="sv" id="scoreTeam">—</div></div>
-    </div>
   </div>
 
   <!-- SCORECARD — shown above lineup once generated -->
@@ -595,9 +589,6 @@ function restoreState(state) {
 
   const batScore  = allHitters.slice(0,9).reduce((n,h)=>n+h.bt,0);
   const pitScore  = allPitchers.slice(0,8).reduce((n,p)=>n+pitchDieVal(p.pitchDie),0)*10;
-  document.getElementById('scoreBat').textContent   = batScore;
-  document.getElementById('scorePitch').textContent = pitScore;
-  document.getElementById('scoreTeam').textContent  = Math.round((batScore+pitScore)/10);
 
   renderPlayerCards();
   buildLineupUI();
@@ -744,9 +735,6 @@ document.getElementById('buildBtn').addEventListener('click', async () => {
     const teamScore = Math.round((batScore+pitScore)/10);
     document.getElementById('bannerName').textContent  = tName;
     document.getElementById('bannerYear').textContent  = `${year} Season`;
-    document.getElementById('scoreBat').textContent    = batScore;
-    document.getElementById('scorePitch').textContent  = pitScore;
-    document.getElementById('scoreTeam').textContent   = teamScore;
 
     // Auto-assign D+/D- from OAA — top 2 with OAA > 0 get D+, bottom 2 with OAA < 0 get D-
     const withOAA = allHitters
