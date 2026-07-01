@@ -796,20 +796,30 @@ function renderPlayerCards() {
     </div>`;
   }).join('');
 
-  // Attach click handlers on each card
-  document.querySelectorAll('.player-card[data-player-id]').forEach(card => {
-    const id = parseInt(card.dataset.playerId);
-    card.addEventListener('click', e => {
-      if (e.target.closest('.toggle-def')) return;
-      try { openPlayerModal(id); } catch(err) { alert('Modal error: ' + err.message); }
-    });
-    card.addEventListener('touchend', e => {
-      if (e.target.closest('.toggle-def')) return;
-      e.preventDefault();
-      try { openPlayerModal(id); } catch(err) { alert('Modal error: ' + err.message); }
-    }, { passive: false });
-  });
 }
+
+// Single document-level listener — catches all clicks regardless of when cards are rendered
+document.addEventListener('click', e => {
+  const card = e.target.closest('.player-card[data-player-id]');
+  if (!card) return;
+  if (e.target.closest('.toggle-def')) return;
+  try {
+    openPlayerModal(parseInt(card.dataset.playerId));
+  } catch(err) {
+    alert('Modal error: ' + err.message);
+  }
+});
+document.addEventListener('touchend', e => {
+  const card = e.target.closest('.player-card[data-player-id]');
+  if (!card) return;
+  if (e.target.closest('.toggle-def')) return;
+  e.preventDefault();
+  try {
+    openPlayerModal(parseInt(card.dataset.playerId));
+  } catch(err) {
+    alert('Modal error: ' + err.message);
+  }
+}, { passive: false });
 
 // ─── Lineup builder ───────────────────────────────────────────────────────────
 function getSelectedPlayerIds(excludeSlot = -1) {
