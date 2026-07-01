@@ -795,11 +795,19 @@ function renderPlayerCards() {
     </div>`;
   }).join('');
 
-  // Attach tap/click handlers directly on each card (delegation misses taps on mobile)
+  // Attach tap handlers directly on each card using pointer events (reliable on Android + iOS)
   document.querySelectorAll('.player-card[data-player-id]').forEach(card => {
-    card.addEventListener('click', e => {
+    let startX, startY;
+    card.addEventListener('pointerdown', e => {
       if (e.target.closest('.toggle-def')) return;
-      openPlayerModal(parseInt(card.dataset.playerId));
+      startX = e.clientX; startY = e.clientY;
+    });
+    card.addEventListener('pointerup', e => {
+      if (e.target.closest('.toggle-def')) return;
+      if (startX === undefined) return;
+      const dx = Math.abs(e.clientX - startX), dy = Math.abs(e.clientY - startY);
+      startX = undefined;
+      if (dx < 10 && dy < 10) openPlayerModal(parseInt(card.dataset.playerId));
     });
   });
 }
