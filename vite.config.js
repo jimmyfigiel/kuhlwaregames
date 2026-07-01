@@ -24,7 +24,13 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,png,webp,woff2}"],
+        globIgnores: ["**/deadball-builder.html"],
         runtimeCaching: [
+          {
+            urlPattern: /\/deadball-builder\.html/,
+            handler: "NetworkFirst",
+            options: { cacheName: "deadball-builder", networkTimeoutSeconds: 5 },
+          },
           {
             urlPattern: /^https:\/\/firestore\.googleapis\.com\/.*/i,
             handler: "NetworkFirst",
