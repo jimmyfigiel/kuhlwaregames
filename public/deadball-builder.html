@@ -141,6 +141,70 @@
     .slot-top { display: grid; grid-template-columns: 1rem 1.4rem 4.5rem 1fr; gap: 0.4rem; align-items: center; }
     .drag-handle { cursor: grab; color: #bbb; font-size: 1rem; line-height: 1; user-select: none; touch-action: none; padding: 0 0.1rem; }
     .drag-handle:hover { color: #888; }
+
+    /* ── Player modal ─────────────────────────────── */
+    .player-card { cursor: pointer; transition: box-shadow 0.15s; }
+    .player-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.13); }
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(3px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem; opacity: 0; pointer-events: none;
+      transition: opacity 0.18s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: #fff; border-radius: 12px;
+      width: 100%; max-width: 680px; max-height: 90vh;
+      overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.28);
+      transform: translateY(12px); transition: transform 0.18s;
+    }
+    .modal-overlay.open .modal-box { transform: translateY(0); }
+    .modal-header {
+      position: sticky; top: 0; background: #fff;
+      border-bottom: 1px solid #ebebeb; padding: 1rem 1.25rem 0.75rem;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+      z-index: 2;
+    }
+    .modal-name { font-size: 1.35rem; font-weight: 700; color: #111; line-height: 1.2; }
+    .modal-sub { font-size: 0.8rem; color: #888; margin-top: 0.2rem; display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+    .modal-close {
+      background: none; border: none; cursor: pointer; font-size: 1.4rem;
+      color: #bbb; padding: 0; line-height: 1; flex-shrink: 0;
+    }
+    .modal-close:hover { color: #555; }
+    .modal-body { padding: 1.1rem 1.25rem 1.5rem; }
+    .modal-section { margin-bottom: 1.25rem; }
+    .modal-section-title {
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: #bbb; margin-bottom: 0.55rem; font-weight: 600;
+    }
+    .modal-stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 0.5rem;
+    }
+    .modal-stat {
+      background: #f7f7f9; border-radius: 8px; padding: 0.5rem 0.7rem;
+    }
+    .modal-stat-lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: #999; margin-bottom: 0.15rem; }
+    .modal-stat-val { font-size: 1.25rem; font-weight: 700; color: #111; }
+    .modal-stat-val.bt  { color: var(--primary); }
+    .modal-stat-val.walk { color: #16a34a; }
+    .modal-stat-val.crit { color: #dc2626; }
+    .modal-stat.highlight { background: #eef3ff; }
+    .modal-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .modal-traits { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+    .modal-trait-row { display: flex; flex-direction: column; gap: 0.6rem; }
+    .modal-trait-entry { display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.8rem; color: #444; line-height: 1.4; }
+    .modal-pitcher-badge {
+      display: inline-block; background: #f1f1f1; border-radius: 5px;
+      padding: 0.25rem 0.55rem; font-size: 0.78rem; font-weight: 600; color: #555;
+    }
+    @media (max-width: 500px) {
+      .modal-box { max-height: 95vh; border-radius: 10px; }
+      .modal-name { font-size: 1.1rem; }
+      .modal-stat-val { font-size: 1.05rem; }
+    }
     .slot-num { font-size: 1.1rem; font-weight: 700; color: var(--primary); text-align: center; transition: color 0.4s; }
     .slot-player, .slot-pos { width: 100%; font-size: 0.88rem; }
     .slot-preview { margin-top: 0.3rem; font-size: 0.72rem; color: #777; font-family: 'Courier New', monospace; padding-left: 2.2rem; line-height: 1.5; }
@@ -344,7 +408,7 @@
 
         <h3 style="margin-top:0.75rem">Pitcher Fatigue</h3>
         <div class="rule-text">
-          <p><strong>Starters</strong> drop a Pitch Die level if they: allow 3+ runs in an inning; allow 4+ runs over two innings; allow any run beyond the 4th allowed; or pitch past the 6th inning (per inning beyond it).</p>
+          <p><strong>Starters</strong> drop a Pitch Die level if they: allow 3+ runs in an inning; allow 4+ runs over two innings; for every run allowed over 4; for every inning pitched past six.</p>
           <p><strong>Relief pitchers</strong> lose a Pitch Die level for every run allowed, and if they pitch more than one inning.</p>
           <p><strong>All pitchers</strong> gain a Pitch Die level if they: strike out the side; put up three straight shutout innings; or escape a bases-loaded, no-out jam without allowing a run.</p>
         </div>
@@ -569,6 +633,17 @@ function restoreState(state) {
 // ─── Init ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   initSlotDrag();
+
+  // Card click → player modal (event delegation, avoids inline onclick scope issues)
+  ['hitterCards', 'pitcherCards'].forEach(containerId => {
+    document.getElementById(containerId).addEventListener('click', e => {
+      if (e.target.closest('.toggle-def')) return; // let toggle button handle its own click
+      const card = e.target.closest('.player-card');
+      if (!card) return;
+      const id = parseInt(card.dataset.playerId);
+      if (id) openPlayerModal(id);
+    });
+  });
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch(e) {}
   if (saved?.year) yearSel.value = saved.year;
@@ -697,7 +772,7 @@ function renderPlayerCards() {
   document.getElementById('hitterCards').innerHTML = allHitters.map(h => {
     const t = h.hitTypeTable;
     const avgStr = '.' + String(Math.round(h.avg*1000)).padStart(3,'0');
-    return `<div class="player-card">
+    return `<div class="player-card" data-player-id="${h.id}">
       <div class="card-header">
         <div class="card-name">${h.name}</div>
         <div class="card-badges"><span class="badge badge-pos">${h.pos}</span><span class="badge badge-hand">${h.hand}</span></div>
@@ -708,7 +783,7 @@ function renderPlayerCards() {
         <div><div class="stat-lbl">Crit</div><div class="stat-val">≤5</div></div>
         <div><div class="stat-lbl">Traits</div><div class="stat-val card-traits">
           <span id="traits-${h.id}">${buildAllTraitsHtml(h)}</span>
-          <button id="def-btn-${h.id}" class="toggle-def no-print" onclick="toggleDef(${h.id})" title="Toggle Defensive trait">${defBtnLabel(h.dTrait)}</button>
+          <button id="def-btn-${h.id}" class="toggle-def no-print" onclick="event.stopPropagation();toggleDef(${h.id})" title="Toggle Defensive trait">${defBtnLabel(h.dTrait)}</button>
         </div></div>
         <div><div class="stat-lbl">AVG</div><div class="stat-val">${avgStr}</div></div>
         <div><div class="stat-lbl">HR</div><div class="stat-val">${h.hr}</div></div>
@@ -723,7 +798,7 @@ function renderPlayerCards() {
 
   document.getElementById('pitcherCards').innerHTML = allPitchers.map(p => {
     const eraStr = isNaN(p.era) ? '—' : p.era.toFixed(2);
-    return `<div class="player-card pitcher-card">
+    return `<div class="player-card pitcher-card" data-player-id="${p.id}">
       <div class="card-header">
         <div class="card-name">${p.name}</div>
         <div class="card-badges"><span class="badge badge-hand">${p.hand}</span></div>
@@ -736,7 +811,7 @@ function renderPlayerCards() {
         ${p.gs>0?`<div><div class="stat-lbl">GS</div><div class="stat-val">${p.gs}</div></div>`:''}
         <div><div class="stat-lbl">Traits</div><div class="stat-val card-traits">
           <span id="traits-${p.id}">${buildAllTraitsHtml(p)}</span><span class="trait trait-neg">P-</span>
-          <button id="def-btn-${p.id}" class="toggle-def no-print" onclick="toggleDef(${p.id})" title="Toggle Defensive trait">${defBtnLabel(p.dTrait)}</button>
+          <button id="def-btn-${p.id}" class="toggle-def no-print" onclick="event.stopPropagation();toggleDef(${p.id})" title="Toggle Defensive trait">${defBtnLabel(p.dTrait)}</button>
         </div></div>
       </div>
     </div>`;
@@ -1164,6 +1239,169 @@ function renderPitchDieHtml(die) {
 function setStatus(msg) { document.getElementById('statusBar').textContent = msg; }
 function show(id) { document.getElementById(id).classList.remove('hidden'); }
 function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+// ─── Player modal ─────────────────────────────────────────────────────────────
+function openPlayerModal(id) {
+  const h = allHitters.find(p => p.id === id);
+  const p = !h && allPitchers.find(p => p.id === id);
+  const player = h || p;
+  if (!player) return;
+
+  const overlay = document.getElementById('playerModal');
+  const content = document.getElementById('playerModalContent');
+
+  if (h) {
+    const t = h.hitTypeTable;
+    const avgStr = '.' + String(Math.round(h.avg * 1000)).padStart(3, '0');
+    const allTraits = [...h.traits, ...(h.dTrait ? [{code: h.dTrait, type: h.dTrait.endsWith('+') ? 'pos' : 'neg'}] : [])];
+
+    content.innerHTML = `
+      <div class="modal-header">
+        <div>
+          <div class="modal-name">${h.name}</div>
+          <div class="modal-sub">
+            <span class="badge badge-pos">${h.pos}</span>
+            <span class="badge badge-hand">Bats ${h.hand}</span>
+            ${allTraits.map(t => `<span class="trait trait-${t.type}">${t.code}</span>`).join('')}
+          </div>
+        </div>
+        <button class="modal-close no-print" onclick="closePlayerModal()" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <div class="modal-section-title">Deadball Ratings</div>
+          <div class="modal-stats-grid">
+            <div class="modal-stat highlight"><div class="modal-stat-lbl">Batter Target</div><div class="modal-stat-val bt">${h.bt}</div></div>
+            <div class="modal-stat highlight"><div class="modal-stat-lbl">Walk Window</div><div class="modal-stat-val walk">+${h.walkWindow}</div></div>
+            <div class="modal-stat highlight"><div class="modal-stat-lbl">Critical Hit</div><div class="modal-stat-val crit">≤ 5</div></div>
+          </div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">MLB Stats (${document.getElementById('yearSel')?.value || ''})</div>
+          <div class="modal-stats-grid">
+            <div class="modal-stat"><div class="modal-stat-lbl">AVG</div><div class="modal-stat-val">${avgStr}</div></div>
+            <div class="modal-stat"><div class="modal-stat-lbl">Home Runs</div><div class="modal-stat-val">${h.hr}</div></div>
+            <div class="modal-stat"><div class="modal-stat-lbl">Stolen Bases</div><div class="modal-stat-val">${h.sb}</div></div>
+            <div class="modal-stat"><div class="modal-stat-lbl">Plate App.</div><div class="modal-stat-val">${h.pa}</div></div>
+          </div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">Hit Type Table (d100)</div>
+          <div class="modal-chips">${buildHitChips(t)}</div>
+          <div style="margin-top:0.5rem;font-size:0.71rem;color:#999;font-family:'Courier New',monospace;line-height:1.6">${hitRangeText(t)}</div>
+        </div>
+        ${allTraits.length ? `
+        <div class="modal-section">
+          <div class="modal-section-title">Traits</div>
+          <div class="modal-trait-row">${allTraits.map(tr => `
+            <div class="modal-trait-entry">
+              <span class="trait trait-${tr.type}" style="flex-shrink:0">${tr.code}</span>
+              <span>${traitDesc(tr.code)}</span>
+            </div>`).join('')}
+          </div>
+        </div>` : ''}
+        <div class="modal-section no-print">
+          <div class="modal-section-title">Defensive Trait</div>
+          <div style="display:flex;gap:0.5rem;align-items:center">
+            <span id="modal-traits-${h.id}">${h.dTrait ? `<span class="trait trait-${h.dTrait.endsWith('+') ? 'pos' : 'neg'}">${h.dTrait}</span>` : '<span style="color:#bbb;font-size:0.8rem">None assigned</span>'}</span>
+            <button class="toggle-def" onclick="toggleDef(${h.id}); refreshModalDef(${h.id})" title="Toggle Defensive trait">${defBtnLabel(h.dTrait)}</button>
+          </div>
+          <p style="font-size:0.7rem;color:#aaa;margin-top:0.35rem">D+ adds +1 to this player's DEF rolls. If catcher, starting pitcher gains +1 die level. D- is the reverse.</p>
+        </div>
+      </div>`;
+  } else {
+    const eraStr = isNaN(p.era) ? '—' : p.era.toFixed(2);
+    const allTraits = [...p.traits, ...(p.dTrait ? [{code: p.dTrait, type: p.dTrait.endsWith('+') ? 'pos' : 'neg'}] : []), {code: 'P-', type: 'neg'}];
+
+    content.innerHTML = `
+      <div class="modal-header">
+        <div>
+          <div class="modal-name">${p.name}</div>
+          <div class="modal-sub">
+            <span class="badge badge-hand">Throws ${p.hand}</span>
+            <span class="modal-pitcher-badge">${p.gs > 0 ? 'Starter' : 'Reliever'}</span>
+            ${allTraits.map(t => `<span class="trait trait-${t.type}">${t.code}</span>`).join('')}
+          </div>
+        </div>
+        <button class="modal-close no-print" onclick="closePlayerModal()" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <div class="modal-section-title">Deadball Ratings</div>
+          <div class="modal-stats-grid">
+            <div class="modal-stat highlight"><div class="modal-stat-lbl">Pitch Die</div><div class="modal-stat-val">${renderPitchDieHtml(p.pitchDie)}</div></div>
+            <div class="modal-stat highlight"><div class="modal-stat-lbl">Batter Target</div><div class="modal-stat-val bt">${p.bt}</div></div>
+          </div>
+          <p style="font-size:0.72rem;color:#888;margin-top:0.55rem">At bat: roll d100 + pitch die = MSS. MSS ≤ 5 → Crit. MSS ≤ BT → Hit. BT &lt; MSS ≤ BT+Walk → Walk. MSS &gt; BT+Walk → Out.</p>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">MLB Stats (${document.getElementById('yearSel')?.value || ''})</div>
+          <div class="modal-stats-grid">
+            <div class="modal-stat"><div class="modal-stat-lbl">ERA</div><div class="modal-stat-val">${eraStr}</div></div>
+            <div class="modal-stat"><div class="modal-stat-lbl">Inn. Pitched</div><div class="modal-stat-val">${p.ip}</div></div>
+            ${p.gs > 0 ? `<div class="modal-stat"><div class="modal-stat-lbl">Games Started</div><div class="modal-stat-val">${p.gs}</div></div>` : ''}
+          </div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">Traits</div>
+          <div class="modal-trait-row">${allTraits.map(tr => `
+            <div class="modal-trait-entry">
+              <span class="trait trait-${tr.type}" style="flex-shrink:0">${tr.code}</span>
+              <span>${traitDesc(tr.code)}</span>
+            </div>`).join('')}
+          </div>
+        </div>
+        <div class="modal-section no-print">
+          <div class="modal-section-title">Defensive Trait</div>
+          <div style="display:flex;gap:0.5rem;align-items:center">
+            <span id="modal-traits-${p.id}">${p.dTrait ? `<span class="trait trait-${p.dTrait.endsWith('+') ? 'pos' : 'neg'}">${p.dTrait}</span>` : '<span style="color:#bbb;font-size:0.8rem">None assigned</span>'}</span>
+            <button class="toggle-def" onclick="toggleDef(${p.id}); refreshModalDef(${p.id})" title="Toggle Defensive trait">${defBtnLabel(p.dTrait)}</button>
+          </div>
+          <p style="font-size:0.7rem;color:#aaa;margin-top:0.35rem">If this pitcher is a catcher (rare), D+ gives starting pitcher +1 die level. D- does the reverse including all relievers.</p>
+        </div>
+      </div>`;
+  }
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePlayerModal() {
+  document.getElementById('playerModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePlayerModal(); });
+
+function refreshModalDef(id) {
+  const player = allHitters.find(p => p.id === id) || allPitchers.find(p => p.id === id);
+  if (!player) return;
+  const el = document.getElementById(`modal-traits-${id}`);
+  if (el) el.innerHTML = player.dTrait
+    ? `<span class="trait trait-${player.dTrait.endsWith('+') ? 'pos' : 'neg'}">${player.dTrait}</span>`
+    : '<span style="color:#bbb;font-size:0.8rem">None assigned</span>';
+  const btn = el?.nextElementSibling;
+  if (btn) btn.textContent = defBtnLabel(player.dTrait);
+}
+
+function traitDesc(code) {
+  const map = {
+    'S+': 'Speedy Runner — splits 1B+ range: lower half → double, upper half → triple. +1 steal roll. Can steal home (d8=8). Bunt for hit any time. Can\'t be doubled up.',
+    'S-': 'Slow Runner — 3B/D results become 2B/ADV. −3 to steal rolls. Easier to double up on any grounder.',
+    'D+': 'Great Defender — +1 to DEF rolls. Modified DEF 13 = lead runner out, batter safe. If catcher, starting pitcher gains +1 die level (max d12).',
+    'D-': 'Poor Defender — −1 to DEF rolls. If catcher, all pitchers start one die level lower. Must roll DEF before double plays (1-2 = error).',
+    'K+': 'Strikeout Artist — +1 to every MSS. Out Table result 3 is a strikeout instead of a grounder to 1B.',
+    'GB+': 'Groundball Machine — +1 to every MSS. Out Table result 2 is a 6-3 groundout instead of a strikeout.',
+    'CN+': 'Control Pitcher — batters only walk when MSS = BT+1 or BT+2 (walk window capped at 2).',
+    'ST+': 'Great Stamina — no Pitch Die penalty until after the 7th inning (instead of 6th).',
+    'P-':  'Weak Hitter (default for pitchers) — subtract 1 from any Hit Die roll when batting.',
+  };
+  return map[code] || code;
+}
 </script>
+
+<!-- Player detail modal -->
+<div id="playerModal" class="modal-overlay no-print" onclick="if(event.target===this)closePlayerModal()">
+  <div class="modal-box" id="playerModalContent"></div>
+</div>
 </body>
 </html>
