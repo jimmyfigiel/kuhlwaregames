@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#8b2020" id="themeColorMeta">
   <title>Deadball Team Builder</title>
   <style>
     /* ── Reset & Base ─────────────────────────── */
@@ -536,6 +540,7 @@ function applyTeamColors(teamId, abbrev) {
   r.style.setProperty('--primary', c.p);
   r.style.setProperty('--secondary', c.s === '#ffffff' ? '#aaa' : c.s);
   r.style.setProperty('--ton', c.t);
+  document.getElementById('themeColorMeta').setAttribute('content', c.p);
   const code = ESPN[abbrev?.toUpperCase()] || abbrev?.toLowerCase() || '';
   const logo = document.getElementById('teamLogo');
   if (code) { logo.src = `https://a.espncdn.com/i/teamlogos/mlb/500/${code}.png`; logo.style.display = ''; }
