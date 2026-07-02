@@ -30,9 +30,14 @@
       font-size: 0.8rem;
       color: #777;
       font-style: italic;
-      min-height: 2rem;
       display: flex;
       align-items: center;
+      overflow: hidden;
+      max-height: 2rem;
+      transition: max-height 0.3s ease, padding 0.3s ease, border 0.3s ease;
+    }
+    #statusBar.hidden-bar {
+      max-height: 0; padding-top: 0; padding-bottom: 0; border-bottom-color: transparent;
     }
 
     /* ── Welcome screen ───────────────────────── */
@@ -667,7 +672,7 @@ async function loadTeams() {
       ts.appendChild(o);
     });
     ts.disabled = bb.disabled = false;
-    setStatus(`${teams.length} teams loaded for ${yearSel.value}.`);
+    setStatus(`${teams.length} teams loaded for ${yearSel.value}.`, true);
   } catch(e) { setStatus('Error: ' + e.message); }
 }
 
@@ -758,7 +763,7 @@ document.getElementById('buildBtn').addEventListener('click', async () => {
     prefillLineup();
 
     show('teamBanner'); show('lineupSection'); show('rosterSection');
-    setStatus(`${tName} ${year} — ${allHitters.length} batters, ${allPitchers.length} pitchers.`);
+    setStatus(`${tName} ${year} — ${allHitters.length} batters, ${allPitchers.length} pitchers.`, true);
     document.getElementById('teamBanner').scrollIntoView({behavior:'smooth'});
     saveState();
   } catch(e) { setStatus('Error: ' + e.message); console.error(e); }
@@ -1089,7 +1094,7 @@ function generateScorecard(scroll) {
   document.getElementById('scorecardCards').innerHTML = cards + pitCard;
   show('scorecardSection');
   document.getElementById('printBtn').style.display = '';
-  setStatus('Scorecard ready.');
+  setStatus('Scorecard ready.', true);
   if (scroll) document.getElementById('scorecardSection').scrollIntoView({behavior:'smooth'});
   saveState();
 }
@@ -1259,7 +1264,14 @@ function renderPitchDieHtml(die) {
 }
 
 // ─── Utility ──────────────────────────────────────────────────────────────────
-function setStatus(msg) { document.getElementById('statusBar').textContent = msg; }
+let _statusTimer = null;
+function setStatus(msg, autohide = false) {
+  const bar = document.getElementById('statusBar');
+  bar.textContent = msg;
+  bar.classList.remove('hidden-bar');
+  clearTimeout(_statusTimer);
+  if (autohide) _statusTimer = setTimeout(() => bar.classList.add('hidden-bar'), 1800);
+}
 function show(id) { document.getElementById(id).classList.remove('hidden'); }
 function hide(id) { document.getElementById(id).classList.add('hidden'); }
 
