@@ -798,28 +798,25 @@ function renderPlayerCards() {
 
 }
 
-// Single document-level listener — catches all clicks regardless of when cards are rendered
-document.addEventListener('click', e => {
-  const card = e.target.closest('.player-card[data-player-id]');
-  if (!card) return;
-  if (e.target.closest('.toggle-def')) return;
-  try {
-    openPlayerModal(parseInt(card.dataset.playerId));
-  } catch(err) {
-    alert('Modal error: ' + err.message);
-  }
-});
-document.addEventListener('touchend', e => {
-  const card = e.target.closest('.player-card[data-player-id]');
-  if (!card) return;
-  if (e.target.closest('.toggle-def')) return;
-  e.preventDefault();
-  try {
-    openPlayerModal(parseInt(card.dataset.playerId));
-  } catch(err) {
-    alert('Modal error: ' + err.message);
-  }
-}, { passive: false });
+// Card tap/click — window capture phase so nothing in the page can block it
+(function() {
+  let ptDown = null;
+
+  window.addEventListener('pointerdown', e => {
+    const card = e.target.closest('.player-card[data-player-id]');
+    if (!card || e.target.closest('.toggle-def')) return;
+    ptDown = { id: parseInt(card.dataset.playerId), x: e.clientX, y: e.clientY };
+  }, true);
+
+  window.addEventListener('pointerup', e => {
+    if (!ptDown) return;
+    const dx = Math.abs(e.clientX - ptDown.x);
+    const dy = Math.abs(e.clientY - ptDown.y);
+    const id = ptDown.id;
+    ptDown = null;
+    if (dx < 12 && dy < 12) openPlayerModal(id);
+  }, true);
+})();
 
 // ─── Lineup builder ───────────────────────────────────────────────────────────
 function getSelectedPlayerIds(excludeSlot = -1) {
