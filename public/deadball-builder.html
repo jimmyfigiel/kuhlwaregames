@@ -1429,6 +1429,12 @@ function traitDesc(code) {
 }
 </script>
 
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/deadball-sw.js', { scope: '/deadball-builder.html' });
+  }
+</script>
+
 <!-- Player detail modal -->
 <div id="playerModal" class="modal-overlay no-print" onclick="if(event.target===this)closePlayerModal()">
   <div class="modal-box" id="playerModalContent"></div>
