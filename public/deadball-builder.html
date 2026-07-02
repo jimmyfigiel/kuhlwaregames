@@ -343,7 +343,7 @@
 <body>
 
 <div id="statusBar">Select a season and team below to get started.</div>
-<div style="font-size:0.6rem;color:#bbb;text-align:right;padding:0.1rem 0.75rem 0;user-select:none">v7-2026-07-01</div>
+<div style="font-size:0.6rem;color:#bbb;text-align:right;padding:0.1rem 0.75rem 0;user-select:none">v8-2026-07-01</div>
 
 <main>
 
@@ -814,7 +814,9 @@ function renderPlayerCards() {
     const dy = Math.abs(e.clientY - ptDown.y);
     const id = ptDown.id;
     ptDown = null;
-    if (dx < 12 && dy < 12) openPlayerModal(id);
+    // Defer until after the click event fires so the overlay's close handler
+    // doesn't immediately close the modal on the same gesture
+    if (dx < 12 && dy < 12) setTimeout(() => openPlayerModal(id), 0);
   }, true);
 })();
 
