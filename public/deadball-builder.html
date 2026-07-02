@@ -34,7 +34,7 @@
       border-bottom: 1px solid #e0e0e0;
       padding: 0.4rem 1rem;
       font-size: 0.8rem;
-      color: #777;
+      color: #444;
       font-style: italic;
       display: flex;
       align-items: center;
@@ -116,7 +116,7 @@
     .sc-card-badges { display: flex; gap: 0.2rem; flex-shrink: 0; }
 
     .sc-stats { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; font-size: 0.78rem; margin-bottom: 0.35rem; }
-    .sc-stat-lbl { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: #aaa; display: block; }
+    .sc-stat-lbl { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: #222; display: block; }
     .sc-stat-val { font-weight: 700; font-family: 'Courier New', monospace; }
     .sc-stat-val.bt   { color: #1a1a1a; font-size: 1rem; }
     .sc-stat-val.walk { color: #1a4a9a; }
@@ -125,12 +125,12 @@
     .sc-stat-val.mod.pos { color: #2a7a10; }
     .sc-stat-val.mod.neg { color: #b02020; }
 
-    .sc-hit-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: #bbb; margin-bottom: 0.2rem; }
+    .sc-hit-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: #222; margin-bottom: 0.2rem; }
     .sc-card-divider { border: none; border-top: 1px solid #eee; margin: 0.35rem 0; }
 
     /* ── Traits key ───────────────────────────── */
     .traits-key { padding: 0.75rem 1rem; }
-    .traits-key h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #999; margin-bottom: 0.5rem; }
+    .traits-key h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #222; margin-bottom: 0.5rem; }
     .traits-key-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 1rem; font-size: 0.75rem; }
     @media (min-width: 640px) { .traits-key-grid { grid-template-columns: 1fr 1fr 1fr; } }
     .trait-key-row { display: flex; gap: 0.4rem; align-items: baseline; padding: 0.15rem 0; border-bottom: 1px dotted #f0f0f0; }
@@ -206,7 +206,7 @@
       border-right: 1px solid #e8e8e8;
     }
     .modal-rating-cell:last-child { border-right: none; }
-    .modal-rating-lbl { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: #aaa; margin-bottom: 0.1rem; }
+    .modal-rating-lbl { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.85); margin-bottom: 0.1rem; }
     .modal-rating-val { font-size: 2rem; font-weight: 900; line-height: 1; }
     .modal-rating-val.bt   { color: var(--primary); }
     .modal-rating-val.walk { color: #16a34a; }
@@ -220,10 +220,10 @@
       padding: 0.25rem 0.6rem;
     }
     .modal-hit-table { width: 100%; border-collapse: collapse; }
-    .modal-hit-table th { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #999; font-weight: 600; padding: 0.3rem 0.6rem; text-align: left; border-bottom: 2px solid #e8e8e8; background: #fafafa; }
+    .modal-hit-table th { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #222; font-weight: 600; padding: 0.3rem 0.6rem; text-align: left; border-bottom: 2px solid #e8e8e8; background: #fafafa; }
     .modal-hit-table td { padding: 0.28rem 0.6rem; border-bottom: 1px solid #f0f0f0; font-size: 1.05rem; }
     .modal-hit-table tr:last-child td { border-bottom: none; }
-    .modal-hit-table td:first-child { font-family: 'Courier New', monospace; color: #666; white-space: nowrap; font-size: 0.95rem; }
+    .modal-hit-table td:first-child { font-family: 'Courier New', monospace; color: #222; white-space: nowrap; font-size: 0.95rem; }
     .modal-hit-table td:last-child .hr-chip { font-size: 0.95rem; padding: 0.15rem 0.5rem; }
     /* traits */
     .modal-trait-row { display: flex; flex-direction: column; }
@@ -235,7 +235,7 @@
     }
     .slot-num { font-size: 1.1rem; font-weight: 700; color: var(--primary); text-align: center; transition: color 0.4s; }
     .slot-player, .slot-pos { width: 100%; font-size: 0.88rem; }
-    .slot-preview { margin-top: 0.3rem; font-size: 0.72rem; color: #777; font-family: 'Courier New', monospace; padding-left: 2.2rem; line-height: 1.5; }
+    .slot-preview { margin-top: 0.3rem; font-size: 0.72rem; color: #222; font-family: 'Courier New', monospace; padding-left: 2.2rem; line-height: 1.5; }
     .pitcher-slot { border: 1px solid #e8e8e8; border-left: 4px solid #777; border-radius: 6px; padding: 0.6rem 0.75rem; background: #fafafa; }
     .pitcher-slot-top { display: grid; grid-template-columns: 5rem 1fr; gap: 0.5rem; align-items: center; }
     .pitcher-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #555; }
@@ -282,9 +282,9 @@
     .badge-hand { background: #e0e0e0; color: #444; }
     .card-stats { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.8rem; color: #555; margin-bottom: 0.5rem; }
     .stat-val { font-weight: 700; color: #1a1a1a; }
-    .stat-lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #999; }
+    .stat-lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #222; }
     .card-divider { border: none; border-top: 1px solid #f0f0f0; margin: 0.5rem 0; }
-    .hit-table-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: #999; margin-bottom: 0.25rem; }
+    .hit-table-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: #222; margin-bottom: 0.25rem; }
     .hit-ranges { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 
     /* ── Hit type chips ───────────────────────── */
@@ -345,7 +345,7 @@
 
     /* ── Helpers ──────────────────────────────── */
     .hidden { display: none !important; }
-    .muted  { color: #999; font-size: 0.75rem; font-style: italic; }
+    .muted  { color: #444; font-size: 0.75rem; font-style: italic; }
     .no-print { }
 
     /* ── Print ────────────────────────────────── */
