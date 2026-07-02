@@ -181,52 +181,46 @@
     /* baseball-card header band */
     .modal-card-band {
       background: var(--primary); color: #fff;
-      padding: 1rem 1.25rem 0.85rem;
-      display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+      padding: 0.65rem 0.75rem 0.6rem;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem;
     }
-    .modal-card-band .modal-name { color: #fff; }
-    .modal-card-band .modal-sub { color: rgba(255,255,255,0.75); margin-top: 0.25rem; }
-    .modal-card-band .modal-close { color: rgba(255,255,255,0.7); }
+    .modal-card-band .modal-name { color: #fff; font-size: 1.5rem; }
+    .modal-card-band .modal-sub { color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
+    .modal-card-band .modal-close { color: rgba(255,255,255,0.7); font-size: 1.6rem; }
     .modal-card-band .modal-close:hover { color: #fff; }
     /* ratings row */
-    .modal-ratings {
-      display: flex; gap: 0; border-bottom: 1px solid #ebebeb;
-    }
+    .modal-ratings { display: flex; border-bottom: 2px solid #e8e8e8; }
     .modal-rating-cell {
-      flex: 1; text-align: center; padding: 0.75rem 0.5rem;
-      border-right: 1px solid #ebebeb;
+      flex: 1; text-align: center; padding: 0.5rem 0.25rem;
+      border-right: 1px solid #e8e8e8;
     }
     .modal-rating-cell:last-child { border-right: none; }
-    .modal-rating-lbl { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: #aaa; margin-bottom: 0.2rem; }
-    .modal-rating-val { font-size: 1.45rem; font-weight: 800; }
+    .modal-rating-lbl { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: #aaa; margin-bottom: 0.1rem; }
+    .modal-rating-val { font-size: 2rem; font-weight: 900; line-height: 1; }
     .modal-rating-val.bt   { color: var(--primary); }
     .modal-rating-val.walk { color: #16a34a; }
     .modal-rating-val.crit { color: #dc2626; }
     /* hit table */
-    .modal-hit-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    .modal-hit-table th { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: #aaa; font-weight: 600; padding: 0.35rem 0.5rem; text-align: left; border-bottom: 2px solid #ebebeb; }
-    .modal-hit-table td { padding: 0.3rem 0.5rem; border-bottom: 1px solid #f5f5f5; }
+    .modal-body { padding: 0; }
+    .modal-section { margin: 0; }
+    .modal-section-title {
+      font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: #fff; font-weight: 700; background: #555;
+      padding: 0.25rem 0.6rem;
+    }
+    .modal-hit-table { width: 100%; border-collapse: collapse; }
+    .modal-hit-table th { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #999; font-weight: 600; padding: 0.3rem 0.6rem; text-align: left; border-bottom: 2px solid #e8e8e8; background: #fafafa; }
+    .modal-hit-table td { padding: 0.28rem 0.6rem; border-bottom: 1px solid #f0f0f0; font-size: 1.05rem; }
     .modal-hit-table tr:last-child td { border-bottom: none; }
-    .modal-hit-table td:first-child { font-family: 'Courier New', monospace; color: #777; white-space: nowrap; }
-    .modal-hit-table td:last-child { font-weight: 700; }
-    /* mlb stats table */
-    .modal-mlb-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    .modal-mlb-table td { padding: 0.3rem 0.2rem; border-bottom: 1px solid #f5f5f5; }
-    .modal-mlb-table tr:last-child td { border-bottom: none; }
-    .modal-mlb-table td:first-child { color: #999; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; }
-    .modal-mlb-table td:last-child { font-weight: 700; color: #111; text-align: right; }
+    .modal-hit-table td:first-child { font-family: 'Courier New', monospace; color: #666; white-space: nowrap; font-size: 0.95rem; }
+    .modal-hit-table td:last-child .hr-chip { font-size: 0.95rem; padding: 0.15rem 0.5rem; }
     /* traits */
-    .modal-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-    .modal-trait-row { display: flex; flex-direction: column; gap: 0.6rem; }
-    .modal-trait-entry { display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.8rem; color: #444; line-height: 1.4; }
+    .modal-trait-row { display: flex; flex-direction: column; }
+    .modal-trait-entry { display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.9rem; color: #444; line-height: 1.4; padding: 0.3rem 0.6rem; border-bottom: 1px solid #f0f0f0; }
+    .modal-trait-entry:last-child { border-bottom: none; }
     .modal-pitcher-badge {
       display: inline-block; background: rgba(255,255,255,0.2); border-radius: 5px;
-      padding: 0.15rem 0.45rem; font-size: 0.75rem; font-weight: 600; color: #fff;
-    }
-    @media (max-width: 500px) {
-      .modal-box { max-height: 95vh; border-radius: 10px; }
-      .modal-name { font-size: 1.1rem; }
-      .modal-rating-val { font-size: 1.2rem; }
+      padding: 0.15rem 0.45rem; font-size: 0.8rem; font-weight: 600; color: #fff;
     }
     .slot-num { font-size: 1.1rem; font-weight: 700; color: var(--primary); text-align: center; transition: color 0.4s; }
     .slot-player, .slot-pos { width: 100%; font-size: 0.88rem; }
@@ -1345,15 +1339,6 @@ function openPlayerModal(id) {
             </div>`).join('')}
           </div>
         </div>` : ''}
-        <div class="modal-section">
-          <div class="modal-section-title">MLB Stats ${year ? '('+year+')' : ''}</div>
-          <table class="modal-mlb-table">
-            <tr><td>AVG</td><td>${avgStr}</td></tr>
-            <tr><td>Home Runs</td><td>${h.hr}</td></tr>
-            <tr><td>Stolen Bases</td><td>${h.sb}</td></tr>
-            <tr><td>Plate App.</td><td>${h.pa}</td></tr>
-          </table>
-        </div>
       </div>`;
   } else {
     const eraStr = isNaN(p.era) ? '—' : p.era.toFixed(2);
@@ -1384,14 +1369,6 @@ function openPlayerModal(id) {
               <span>${traitDesc(tr.code)}</span>
             </div>`).join('')}
           </div>
-        </div>
-        <div class="modal-section">
-          <div class="modal-section-title">MLB Stats ${year ? '('+year+')' : ''}</div>
-          <table class="modal-mlb-table">
-            <tr><td>ERA</td><td>${eraStr}</td></tr>
-            <tr><td>Inn. Pitched</td><td>${p.ip}</td></tr>
-            ${p.gs > 0 ? `<tr><td>Games Started</td><td>${p.gs}</td></tr>` : ''}
-          </table>
         </div>
       </div>`;
   }
