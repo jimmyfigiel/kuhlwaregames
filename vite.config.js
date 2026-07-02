@@ -25,6 +25,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,png,webp,woff2}"],
         globIgnores: ["**/deadball-builder.html"],
+        navigateFallbackDenylist: [/\/deadball-builder\.html/],
         runtimeCaching: [
           {
             urlPattern: /\/deadball-builder\.html/,
