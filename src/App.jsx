@@ -12,8 +12,14 @@ import Dashboard from "./games/player-portal/Dashboard.jsx";
 import RoomScreen from "./games/player-portal/RoomScreen.jsx";
 
 export default function App() {
-  // Apply saved font scale immediately on mount
   useEffect(() => { applyFontScale(getSavedFontScale()); }, []);
+
+  const [installPrompt, setInstallPrompt] = useState(null);
+  useEffect(() => {
+    const handler = (e) => { e.preventDefault(); setInstallPrompt(e); };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
 
   const [authUser, setAuthUser] = useState(null);
   const [currentPlayer, setCurrentPlayer] = useState(null);
@@ -148,14 +154,29 @@ export default function App() {
   }
 
   return (
-    <Dashboard
-      player={currentPlayer}
-      authUser={authUser}
-      pendingJoinCode={pendingJoinCode}
-      onJoinCodeHandled={handleJoinCodeHandled}
-      onOpenRoom={handleOpenRoom}
-      onLogout={handleLogout}
-      onPlayerUpdated={handlePlayerUpdated}
-    />
+    <>
+      <Dashboard
+        player={currentPlayer}
+        authUser={authUser}
+        pendingJoinCode={pendingJoinCode}
+        onJoinCodeHandled={handleJoinCodeHandled}
+        onOpenRoom={handleOpenRoom}
+        onLogout={handleLogout}
+        onPlayerUpdated={handlePlayerUpdated}
+      />
+      {installPrompt && (
+        <button
+          onClick={() => { installPrompt.prompt(); setInstallPrompt(null); }}
+          style={{
+            position: 'fixed', bottom: '1.25rem', right: '1.25rem', zIndex: 9999,
+            background: '#2563eb', color: '#fff', border: 'none', borderRadius: '999px',
+            padding: '0.65rem 1.2rem', fontWeight: 700, fontSize: '0.9rem',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.25)', cursor: 'pointer',
+          }}
+        >
+          Install App
+        </button>
+      )}
+    </>
   );
 }

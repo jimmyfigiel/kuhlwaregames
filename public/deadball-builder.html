@@ -1433,7 +1433,23 @@ function traitDesc(code) {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/deadball-sw.js', { scope: '/deadball-builder.html' });
   }
+  let _installPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _installPrompt = e;
+    document.getElementById('installBtn').style.display = 'flex';
+  });
+  function installApp() {
+    if (!_installPrompt) return;
+    _installPrompt.prompt();
+    _installPrompt = null;
+    document.getElementById('installBtn').style.display = 'none';
+  }
 </script>
+
+<button id="installBtn" onclick="installApp()" style="display:none;position:fixed;bottom:1.25rem;right:1.25rem;z-index:9999;background:#2563eb;color:#fff;border:none;border-radius:999px;padding:0.65rem 1.2rem;font-weight:700;font-size:0.9rem;box-shadow:0 4px 16px rgba(0,0,0,0.25);cursor:pointer;align-items:center;gap:0.4rem">
+  ⬇ Install App
+</button>
 
 <!-- Player detail modal -->
 <div id="playerModal" class="modal-overlay no-print" onclick="if(event.target===this)closePlayerModal()">
