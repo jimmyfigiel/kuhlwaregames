@@ -178,27 +178,55 @@
       font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em;
       color: #bbb; margin-bottom: 0.55rem; font-weight: 600;
     }
-    .modal-stat-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    .modal-stat-table tr { border-bottom: 1px solid #f0f0f0; }
-    .modal-stat-table tr:last-child { border-bottom: none; }
-    .modal-stat-table td { padding: 0.4rem 0.2rem; }
-    .modal-stat-table td:first-child { color: #888; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; width: 50%; }
-    .modal-stat-table td:last-child { font-weight: 700; color: #111; }
-    .modal-stat-table td.bt   { color: var(--primary); }
-    .modal-stat-table td.walk { color: #16a34a; }
-    .modal-stat-table td.crit { color: #dc2626; }
+    /* baseball-card header band */
+    .modal-card-band {
+      background: var(--primary); color: #fff;
+      padding: 1rem 1.25rem 0.85rem;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    }
+    .modal-card-band .modal-name { color: #fff; }
+    .modal-card-band .modal-sub { color: rgba(255,255,255,0.75); margin-top: 0.25rem; }
+    .modal-card-band .modal-close { color: rgba(255,255,255,0.7); }
+    .modal-card-band .modal-close:hover { color: #fff; }
+    /* ratings row */
+    .modal-ratings {
+      display: flex; gap: 0; border-bottom: 1px solid #ebebeb;
+    }
+    .modal-rating-cell {
+      flex: 1; text-align: center; padding: 0.75rem 0.5rem;
+      border-right: 1px solid #ebebeb;
+    }
+    .modal-rating-cell:last-child { border-right: none; }
+    .modal-rating-lbl { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: #aaa; margin-bottom: 0.2rem; }
+    .modal-rating-val { font-size: 1.45rem; font-weight: 800; }
+    .modal-rating-val.bt   { color: var(--primary); }
+    .modal-rating-val.walk { color: #16a34a; }
+    .modal-rating-val.crit { color: #dc2626; }
+    /* hit table */
+    .modal-hit-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .modal-hit-table th { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: #aaa; font-weight: 600; padding: 0.35rem 0.5rem; text-align: left; border-bottom: 2px solid #ebebeb; }
+    .modal-hit-table td { padding: 0.3rem 0.5rem; border-bottom: 1px solid #f5f5f5; }
+    .modal-hit-table tr:last-child td { border-bottom: none; }
+    .modal-hit-table td:first-child { font-family: 'Courier New', monospace; color: #777; white-space: nowrap; }
+    .modal-hit-table td:last-child { font-weight: 700; }
+    /* mlb stats table */
+    .modal-mlb-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .modal-mlb-table td { padding: 0.3rem 0.2rem; border-bottom: 1px solid #f5f5f5; }
+    .modal-mlb-table tr:last-child td { border-bottom: none; }
+    .modal-mlb-table td:first-child { color: #999; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; }
+    .modal-mlb-table td:last-child { font-weight: 700; color: #111; text-align: right; }
+    /* traits */
     .modal-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-    .modal-traits { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
     .modal-trait-row { display: flex; flex-direction: column; gap: 0.6rem; }
     .modal-trait-entry { display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.8rem; color: #444; line-height: 1.4; }
     .modal-pitcher-badge {
-      display: inline-block; background: #f1f1f1; border-radius: 5px;
-      padding: 0.25rem 0.55rem; font-size: 0.78rem; font-weight: 600; color: #555;
+      display: inline-block; background: rgba(255,255,255,0.2); border-radius: 5px;
+      padding: 0.15rem 0.45rem; font-size: 0.75rem; font-weight: 600; color: #fff;
     }
     @media (max-width: 500px) {
       .modal-box { max-height: 95vh; border-radius: 10px; }
       .modal-name { font-size: 1.1rem; }
-      .modal-stat-val { font-size: 1.05rem; }
+      .modal-rating-val { font-size: 1.2rem; }
     }
     .slot-num { font-size: 1.1rem; font-weight: 700; color: var(--primary); text-align: center; transition: color 0.4s; }
     .slot-player, .slot-pos { width: 100%; font-size: 0.88rem; }
@@ -1242,6 +1270,31 @@ function show(id) { document.getElementById(id).classList.remove('hidden'); }
 function hide(id) { document.getElementById(id).classList.add('hidden'); }
 
 // ─── Player modal ─────────────────────────────────────────────────────────────
+function buildHitTableRows(t) {
+  const rows = []; let cur = 0;
+  function row(label, count, cls) {
+    if (count <= 0) return;
+    const end = cur + count;
+    const range = cur + 1 === end ? `${end}` : `${cur+1}–${end}`;
+    rows.push(`<tr><td>${range}</td><td><span class="hr-chip ${cls}">${label}</span></td></tr>`);
+    cur = end;
+  }
+  row('1B+',    t.singlePlus,   'c1b-plus');
+  row('1B/1B',  t.defSingle1B,  'c1b-def');
+  row('1B/2B',  t.defSingle2B,  'c1b-def');
+  row('1B/3B',  t.defSingle3B,  'c1b-def');
+  row('1B/SS',  t.defSingleSS,  'c1b-def');
+  row('1B/MI',  t.defSingleMI,  'c1b-def');
+  row('1B/ADV', t.singleAdv,    'c1b');
+  row('2B/LF',  t.defDoubleLF,  'c2b-def');
+  row('2B/CF',  t.defDoubleCF,  'c2b-def');
+  row('2B/RF',  t.defDoubleRF,  'c2b-def');
+  row('2B/ADV', t.doubleAdv,    'c2b');
+  row('3B/D',   t.tripleDF,     'c3b-def');
+  row('HR',     t.homeRun,      'chr');
+  return rows.join('');
+}
+
 function openPlayerModal(id) {
   const h = allHitters.find(p => p.id === id);
   const p = !h && allPitchers.find(p => p.id === id);
@@ -1250,6 +1303,7 @@ function openPlayerModal(id) {
 
   const overlay = document.getElementById('playerModal');
   const content = document.getElementById('playerModalContent');
+  const year = document.getElementById('yearSel')?.value || '';
 
   if (h) {
     const t = h.hitTypeTable;
@@ -1257,38 +1311,29 @@ function openPlayerModal(id) {
     const allTraits = [...h.traits, ...(h.dTrait ? [{code: h.dTrait, type: h.dTrait.endsWith('+') ? 'pos' : 'neg'}] : [])];
 
     content.innerHTML = `
-      <div class="modal-header">
+      <div class="modal-card-band">
         <div>
           <div class="modal-name">${h.name}</div>
           <div class="modal-sub">
             <span class="badge badge-pos">${h.pos}</span>
             <span class="badge badge-hand">Bats ${h.hand}</span>
-            ${allTraits.map(t => `<span class="trait trait-${t.type}">${t.code}</span>`).join('')}
+            ${allTraits.map(tr => `<span class="trait trait-${tr.type}">${tr.code}</span>`).join('')}
           </div>
         </div>
         <button class="modal-close no-print" onclick="closePlayerModal()" aria-label="Close">✕</button>
       </div>
+      <div class="modal-ratings">
+        <div class="modal-rating-cell"><div class="modal-rating-lbl">BT</div><div class="modal-rating-val bt">${h.bt}</div></div>
+        <div class="modal-rating-cell"><div class="modal-rating-lbl">Walk</div><div class="modal-rating-val walk">+${h.walkWindow}</div></div>
+        <div class="modal-rating-cell"><div class="modal-rating-lbl">Crit</div><div class="modal-rating-val crit">≤5</div></div>
+      </div>
       <div class="modal-body">
         <div class="modal-section">
-          <div class="modal-section-title">Deadball Ratings</div>
-          <table class="modal-stat-table">
-            <tr><td>Batter Target</td><td class="bt">${h.bt}</td></tr>
-            <tr><td>Walk Window</td><td class="walk">+${h.walkWindow}</td></tr>
-            <tr><td>Critical Hit</td><td class="crit">≤ 5</td></tr>
-          </table>
-        </div>
-        <div class="modal-section">
-          <div class="modal-section-title">MLB Stats (${document.getElementById('yearSel')?.value || ''})</div>
-          <table class="modal-stat-table">
-            <tr><td>AVG</td><td>${avgStr}</td></tr>
-            <tr><td>Home Runs</td><td>${h.hr}</td></tr>
-            <tr><td>Stolen Bases</td><td>${h.sb}</td></tr>
-            <tr><td>Plate App.</td><td>${h.pa}</td></tr>
-          </table>
-        </div>
-        <div class="modal-section">
           <div class="modal-section-title">Hit Type Table (d100)</div>
-          <div class="modal-chips">${buildHitChips(t)}</div>
+          <table class="modal-hit-table">
+            <thead><tr><th>Roll</th><th>Result</th></tr></thead>
+            <tbody>${buildHitTableRows(t)}</tbody>
+          </table>
         </div>
         ${allTraits.length ? `
         <div class="modal-section">
@@ -1300,13 +1345,14 @@ function openPlayerModal(id) {
             </div>`).join('')}
           </div>
         </div>` : ''}
-        <div class="modal-section no-print">
-          <div class="modal-section-title">Defensive Trait</div>
-          <div style="display:flex;gap:0.5rem;align-items:center">
-            <span id="modal-traits-${h.id}">${h.dTrait ? `<span class="trait trait-${h.dTrait.endsWith('+') ? 'pos' : 'neg'}">${h.dTrait}</span>` : '<span style="color:#bbb;font-size:0.8rem">None assigned</span>'}</span>
-            <button class="toggle-def" onclick="toggleDef(${h.id}); refreshModalDef(${h.id})" title="Toggle Defensive trait">${defBtnLabel(h.dTrait)}</button>
-          </div>
-          <p style="font-size:0.7rem;color:#aaa;margin-top:0.35rem">D+ adds +1 to this player's DEF rolls. If catcher, starting pitcher gains +1 die level. D- is the reverse.</p>
+        <div class="modal-section">
+          <div class="modal-section-title">MLB Stats ${year ? '('+year+')' : ''}</div>
+          <table class="modal-mlb-table">
+            <tr><td>AVG</td><td>${avgStr}</td></tr>
+            <tr><td>Home Runs</td><td>${h.hr}</td></tr>
+            <tr><td>Stolen Bases</td><td>${h.sb}</td></tr>
+            <tr><td>Plate App.</td><td>${h.pa}</td></tr>
+          </table>
         </div>
       </div>`;
   } else {
@@ -1314,34 +1360,22 @@ function openPlayerModal(id) {
     const allTraits = [...p.traits, ...(p.dTrait ? [{code: p.dTrait, type: p.dTrait.endsWith('+') ? 'pos' : 'neg'}] : []), {code: 'P-', type: 'neg'}];
 
     content.innerHTML = `
-      <div class="modal-header">
+      <div class="modal-card-band">
         <div>
           <div class="modal-name">${p.name}</div>
           <div class="modal-sub">
             <span class="badge badge-hand">Throws ${p.hand}</span>
             <span class="modal-pitcher-badge">${p.gs > 0 ? 'Starter' : 'Reliever'}</span>
-            ${allTraits.map(t => `<span class="trait trait-${t.type}">${t.code}</span>`).join('')}
+            ${allTraits.map(tr => `<span class="trait trait-${tr.type}">${tr.code}</span>`).join('')}
           </div>
         </div>
         <button class="modal-close no-print" onclick="closePlayerModal()" aria-label="Close">✕</button>
       </div>
+      <div class="modal-ratings">
+        <div class="modal-rating-cell"><div class="modal-rating-lbl">Pitch Die</div><div class="modal-rating-val">${renderPitchDieHtml(p.pitchDie)}</div></div>
+        <div class="modal-rating-cell"><div class="modal-rating-lbl">BT</div><div class="modal-rating-val bt">${p.bt}</div></div>
+      </div>
       <div class="modal-body">
-        <div class="modal-section">
-          <div class="modal-section-title">Deadball Ratings</div>
-          <table class="modal-stat-table">
-            <tr><td>Pitch Die</td><td>${renderPitchDieHtml(p.pitchDie)}</td></tr>
-            <tr><td>Batter Target</td><td class="bt">${p.bt}</td></tr>
-          </table>
-          <p style="font-size:0.72rem;color:#888;margin-top:0.55rem">At bat: roll d100 + pitch die = MSS. MSS ≤ 5 → Crit. MSS ≤ BT → Hit. BT &lt; MSS ≤ BT+Walk → Walk. MSS &gt; BT+Walk → Out.</p>
-        </div>
-        <div class="modal-section">
-          <div class="modal-section-title">MLB Stats (${document.getElementById('yearSel')?.value || ''})</div>
-          <table class="modal-stat-table">
-            <tr><td>ERA</td><td>${eraStr}</td></tr>
-            <tr><td>Inn. Pitched</td><td>${p.ip}</td></tr>
-            ${p.gs > 0 ? `<tr><td>Games Started</td><td>${p.gs}</td></tr>` : ''}
-          </table>
-        </div>
         <div class="modal-section">
           <div class="modal-section-title">Traits</div>
           <div class="modal-trait-row">${allTraits.map(tr => `
@@ -1351,13 +1385,13 @@ function openPlayerModal(id) {
             </div>`).join('')}
           </div>
         </div>
-        <div class="modal-section no-print">
-          <div class="modal-section-title">Defensive Trait</div>
-          <div style="display:flex;gap:0.5rem;align-items:center">
-            <span id="modal-traits-${p.id}">${p.dTrait ? `<span class="trait trait-${p.dTrait.endsWith('+') ? 'pos' : 'neg'}">${p.dTrait}</span>` : '<span style="color:#bbb;font-size:0.8rem">None assigned</span>'}</span>
-            <button class="toggle-def" onclick="toggleDef(${p.id}); refreshModalDef(${p.id})" title="Toggle Defensive trait">${defBtnLabel(p.dTrait)}</button>
-          </div>
-          <p style="font-size:0.7rem;color:#aaa;margin-top:0.35rem">If this pitcher is a catcher (rare), D+ gives starting pitcher +1 die level. D- does the reverse including all relievers.</p>
+        <div class="modal-section">
+          <div class="modal-section-title">MLB Stats ${year ? '('+year+')' : ''}</div>
+          <table class="modal-mlb-table">
+            <tr><td>ERA</td><td>${eraStr}</td></tr>
+            <tr><td>Inn. Pitched</td><td>${p.ip}</td></tr>
+            ${p.gs > 0 ? `<tr><td>Games Started</td><td>${p.gs}</td></tr>` : ''}
+          </table>
         </div>
       </div>`;
   }
