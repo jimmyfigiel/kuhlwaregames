@@ -343,6 +343,51 @@
     }
     .bottom-bar .btn-print:hover { filter: brightness(1.15); }
 
+    /* ── Rules overlay ───────────────────────── */
+    .rules-overlay {
+      position: fixed; inset: 0; z-index: 1100;
+      background: #f2f2f2; overflow-y: auto;
+      opacity: 0; pointer-events: none; transition: opacity 0.18s;
+    }
+    .rules-overlay.open { opacity: 1; pointer-events: all; }
+    .rules-header {
+      position: sticky; top: 0; z-index: 2;
+      background: var(--primary); color: #fff;
+      padding: 0.75rem 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .rules-header h2 { font-size: 1.1rem; font-weight: 900; letter-spacing: 0.04em; margin: 0; }
+    .rules-header button { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0; }
+    .rules-body { padding: 0.75rem; max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.5rem; }
+    .rules-section { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
+    .rules-section-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.7rem 0.9rem; cursor: pointer; user-select: none;
+      background: #fff; border: none; width: 100%; text-align: left;
+      font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: #111;
+    }
+    .rules-section-hd:hover { background: #f7f7f7; }
+    .rules-section-hd .chevron { font-size: 0.8rem; transition: transform 0.2s; color: #888; }
+    .rules-section-hd.open .chevron { transform: rotate(180deg); }
+    .rules-section-body { display: none; border-top: 1px solid #ebebeb; padding: 0.75rem 0.9rem; }
+    .rules-section-body.open { display: block; }
+    .rules-tbl { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-bottom: 0.75rem; }
+    .rules-tbl:last-child { margin-bottom: 0; }
+    .rules-tbl th { background: #f0f0f0; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.3rem 0.5rem; text-align: left; }
+    .rules-tbl td { padding: 0.28rem 0.5rem; border-bottom: 1px solid #f5f5f5; vertical-align: top; }
+    .rules-tbl tr:last-child td { border-bottom: none; }
+    .rules-tbl td:first-child { font-weight: 700; white-space: nowrap; width: 30%; }
+    .rules-sub { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #555; margin: 0.6rem 0 0.25rem; }
+    .rules-list { list-style: none; padding: 0; margin: 0; font-size: 0.88rem; }
+    .rules-list li { padding: 0.2rem 0; border-bottom: 1px solid #f5f5f5; }
+    .rules-list li:last-child { border-bottom: none; }
+    .btn-rules {
+      background: #1a3a5c; border-color: #1a3a5c; color: #fff;
+      font-size: 0.78rem; padding: 0 0.75rem; min-height: 38px;
+      white-space: nowrap; flex-shrink: 0; font-weight: 700;
+    }
+    .btn-rules:hover { filter: brightness(1.2); }
+
     /* ── Helpers ──────────────────────────────── */
     .hidden { display: none !important; }
     .muted  { color: #444; font-size: 0.75rem; font-style: italic; }
@@ -507,6 +552,7 @@
   <select id="teamSelect" disabled><option>— teams —</option></select>
   <button class="btn-build" id="buildBtn" disabled>Build Roster</button>
   <button class="btn-print" id="printBtn" onclick="window.print()">Print</button>
+  <button class="btn-rules no-print" onclick="openRules()">Rules</button>
 </div>
 
 <script>
@@ -1400,6 +1446,20 @@ function closePlayerModal() {
   document.getElementById('playerModal').classList.remove('open');
   document.body.style.overflow = '';
 }
+
+function openRules() {
+  document.getElementById('rulesOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeRules() {
+  document.getElementById('rulesOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function toggleRules(btn) {
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePlayerModal(); closeRules(); } });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePlayerModal(); });
 
 function refreshModalDef(id) {
@@ -1454,6 +1514,275 @@ function traitDesc(code) {
 <!-- Player detail modal -->
 <div id="playerModal" class="modal-overlay no-print" onclick="if(event.target===this)closePlayerModal()">
   <div class="modal-box" id="playerModalContent"></div>
+</div>
+
+<!-- Rules reference overlay -->
+<div id="rulesOverlay" class="rules-overlay no-print">
+  <div class="rules-header">
+    <h2>Deadball Quick Reference</h2>
+    <button onclick="closeRules()" aria-label="Close">✕</button>
+  </div>
+  <div class="rules-body">
+
+    <div class="rules-section">
+      <button class="rules-section-hd" onclick="toggleRules(this)">Sequence of Play <span class="chevron">▼</span></button>
+      <div class="rules-section-body">
+        <ol style="margin:0;padding-left:1.2rem;font-size:0.88rem;line-height:1.8">
+          <li>Roll MSS (d100 + Pitch Die)</li>
+          <li>Check MSS against BT</li>
+          <li>Roll on Hit Table <em>(if necessary)</em></li>
+          <li>Roll for DEF <em>(if necessary)</em></li>
+          <li>Record the result</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="rules-section">
+      <button class="rules-section-hd" onclick="toggleRules(this)">Swing Result Table (d100+PD) <span class="chevron">▼</span></button>
+      <div class="rules-section-body">
+        <table class="rules-tbl">
+          <tr><th>MSS</th><th>Result</th></tr>
+          <tr><td>0 – 5</td><td>Critical hit</td></tr>
+          <tr><td>6 – BT</td><td>Ordinary hit</td></tr>
+          <tr><td>BT+1 – BT+5</td><td>Walk</td></tr>
+          <tr><td>BT+6 – 70</td><td>Productive out</td></tr>
+          <tr><td>71 – 99</td><td>Possible double play</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="rules-section">
+      <button class="rules-section-hd" onclick="toggleRules(this)">ERA / Pitch Die <span class="chevron">▼</span></button>
+      <div class="rules-section-body">
+        <table class="rules-tbl">
+          <tr><th>ERA</th><th>Pitch Die</th></tr>
+          <tr><td>0 – 0.99</td><td>d20</td></tr>
+          <tr><td>1 – 1.99</td><td>d12</td></tr>
+          <tr><td>2 – 2.99</td><td>d8</td></tr>
+          <tr><td>3 – 3.49</td><td>d4</td></tr>
+          <tr><td>3.5 – 4</td><td>−d4</td></tr>
+          <tr><td>4 – 4.99</td><td>−d8</td></tr>
+          <tr><td>5 – 5.99</td><td>−d12</td></tr>
+          <tr><td>6 – 6.99</td><td>−d20</td></tr>
+          <tr><td>7 – 7.99</td><td>−20</td></tr>
+          <tr><td>8 – 8.99</td><td>−25</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="rules-section">
+      <button class="rules-section-hd" onclick="toggleRules(this)">Out Table <span class="chevron">▼</span></button>
+      <div class="rules-section-body">
+        <table class="rules-tbl">
+          <tr><th>Roll</th><th>Result</th></tr>
+          <tr><td>0</td><td>K</td></tr>
+          <tr><td>1</td><td>K</td></tr>
+          <tr><td>2</td><td>K</td></tr>
+          <tr><td>3</td><td>G-3</td></tr>
+          <tr><td>4</td><td>4-3</td></tr>
+          <tr><td>5</td><td>5-3</td></tr>
+          <tr><td>6</td><td>6-3</td></tr>
+          <tr><td>7</td><td>F-7</td></tr>
+          <tr><td>8</td><td>F-8</td></tr>
+          <tr><td>9</td><td>F-9</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="rules-section">
+      <button class="rules-section-hd" onclick="toggleRules(this)">Advanced Hit Table (d20) <span class="chevron">▼</span></button>
+      <div class="rules-section-body">
+        <table class="rules-tbl">
+          <tr><th>Roll</th><th>Result</th></tr>
+          <tr><td>1–2</td><td>Single+ †</td></tr>
+          <tr><td>3</td><td>Single, DEF (1B)</td></tr>
+          <tr><td>4</td><td>Single, DEF (2B)</td></tr>
+          <tr><td>5</td><td>Single, DEF (3B)</td></tr>
+          <tr><td>6</td><td>Single, DEF (SS)</td></tr>
+          <tr><td>7</td><td>Single, DEF (SS/2B *)</td></tr>
+          <tr><td>8–12</td><td>Single, runners adv. 2+</td></tr>
+          <tr><td>13</td><td>Double, DEF (LF)</td></tr>
+          <tr><td>14</td><td>Double, DEF (CF)</td></tr>
+          <tr><td>15</td><td>Double, DEF (RF)</td></tr>
+          <tr><td>16–17</td><td>Double, runners adv. 3</td></tr>
+          <tr><td>18</td><td>Triple, DEF (RF/CF **) †</td></tr>
+          <tr><td>19–20</td><td>Home Run</td></tr>
+        </table>
+        <p style="font-size:0.75rem;color:#555;line-height:1.5;margin-top:0.4rem">
+          † Players with certain traits have special results on these rolls.<br>
+          * If MSS is even, SS fields; if odd, 2B fields.<br>
+          ** If MSS is even, RF fields; if odd, CF fields.
+        </p>
+      </div>
+    </div>
+
+    <div class="rules-section">
+      <button class="rules-section-hd" onclick="toggleRules(this)">Defense (d12) <span class="chevron">▼</span></button>
+      <div class="rules-section-body">
+        <table class="rules-tbl">
+          <tr><th>Roll</th><th>Result</th></tr>
+          <tr><td>1–2</td><td>Error. Runners take an extra base.</td></tr>
+          <tr><td>3–9</td><td>No change.</td></tr>
+          <tr><td>10–11</td><td>Hit goes down a level. Double→single (runners adv. 2). Triple→double (runners adv. 3). Single stays single.</td></tr>
+          <tr><td>12</td><td>Hit turned into out. Runners hold.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="rules-section">
+      <button class="rules-section-hd" onclick="toggleRules(this)">Base Stealing, Bunting &amp; Double Steals <span class="chevron">▼</span></button>
+      <div class="rules-section-body">
+        <p class="rules-sub">Base Stealing — d8 (2nd) / d8−1 (3rd)</p>
+        <table class="rules-tbl">
+          <tr><td>1–3</td><td>Runner is out</td></tr>
+          <tr><td>4–8</td><td>Runner is safe</td></tr>
+        </table>
+        <p class="rules-sub">Bunting — d4</p>
+        <table class="rules-tbl">
+          <tr><td>1–3</td><td>Lead runner advances; batter is out</td></tr>
+          <tr><td>4</td><td>Lead runner is out; batter reaches first</td></tr>
+        </table>
+        <p class="rules-sub">Double Steals — d8</p>
+        <table class="rules-tbl">
+          <tr><td>1–3</td><td>Lead runner is out</td></tr>
+          <tr><td>4–5</td><td>Trailing runner is out</td></tr>
+          <tr><td>6–8</td><td>Both runners safe</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="rules-section">
+      <button class="rules-section-hd" onclick="toggleRules(this)">Pitcher Fatigue <span class="chevron">▼</span></button>
+      <div class="rules-section-body">
+        <p class="rules-sub">Starters drop a pitch die level</p>
+        <ul class="rules-list">
+          <li>Allow 3+ runs in an inning</li>
+          <li>Allow 4+ runs over two innings</li>
+          <li>For every run allowed over 4 runs</li>
+          <li>For every inning pitched past the sixth</li>
+        </ul>
+        <p class="rules-sub">Relievers drop a pitch die level</p>
+        <ul class="rules-list">
+          <li>For every run allowed</li>
+          <li>If they pitch more than one inning</li>
+        </ul>
+        <p class="rules-sub">Pitchers gain a level if they</p>
+        <ul class="rules-list">
+          <li>Strike out the side</li>
+          <li>Go three straight innings without allowing a run</li>
+          <li>Escape a bases-loaded, no-out jam without allowing a run</li>
+        </ul>
+        <p style="font-size:0.8rem;color:#444;margin-top:0.6rem;line-height:1.5">If a pitcher's PD improves past d20, add 1 to every MSS. Each additional level adds another +1. After the sixth inning, if a pitcher who gained levels gives up one or more runs, his PD drops back to its starting level.</p>
+      </div>
+    </div>
+
+    <div class="rules-section">
+      <button class="rules-section-hd" onclick="toggleRules(this)">Traits <span class="chevron">▼</span></button>
+      <div class="rules-section-body">
+        <p class="rules-sub">P+ / P++ — Power Hitters</p>
+        <ul class="rules-list">
+          <li>P+: add 1 to every HT roll. P++: add 2.</li>
+          <li>Can be shifted against.</li>
+        </ul>
+        <p class="rules-sub">P- / P-- — Weak Hitters</p>
+        <ul class="rules-list">
+          <li>P−: subtract 1 from every HT roll. P−−: subtract 2.</li>
+        </ul>
+        <p class="rules-sub">C+ — Contact Hitter</p>
+        <ul class="rules-list">
+          <li>Double on HT rolls of 1–2. No DEF.</li>
+          <li>Automatically successful at bunting.</li>
+          <li>Always converts sac flies unless outfielder is D+.</li>
+        </ul>
+        <p class="rules-sub">C− — Free Swinger</p>
+        <ul class="rules-list">
+          <li>Strike out on HT rolls of 11–12.</li>
+          <li>Bunt successfully only on rolls of 1–2.</li>
+          <li>Can't hit sac flies. Can be shifted against.</li>
+        </ul>
+        <p class="rules-sub">S+ — Speedy Runner</p>
+        <ul class="rules-list">
+          <li>Double on HT roll of 1. Triple on HT roll of 2. No DEF.</li>
+          <li>Steal 2nd or 3rd: roll d8+1.</li>
+          <li>Can steal home: roll d8, safe on 8.</li>
+          <li>Can bunt for a hit: roll of 1 = Single, DEF (3B).</li>
+          <li>Can't be doubled up (unless defender is D+).</li>
+        </ul>
+        <p class="rules-sub">S− — Slow Runner</p>
+        <ul class="rules-list">
+          <li>Double on HT rolls of 18.</li>
+          <li>Subtract 3 from every stolen base roll.</li>
+          <li>Any infield ball in a DP situation is a double play.</li>
+        </ul>
+        <p class="rules-sub">D+ — Great Defender</p>
+        <ul class="rules-list">
+          <li>Add 1 to all DEF rolls. Throw out lead runner on DEF 13.</li>
+          <li>Catcher: increase starter's PD by 1 level (max d12).</li>
+          <li>Can turn routine grounder into DP: DEF roll 10–12 = double play.</li>
+          <li>Can throw out runner on sac fly: DEF roll 10–12 = out at plate.</li>
+        </ul>
+        <p class="rules-sub">D− — Poor Defender</p>
+        <ul class="rules-list">
+          <li>Subtract 1 from all DEF rolls.</li>
+          <li>Catcher: reduce every pitcher's PD by 1 level.</li>
+          <li>Infielder: must DEF roll before DP; 1–2 = all runners safe.</li>
+          <li>Outfielder: always allows sac flies regardless of MSS.</li>
+          <li>Any player out of position counts as D−.</li>
+        </ul>
+        <p class="rules-sub">K+ — Strikeout Artist</p>
+        <ul class="rules-list">
+          <li>Add 1 to every MSS.</li>
+          <li>Out Table result of 3 = strikeout.</li>
+        </ul>
+        <p class="rules-sub">GB+ — Groundball Machine</p>
+        <ul class="rules-list">
+          <li>Add 1 to every MSS.</li>
+          <li>Out Table result of 2 = ground ball to SS (6-3).</li>
+        </ul>
+        <p class="rules-sub">CN+ — Control Pitcher</p>
+        <ul class="rules-list">
+          <li>Only gives up a walk when MSS is 1–2 points greater than BT.</li>
+        </ul>
+        <p class="rules-sub">ST+ — Great Stamina</p>
+        <ul class="rules-list">
+          <li>Begins losing PD levels past the seventh inning, not the sixth.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rules-section">
+      <button class="rules-section-hd" onclick="toggleRules(this)">Defensive Alignments <span class="chevron">▼</span></button>
+      <div class="rules-section-body">
+        <p class="rules-sub">Infield In — affects HT rolls of:</p>
+        <table class="rules-tbl">
+          <tr><td>3–7</td><td>Add 2 to DEF roll. On a 13, runner coming home is out; batter reaches first.</td></tr>
+          <tr><td>8–12</td><td>Batter doubles; runners advance 2.</td></tr>
+        </table>
+        <p class="rules-sub">No Doubles — affects HT rolls of:</p>
+        <table class="rules-tbl">
+          <tr><td>3–7</td><td>Do not roll for DEF.</td></tr>
+          <tr><td>13–15</td><td>Single, runners adv. 2.</td></tr>
+        </table>
+        <p class="rules-sub">Infield Shift — affects HT rolls of:</p>
+        <table class="rules-tbl">
+          <tr><td>3–4</td><td>Add 3 to the DEF roll.</td></tr>
+          <tr><td>5</td><td>Double, runners adv. 2.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="rules-section">
+      <button class="rules-section-hd" onclick="toggleRules(this)">Baseball Feelings (d6) <span class="chevron">▼</span></button>
+      <div class="rules-section-body">
+        <table class="rules-tbl">
+          <tr><td>1–4</td><td>There's no crying in baseball!</td></tr>
+          <tr><td>5</td><td>Well, maybe a little…</td></tr>
+          <tr><td>6</td><td>Oh my god! There's so much crying in baseball all the time always! Have you ever even seen a baseball game? The crying's the best part! Gimme a hug, slugger, and let's cry it out.</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
 </div>
 </body>
 </html>
