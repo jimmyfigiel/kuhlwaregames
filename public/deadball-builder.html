@@ -178,19 +178,15 @@
       font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em;
       color: #bbb; margin-bottom: 0.55rem; font-weight: 600;
     }
-    .modal-stats-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 0.5rem;
-    }
-    .modal-stat {
-      background: #f7f7f9; border-radius: 8px; padding: 0.5rem 0.7rem;
-    }
-    .modal-stat-lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: #999; margin-bottom: 0.15rem; }
-    .modal-stat-val { font-size: 1.25rem; font-weight: 700; color: #111; }
-    .modal-stat-val.bt  { color: var(--primary); }
-    .modal-stat-val.walk { color: #16a34a; }
-    .modal-stat-val.crit { color: #dc2626; }
-    .modal-stat.highlight { background: #eef3ff; }
+    .modal-stat-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .modal-stat-table tr { border-bottom: 1px solid #f0f0f0; }
+    .modal-stat-table tr:last-child { border-bottom: none; }
+    .modal-stat-table td { padding: 0.4rem 0.2rem; }
+    .modal-stat-table td:first-child { color: #888; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; width: 50%; }
+    .modal-stat-table td:last-child { font-weight: 700; color: #111; }
+    .modal-stat-table td.bt   { color: var(--primary); }
+    .modal-stat-table td.walk { color: #16a34a; }
+    .modal-stat-table td.crit { color: #dc2626; }
     .modal-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
     .modal-traits { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
     .modal-trait-row { display: flex; flex-direction: column; gap: 0.6rem; }
@@ -803,19 +799,22 @@ function renderPlayerCards() {
   let ptDown = null;
 
   window.addEventListener('pointerdown', e => {
-    const card = e.target.closest('.player-card[data-player-id]');
-    if (!card || e.target.closest('.toggle-def')) return;
+    console.log('[TAP] pointerdown target:', e.target.tagName, e.target.className);
+    const card = e.target.closest('.sc-card[data-player-id]');
+    console.log('[TAP] card found:', card ? card.dataset.playerId : 'null');
+    if (!card) return;
     ptDown = { id: parseInt(card.dataset.playerId), x: e.clientX, y: e.clientY };
+    console.log('[TAP] ptDown set:', ptDown);
   }, true);
 
   window.addEventListener('pointerup', e => {
+    console.log('[TAP] pointerup, ptDown:', ptDown);
     if (!ptDown) return;
     const dx = Math.abs(e.clientX - ptDown.x);
     const dy = Math.abs(e.clientY - ptDown.y);
     const id = ptDown.id;
     ptDown = null;
-    // Defer until after the click event fires so the overlay's close handler
-    // doesn't immediately close the modal on the same gesture
+    console.log('[TAP] dx/dy:', dx, dy, '→ will open:', dx < 12 && dy < 12);
     if (dx < 12 && dy < 12) setTimeout(() => openPlayerModal(id), 0);
   }, true);
 })();
@@ -1026,7 +1025,7 @@ function generateScorecard(scroll) {
 
   const cards = slots.map((s, i) => {
     const h = s.h, t = h.hitTypeTable;
-    return `<div class="sc-card">
+    return `<div class="sc-card" data-player-id="${h.id}" style="cursor:pointer">
       <div class="sc-card-top">
         <div class="sc-card-name-wrap">
           <span class="sc-card-num">${i+1}</span>
@@ -1049,7 +1048,7 @@ function generateScorecard(scroll) {
     </div>`;
   }).join('');
 
-  const pitCard = pitcher ? `<div class="sc-card sc-pitcher">
+  const pitCard = pitcher ? `<div class="sc-card sc-pitcher" data-player-id="${pitcher.id}" style="cursor:pointer">
     <div class="sc-card-top">
       <div class="sc-card-name-wrap">
         <span class="sc-card-num">SP</span>
@@ -1165,7 +1164,7 @@ function buildHitChips(t) {
   function chip(cls, label, count) {
     if (count <= 0) return;
     const end = cur + count;
-    chips.push(`<span class="hr-chip ${cls}">${label} ${cur+1}${end > cur+1 ? '–'+end : ''}</span>`);
+    chips.push(`<span class="hr-chip ${cls}">${cur+1}${end > cur+1 ? '–'+end : ''}: ${label}</span>`);
     cur = end;
   }
   chip('c1b-plus', '1B+',    t.singlePlus);
@@ -1272,25 +1271,24 @@ function openPlayerModal(id) {
       <div class="modal-body">
         <div class="modal-section">
           <div class="modal-section-title">Deadball Ratings</div>
-          <div class="modal-stats-grid">
-            <div class="modal-stat highlight"><div class="modal-stat-lbl">Batter Target</div><div class="modal-stat-val bt">${h.bt}</div></div>
-            <div class="modal-stat highlight"><div class="modal-stat-lbl">Walk Window</div><div class="modal-stat-val walk">+${h.walkWindow}</div></div>
-            <div class="modal-stat highlight"><div class="modal-stat-lbl">Critical Hit</div><div class="modal-stat-val crit">≤ 5</div></div>
-          </div>
+          <table class="modal-stat-table">
+            <tr><td>Batter Target</td><td class="bt">${h.bt}</td></tr>
+            <tr><td>Walk Window</td><td class="walk">+${h.walkWindow}</td></tr>
+            <tr><td>Critical Hit</td><td class="crit">≤ 5</td></tr>
+          </table>
         </div>
         <div class="modal-section">
           <div class="modal-section-title">MLB Stats (${document.getElementById('yearSel')?.value || ''})</div>
-          <div class="modal-stats-grid">
-            <div class="modal-stat"><div class="modal-stat-lbl">AVG</div><div class="modal-stat-val">${avgStr}</div></div>
-            <div class="modal-stat"><div class="modal-stat-lbl">Home Runs</div><div class="modal-stat-val">${h.hr}</div></div>
-            <div class="modal-stat"><div class="modal-stat-lbl">Stolen Bases</div><div class="modal-stat-val">${h.sb}</div></div>
-            <div class="modal-stat"><div class="modal-stat-lbl">Plate App.</div><div class="modal-stat-val">${h.pa}</div></div>
-          </div>
+          <table class="modal-stat-table">
+            <tr><td>AVG</td><td>${avgStr}</td></tr>
+            <tr><td>Home Runs</td><td>${h.hr}</td></tr>
+            <tr><td>Stolen Bases</td><td>${h.sb}</td></tr>
+            <tr><td>Plate App.</td><td>${h.pa}</td></tr>
+          </table>
         </div>
         <div class="modal-section">
           <div class="modal-section-title">Hit Type Table (d100)</div>
           <div class="modal-chips">${buildHitChips(t)}</div>
-          <div style="margin-top:0.5rem;font-size:0.71rem;color:#999;font-family:'Courier New',monospace;line-height:1.6">${hitRangeText(t)}</div>
         </div>
         ${allTraits.length ? `
         <div class="modal-section">
@@ -1330,19 +1328,19 @@ function openPlayerModal(id) {
       <div class="modal-body">
         <div class="modal-section">
           <div class="modal-section-title">Deadball Ratings</div>
-          <div class="modal-stats-grid">
-            <div class="modal-stat highlight"><div class="modal-stat-lbl">Pitch Die</div><div class="modal-stat-val">${renderPitchDieHtml(p.pitchDie)}</div></div>
-            <div class="modal-stat highlight"><div class="modal-stat-lbl">Batter Target</div><div class="modal-stat-val bt">${p.bt}</div></div>
-          </div>
+          <table class="modal-stat-table">
+            <tr><td>Pitch Die</td><td>${renderPitchDieHtml(p.pitchDie)}</td></tr>
+            <tr><td>Batter Target</td><td class="bt">${p.bt}</td></tr>
+          </table>
           <p style="font-size:0.72rem;color:#888;margin-top:0.55rem">At bat: roll d100 + pitch die = MSS. MSS ≤ 5 → Crit. MSS ≤ BT → Hit. BT &lt; MSS ≤ BT+Walk → Walk. MSS &gt; BT+Walk → Out.</p>
         </div>
         <div class="modal-section">
           <div class="modal-section-title">MLB Stats (${document.getElementById('yearSel')?.value || ''})</div>
-          <div class="modal-stats-grid">
-            <div class="modal-stat"><div class="modal-stat-lbl">ERA</div><div class="modal-stat-val">${eraStr}</div></div>
-            <div class="modal-stat"><div class="modal-stat-lbl">Inn. Pitched</div><div class="modal-stat-val">${p.ip}</div></div>
-            ${p.gs > 0 ? `<div class="modal-stat"><div class="modal-stat-lbl">Games Started</div><div class="modal-stat-val">${p.gs}</div></div>` : ''}
-          </div>
+          <table class="modal-stat-table">
+            <tr><td>ERA</td><td>${eraStr}</td></tr>
+            <tr><td>Inn. Pitched</td><td>${p.ip}</td></tr>
+            ${p.gs > 0 ? `<tr><td>Games Started</td><td>${p.gs}</td></tr>` : ''}
+          </table>
         </div>
         <div class="modal-section">
           <div class="modal-section-title">Traits</div>
