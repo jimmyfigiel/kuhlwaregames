@@ -1525,6 +1525,27 @@ function traitDesc(code) {
   <div class="rules-body">
 
     <div class="rules-section">
+      <button class="rules-section-hd" onclick="toggleRules(this)">How This App Works <span class="chevron">▼</span></button>
+      <div class="rules-section-body">
+        <p class="rules-sub">d100 Hit Table vs d20 Advanced Hit Table</p>
+        <p style="font-size:0.88rem;line-height:1.6;margin-bottom:0.6rem">This app generates a <strong>player-specific d100 hit table</strong> proportional to each player's real MLB stats. The ranges map directly to the d20 Advanced Hit Table — the same results, just scaled to 100 so better hitters get wider ranges for extra-base hits.</p>
+        <table class="rules-tbl">
+          <tr><th>d20 Roll</th><th>d100 Range (approx)</th><th>Result</th></tr>
+          <tr><td>1–2</td><td>~1–13</td><td>1B+</td></tr>
+          <tr><td>3–7</td><td>~14–38</td><td>1B / DEF</td></tr>
+          <tr><td>8–12</td><td>~39–76</td><td>1B / ADV</td></tr>
+          <tr><td>13–15</td><td>~77–82</td><td>2B / DEF</td></tr>
+          <tr><td>16–17</td><td>~83–90</td><td>2B / ADV</td></tr>
+          <tr><td>18</td><td>~91</td><td>3B / D</td></tr>
+          <tr><td>19–20</td><td>~92–100</td><td>HR</td></tr>
+        </table>
+        <p style="font-size:0.8rem;color:#555;margin-top:0.5rem;line-height:1.5">Exact ranges vary by player. Power hitters have wider HR/3B ranges; contact hitters have wider 1B ranges. Trait rules that say "HT rolls of 1–2" mean the 1B+ range on the card.</p>
+        <p class="rules-sub">Pitchers Batting</p>
+        <p style="font-size:0.88rem;line-height:1.6">All pitchers automatically receive the <strong>P−</strong> trait when batting. This subtracts 1 from every hit table roll. The app applies this automatically — you'll see P− on every pitcher's card.</p>
+      </div>
+    </div>
+
+    <div class="rules-section">
       <button class="rules-section-hd" onclick="toggleRules(this)">Sequence of Play <span class="chevron">▼</span></button>
       <div class="rules-section-body">
         <ol style="margin:0;padding-left:1.2rem;font-size:0.88rem;line-height:1.8">
@@ -1542,11 +1563,11 @@ function traitDesc(code) {
       <div class="rules-section-body">
         <table class="rules-tbl">
           <tr><th>MSS</th><th>Result</th></tr>
-          <tr><td>0 – 5</td><td>Critical hit</td></tr>
-          <tr><td>6 – BT</td><td>Ordinary hit</td></tr>
-          <tr><td>BT+1 – BT+5</td><td>Walk</td></tr>
-          <tr><td>BT+6 – 70</td><td>Productive out</td></tr>
-          <tr><td>71 – 99</td><td>Possible double play</td></tr>
+          <tr><td>0 – 5</td><td>Critical hit — roll on hit table, result cannot be reduced below a single. No DEF roll.</td></tr>
+          <tr><td>6 – BT</td><td>Ordinary hit — roll on hit table</td></tr>
+          <tr><td>BT+1 – BT+5</td><td>Walk — batter takes first; forced runners advance</td></tr>
+          <tr><td>BT+6 – 70</td><td>Productive out — roll Out Table; runners may advance</td></tr>
+          <tr><td>71 – 99</td><td>Possible double play — roll Out Table; if runners on base, check for DP</td></tr>
         </table>
       </div>
     </div>
@@ -1768,6 +1789,20 @@ function traitDesc(code) {
           <tr><td>3–4</td><td>Add 3 to the DEF roll.</td></tr>
           <tr><td>5</td><td>Double, runners adv. 2.</td></tr>
         </table>
+      </div>
+    </div>
+
+    <div class="rules-section">
+      <button class="rules-section-hd" onclick="toggleRules(this)">Sacrifice Fly <span class="chevron">▼</span></button>
+      <div class="rules-section-body">
+        <p style="font-size:0.88rem;line-height:1.6;margin-bottom:0.5rem">A sacrifice fly occurs on a fly out (F-7, F-8, or F-9 on the Out Table) with a runner on third and fewer than two outs.</p>
+        <ul class="rules-list">
+          <li>Runner on third scores automatically.</li>
+          <li>If the outfielder is <strong>D+</strong>, they may attempt to throw the runner out: roll DEF (d12). On 10–12, runner is out.</li>
+          <li>If the outfielder is <strong>D−</strong>, the sac fly always scores regardless of MSS.</li>
+          <li><strong>C+</strong> hitters always convert a sac fly unless the outfielder is D+.</li>
+          <li><strong>C−</strong> hitters cannot hit sac flies.</li>
+        </ul>
       </div>
     </div>
 
