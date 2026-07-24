@@ -1,23 +1,6 @@
 import BaseCommand from "../../../procedure-core/commands/BaseCommand";
 import { removeUndefinedValues } from "../../../procedure-core/utils";
 
-const POST_BATTLE_STEPS = [
-  ["resolve-rival-status", "Post-Battle: Resolve Rival Status", "Resolve Rival status after the battle."],
-  ["resolve-patron-status", "Post-Battle: Resolve Patron Status", "Resolve Patron status after the battle."],
-  ["quest-progress", "Post-Battle: Determine Quest Progress", "Determine Quest progress."],
-  ["get-paid", "Post-Battle: Get Paid", "Resolve payment for the job if payment is pending."],
-  ["battlefield-finds", "Post-Battle: Battlefield Finds", "Resolve Battlefield Finds."],
-  ["check-invasion", "Post-Battle: Check for Invasion", "Check whether an Invasion occurs or progresses."],
-  ["gather-loot", "Post-Battle: Gather the Loot", "Gather and record loot."],
-  ["injuries-recovery", "Post-Battle: Determine Injuries and Recovery", "Determine Injuries and recovery for casualties."],
-  ["xp-upgrades", "Post-Battle: Experience and Character Upgrades", "Assign XP and resolve character upgrades."],
-  ["advanced-training", "Post-Battle: Invest in Advanced Training", "Invest in Advanced Training if desired."],
-  ["purchase-items", "Post-Battle: Purchase Items", "Purchase items after the battle."],
-  ["campaign-event", "Post-Battle: Campaign Event", "Roll for a Campaign Event."],
-  ["character-event", "Post-Battle: Character Event", "Roll for a Character Event."],
-  ["galactic-war", "Post-Battle: Galactic War Progress", "Check for Galactic War progress if applicable."],
-];
-
 export class PostBattlePhaseCommand extends BaseCommand {
   constructor({
     id,
@@ -41,16 +24,25 @@ export class PostBattlePhaseCommand extends BaseCommand {
 
   execute(engineContext) {
     const factory = engineContext.commandFactory;
+    const baseId = this.id;
 
-    const stepCommands = POST_BATTLE_STEPS.map(([slug, title, message]) =>
-      factory.popupMessage({
-        id: `${this.id}-${slug}`,
-        title,
-        message,
-        buttonText: "Done",
-        pauseAfter: false,
-      })
-    );
+    const stepCommands = [
+      factory.battleRoster({ id: `${baseId}-battle-roster` }),
+      factory.resolveRivalStatus({ id: `${baseId}-resolve-rival-status` }),
+      factory.resolvePatronStatus({ id: `${baseId}-resolve-patron-status` }),
+      factory.questProgress({ id: `${baseId}-quest-progress` }),
+      factory.getPaid({ id: `${baseId}-get-paid` }),
+      factory.battlefieldFinds({ id: `${baseId}-battlefield-finds` }),
+      factory.checkInvasion({ id: `${baseId}-check-invasion` }),
+      factory.gatherLoot({ id: `${baseId}-gather-loot` }),
+      factory.injuriesRecovery({ id: `${baseId}-injuries-recovery` }),
+      factory.experienceUpgrades({ id: `${baseId}-xp-upgrades` }),
+      factory.advancedTraining({ id: `${baseId}-advanced-training` }),
+      factory.purchaseItems({ id: `${baseId}-purchase-items` }),
+      factory.campaignEvent({ id: `${baseId}-campaign-event` }),
+      factory.characterEvent({ id: `${baseId}-character-event` }),
+      factory.galacticWarProgress({ id: `${baseId}-galactic-war` }),
+    ];
 
     engineContext.pushCommandsToTop([
       factory.updateState({

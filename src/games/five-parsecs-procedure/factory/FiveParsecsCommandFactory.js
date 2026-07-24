@@ -37,6 +37,22 @@ import {
   TabletopCombatCommand,
   TabletopCombatRoundCommand,
   TabletopContinueCommand,
+  PostBattleDispatchCommand,
+  BattleRosterCommand,
+  ResolveRivalStatusCommand,
+  ResolvePatronStatusCommand,
+  QuestProgressCommand,
+  GetPaidCommand,
+  BattlefieldFindsCommand,
+  CheckInvasionCommand,
+  GatherLootCommand,
+  InjuriesRecoveryCommand,
+  ExperienceUpgradesCommand,
+  AdvancedTrainingCommand,
+  PurchaseItemsCommand,
+  CampaignEventCommand,
+  CharacterEventCommand,
+  GalacticWarProgressCommand,
 } from "../commands";
 import { buildCrewMemberTableResultUpdateCommands } from "../effects";
 import { EQUIPMENT_ROLL_TABLES_BY_ID, SHIP_TABLE_DEFINITION, CAMPAIGN_TABLES } from "../data/tables";
@@ -608,6 +624,70 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     visible = true,
   } = {}) {
     return new TabletopCombatCommand({ id, title, missionType, pauseAfter, visible });
+  }
+
+  postBattleDispatch({ id, title = "Post-Battle Step", dispatchKey, params = {}, pauseAfter = false, visible = false } = {}) {
+    return new PostBattleDispatchCommand({ id, title, dispatchKey, params, pauseAfter, visible });
+  }
+
+  battleRoster({ id, title = "Post-Battle: Battle Roster", pauseAfter = false, visible = true } = {}) {
+    return new BattleRosterCommand({ id, title, pauseAfter, visible });
+  }
+
+  resolveRivalStatus({ id, title = "Post-Battle: Resolve Rival Status", pauseAfter = false, visible = true } = {}) {
+    return new ResolveRivalStatusCommand({ id, title, pauseAfter, visible });
+  }
+
+  resolvePatronStatus({ id, title = "Post-Battle: Resolve Patron Status", pauseAfter = false, visible = true } = {}) {
+    return new ResolvePatronStatusCommand({ id, title, pauseAfter, visible });
+  }
+
+  questProgress({ id, title = "Post-Battle: Determine Quest Progress", pauseAfter = false, visible = true } = {}) {
+    return new QuestProgressCommand({ id, title, pauseAfter, visible });
+  }
+
+  getPaid({ id, title = "Post-Battle: Get Paid", pauseAfter = false, visible = true } = {}) {
+    return new GetPaidCommand({ id, title, pauseAfter, visible });
+  }
+
+  battlefieldFinds({ id, title = "Post-Battle: Battlefield Finds", pauseAfter = false, visible = true } = {}) {
+    return new BattlefieldFindsCommand({ id, title, pauseAfter, visible });
+  }
+
+  checkInvasion({ id, title = "Post-Battle: Check for Invasion", pauseAfter = false, visible = true } = {}) {
+    return new CheckInvasionCommand({ id, title, pauseAfter, visible });
+  }
+
+  gatherLoot({ id, title = "Post-Battle: Gather the Loot", pauseAfter = false, visible = true } = {}) {
+    return new GatherLootCommand({ id, title, pauseAfter, visible });
+  }
+
+  injuriesRecovery({ id, title = "Post-Battle: Determine Injuries and Recovery", pauseAfter = false, visible = true } = {}) {
+    return new InjuriesRecoveryCommand({ id, title, pauseAfter, visible });
+  }
+
+  experienceUpgrades({ id, title = "Post-Battle: Experience and Character Upgrades", pauseAfter = false, visible = true } = {}) {
+    return new ExperienceUpgradesCommand({ id, title, pauseAfter, visible });
+  }
+
+  advancedTraining({ id, title = "Post-Battle: Invest in Advanced Training", pauseAfter = false, visible = true } = {}) {
+    return new AdvancedTrainingCommand({ id, title, pauseAfter, visible });
+  }
+
+  purchaseItems({ id, title = "Post-Battle: Purchase Items", pauseAfter = false, visible = true } = {}) {
+    return new PurchaseItemsCommand({ id, title, pauseAfter, visible });
+  }
+
+  campaignEvent({ id, title = "Post-Battle: Campaign Event", pauseAfter = false, visible = true } = {}) {
+    return new CampaignEventCommand({ id, title, pauseAfter, visible });
+  }
+
+  characterEvent({ id, title = "Post-Battle: Character Event", pauseAfter = false, visible = true } = {}) {
+    return new CharacterEventCommand({ id, title, pauseAfter, visible });
+  }
+
+  galacticWarProgress({ id, title = "Post-Battle: Galactic War Progress", pauseAfter = false, visible = true } = {}) {
+    return new GalacticWarProgressCommand({ id, title, pauseAfter, visible });
   }
 
 
@@ -1383,6 +1463,54 @@ export class FiveParsecsCommandFactory extends CommandFactory {
 
       case "tabletopContinue":
         return new TabletopContinueCommand(commandData);
+
+      case "battleRoster":
+        return new BattleRosterCommand(commandData);
+
+      case "resolveRivalStatus":
+        return new ResolveRivalStatusCommand(commandData);
+
+      case "resolvePatronStatus":
+        return new ResolvePatronStatusCommand(commandData);
+
+      case "questProgress":
+        return new QuestProgressCommand(commandData);
+
+      case "getPaid":
+        return new GetPaidCommand(commandData);
+
+      case "battlefieldFinds":
+        return new BattlefieldFindsCommand(commandData);
+
+      case "checkInvasion":
+        return new CheckInvasionCommand(commandData);
+
+      case "gatherLoot":
+        return new GatherLootCommand(commandData);
+
+      case "injuriesRecovery":
+        return new InjuriesRecoveryCommand(commandData);
+
+      case "experienceUpgrades":
+        return new ExperienceUpgradesCommand(commandData);
+
+      case "advancedTraining":
+        return new AdvancedTrainingCommand(commandData);
+
+      case "purchaseItems":
+        return new PurchaseItemsCommand(commandData);
+
+      case "campaignEvent":
+        return new CampaignEventCommand(commandData);
+
+      case "characterEvent":
+        return new CharacterEventCommand(commandData);
+
+      case "galacticWarProgress":
+        return new GalacticWarProgressCommand(commandData);
+
+      case "postBattleDispatch":
+        return new PostBattleDispatchCommand(commandData);
 
       default:
         console.warn(`Unknown command type: ${commandData.type}`);

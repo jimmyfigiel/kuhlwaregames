@@ -36,11 +36,30 @@ export class WorldPhaseCommand extends BaseCommand {
           message += `\n\nYour ship has ${hullDamage} Hull Point${hullDamage !== 1 ? "s" : ""} of damage.\nShip repairs cost 1 credit per Hull Point. Resolve repairs now if desired.`;
         }
 
+        const crewDetails = ctx.getStateValue("crewLog.crewDetails") || {};
+        const recoveryOps = [];
+        const recoveredNames = [];
+
+        for (const member of crewMembers) {
+          const turnsRemaining = Number(crewDetails?.[member.id]?.sickBayTurnsRemaining || 0);
+          if (turnsRemaining > 0) {
+            const nextTurns = turnsRemaining - 1;
+            recoveryOps.push({ op: "set", path: `crewLog.crewDetails.${member.id}.sickBayTurnsRemaining`, value: nextTurns });
+            if (nextTurns === 0) {
+              recoveredNames.push(member.name);
+            }
+          }
+        }
+
+        if (recoveredNames.length > 0) {
+          message += `\n\nRecovered from Sick Bay this turn: ${recoveredNames.join(", ")}.`;
+        }
+
         ctx.pushCommandsToTop([
           ctx.commandFactory.updateState({
             id: `${baseId}-upkeep-deduct`,
             title: "Upkeep Costs",
-            operations: [{ op: "increment", path: "crewLog.credits", amount: -upkeepCost }],
+            operations: [{ op: "increment", path: "crewLog.credits", amount: -upkeepCost }, ...recoveryOps],
             pauseAfter: false,
             visible: false,
           }),

@@ -12,3 +12,5 @@ export * from "./terrainGenerator.js";
 export * from "./noMinisBattleFlowEvents.js";
 export * from "./noMinisInitiativeActions.js";
 export * from "./tabletopBattleTables.js";
+export * from "./postBattleTables.js";
+export * from "./lootTables.js";

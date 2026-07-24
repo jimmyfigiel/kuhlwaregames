@@ -12,6 +12,7 @@ export class WorldChooseBattleCommand extends BaseCommand {
 
     const patronJobsFound = engineContext.getStateValue("worldPhase.patronJobsFound") ?? 0;
     const rivals = engineContext.getStateValue("worldLog.rivals") || [];
+    const questRumors = engineContext.getStateValue("worldLog.questRumors") ?? 0;
 
     const options = [];
 
@@ -33,6 +34,15 @@ export class WorldChooseBattleCommand extends BaseCommand {
       });
     }
 
+    if (questRumors > 0) {
+      options.push({
+        id: "quest",
+        label: "Pursue a Quest",
+        value: "quest",
+        description: `Follow up on a Quest lead (${questRumors} Quest Rumor${questRumors === 1 ? "" : "s"} accumulated).`,
+      });
+    }
+
     options.push({
       id: "opportunity",
       label: "Opportunity Mission",
@@ -50,6 +60,8 @@ export class WorldChooseBattleCommand extends BaseCommand {
           message = "Record the patron details in your Encounter Log.\nSet up the battlefield and generate enemy forces according to the patron's mission parameters.";
         } else if (missionType === "rival") {
           message = "Select a rival from your list.\nNote their faction for enemy force generation.";
+        } else if (missionType === "quest") {
+          message = "This is a Quest mission. If a Quest finale is pending, it's a Straight-up Fight with +1 opponent, and the opponents are Fearless.\nSet up the battlefield and generate enemy forces using the standard tables.";
         } else {
           message = "Roll for the Opportunity mission type and enemy forces using the standard tables.";
         }

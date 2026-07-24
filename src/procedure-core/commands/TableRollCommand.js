@@ -202,7 +202,13 @@ export class TableRollCommand extends BaseCommand {
       saveTo: this.saveTo,
       buttonText: this.buttonText,
       rollButtonText: this.rollButtonText,
-      afterSelectionCommands: this.afterSelectionCommands,
+      // Serialize each entry through its own toJSON() (if present) rather than storing it raw.
+      // While this command is the active/waiting-for-user command, this object gets snapshotted
+      // into engine state (and structuredClone'd across turns), which fails on any function-valued
+      // own property — a risk with plain inline dispatch objects, not just class instances.
+      afterSelectionCommands: this.afterSelectionCommands.map((command) =>
+        command && typeof command.toJSON === "function" ? command.toJSON() : command
+      ),
     });
   }
 }
