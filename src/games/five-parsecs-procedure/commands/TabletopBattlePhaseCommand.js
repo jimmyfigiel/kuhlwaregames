@@ -1,8 +1,5 @@
 import BaseCommand from "../../../procedure-core/commands/BaseCommand";
 import { removeUndefinedValues } from "../../../procedure-core/utils";
-import NoMinisCombatCommand from "./NoMinisCombatCommand";
-import TabletopCombatCommand from "./TabletopCombatCommand";
-import TerrainGeneratorCommand from "./TerrainGeneratorCommand";
 
 export class TabletopBattlePhaseCommand extends BaseCommand {
   constructor({
@@ -52,30 +49,11 @@ export class TabletopBattlePhaseCommand extends BaseCommand {
           buttonText: "Confirm",
           pauseAfter: false,
         }),
-        {
+        factory.postBattleDispatch({
           id: `${this.id}-maybe-run-terrain-gen`,
-          type: "maybeRunTerrainGenerator",
-          status: "pending",
-          pauseAfter: false,
-          visible: false,
-          commandBaseId: this.id,
-          execute(ctx) {
-            if (ctx.state?.terrainSetup?.useGenerator === "yes") {
-              ctx.pushCommandsToTop([
-                new TerrainGeneratorCommand({
-                  id: `${this.commandBaseId}-terrain-generator`,
-                  title: "Terrain Generator",
-                  pauseAfter: false,
-                }),
-              ]);
-            }
-            this.status = "complete";
-            ctx.setStatus("running");
-          },
-          toJSON() {
-            return removeUndefinedValues({ id: this.id, type: this.type, status: this.status, pauseAfter: this.pauseAfter, visible: this.visible, commandBaseId: this.commandBaseId });
-          },
-        }
+          dispatchKey: "maybeRunTerrainGenerator",
+          params: { baseId: this.id },
+        })
       );
     }
 
@@ -104,45 +82,11 @@ export class TabletopBattlePhaseCommand extends BaseCommand {
         buttonText: "Confirm",
         pauseAfter: false,
       }),
-      {
+      factory.postBattleDispatch({
         id: `${this.id}-branch-resolution`,
-        type: "branchBattleResolution",
-        status: "pending",
-        pauseAfter: false,
-        visible: false,
-        commandBaseId: this.id,
-        missionType,
-        execute(ctx) {
-          const mode = ctx.state?.encounter?.resolutionMode ?? "tabletop";
-          const f = ctx.commandFactory;
-
-          if (mode === "no-minis") {
-            ctx.pushCommandsToTop([
-              new NoMinisCombatCommand({
-                id: `${this.commandBaseId}-no-minis`,
-                title: "No-Minis Combat Resolution",
-                missionType: this.missionType,
-                pauseAfter: false,
-              }),
-            ]);
-          } else {
-            ctx.pushCommandsToTop([
-              new TabletopCombatCommand({
-                id: `${this.commandBaseId}-tabletop-combat`,
-                title: "Tabletop Battle",
-                missionType: this.missionType,
-                pauseAfter: false,
-              }),
-            ]);
-          }
-
-          this.status = "complete";
-          ctx.setStatus("running");
-        },
-        toJSON() {
-          return removeUndefinedValues({ id: this.id, type: this.type, status: this.status, pauseAfter: this.pauseAfter, visible: this.visible, commandBaseId: this.commandBaseId, missionType: this.missionType });
-        },
-      }
+        dispatchKey: "branchBattleResolution",
+        params: { baseId: this.id, missionType },
+      })
     );
 
     engineContext.pushCommandsToTop(cmds);

@@ -14,3 +14,5 @@ export * from "./noMinisInitiativeActions.js";
 export * from "./tabletopBattleTables.js";
 export * from "./postBattleTables.js";
 export * from "./lootTables.js";
+export * from "./enemyTables.js";
+export * from "./objectiveTables.js";

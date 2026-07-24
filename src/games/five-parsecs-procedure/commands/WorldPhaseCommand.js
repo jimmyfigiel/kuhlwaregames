@@ -85,47 +85,6 @@ export class WorldPhaseCommand extends BaseCommand {
       },
     };
 
-    // Rumors inline command
-    const rumorsCmd = {
-      status: "pending",
-      execute(ctx) {
-        const rumors = ctx.getStateValue("worldLog.rumors") ?? 0;
-        const questRumors = ctx.getStateValue("worldLog.questRumors") ?? 0;
-        const total = rumors + questRumors;
-
-        let message;
-        if (total === 0) {
-          message = "You have no Rumors or Quest Rumors to resolve this turn.";
-        } else {
-          const parts = [];
-          if (rumors > 0) parts.push(`${rumors} Rumor${rumors !== 1 ? "s" : ""}`);
-          if (questRumors > 0) parts.push(`${questRumors} Quest Rumor${questRumors !== 1 ? "s" : ""}`);
-          message = `You have ${parts.join(" and ")} to resolve.\nSpend 1 credit per Rumor to convert it into a Quest lead. Quest Rumors may advance your current Quest.`;
-        }
-
-        ctx.pushCommandsToTop([
-          ctx.commandFactory.popupMessage({
-            id: `${baseId}-rumors-msg`,
-            title: "Resolve Rumors",
-            message,
-            buttonText: total === 0 ? "Skip" : "Resolve",
-            pauseAfter: false,
-          }),
-        ]);
-
-        this.status = "complete";
-        ctx.setStatus("running");
-      },
-      toJSON() {
-        return removeUndefinedValues({
-          id: `${baseId}-rumors`,
-          type: "worldRumors",
-          status: this.status || "pending",
-          baseId,
-        });
-      },
-    };
-
     engineContext.pushCommandsToTop([
       factory.updateState({
         id: `${baseId}-set-phase`,
@@ -147,7 +106,11 @@ export class WorldPhaseCommand extends BaseCommand {
         buttonText: "Done",
         pauseAfter: false,
       }),
-      rumorsCmd,
+      factory.postBattleDispatch({
+        id: `${baseId}-rumors`,
+        dispatchKey: "worldRumors",
+        params: { baseId },
+      }),
       new WorldChooseBattleCommand({ id: `${baseId}-choose-battle` }),
     ]);
 

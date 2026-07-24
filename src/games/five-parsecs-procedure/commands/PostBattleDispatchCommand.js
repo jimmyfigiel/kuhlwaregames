@@ -1,14 +1,19 @@
 import BaseCommand from "../../../procedure-core/commands/BaseCommand";
 import { removeUndefinedValues } from "../../../procedure-core/utils";
 import { POST_BATTLE_DISPATCH_HANDLERS } from "./postBattleDispatchHandlers";
+import { GAME_DISPATCH_HANDLERS } from "./gameDispatchHandlers";
 
-// A single, real, factory-registered command used for every "run this logic after
-// a choice/tableRoll resolves" step in the Post-Battle sequence. Handler logic is
-// looked up fresh (by dispatchKey) from a static registry at execute() time, and all
-// context is passed via `params` (plain, serializable data) rather than closures —
-// this command (like any other) gets serialized to JSON and rebuilt from JSON on every
-// player interaction in this app's architecture, so nothing can rely on captured
-// function references surviving that round-trip.
+const ALL_DISPATCH_HANDLERS = { ...POST_BATTLE_DISPATCH_HANDLERS, ...GAME_DISPATCH_HANDLERS };
+
+// A single, real, factory-registered command used module-wide for every "run this
+// logic after a choice/tableRoll resolves" step (Post-Battle, World Phase, Terrain
+// Generator, Tabletop Combat, No-Minis Combat). Handler logic is looked up fresh (by
+// dispatchKey) from a static registry at execute() time, and all context is passed
+// via `params` (plain, serializable data) rather than closures — this command (like
+// any other) gets serialized to JSON and rebuilt from JSON on every player interaction
+// in this app's architecture, so nothing can rely on captured function references
+// surviving that round-trip. (Named for its original use in Post-Battle; kept as-is
+// module-wide to avoid touching every existing call site for a cosmetic rename.)
 export class PostBattleDispatchCommand extends BaseCommand {
   constructor({
     id,
@@ -25,7 +30,7 @@ export class PostBattleDispatchCommand extends BaseCommand {
   }
 
   execute(engineContext) {
-    const handler = POST_BATTLE_DISPATCH_HANDLERS[this.dispatchKey];
+    const handler = ALL_DISPATCH_HANDLERS[this.dispatchKey];
 
     if (typeof handler !== "function") {
       engineContext.addLogEntry({

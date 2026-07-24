@@ -1,8 +1,6 @@
 import BaseCommand from "../../../procedure-core/commands/BaseCommand";
 import { removeUndefinedValues } from "../../../procedure-core/utils";
 import { NO_MINIS_BATTLE_FLOW_EVENTS } from "../data/tables/noMinisBattleFlowEvents";
-import NoMinisInitiativeCommand from "./NoMinisInitiativeCommand";
-import NoMinisFirefightCommand from "./NoMinisFirefightCommand";
 
 // Self-looping round command — pushes all steps for one round, then a continue check
 class NoMinisCombatRoundCommand extends BaseCommand {
@@ -48,37 +46,11 @@ class NoMinisCombatRoundCommand extends BaseCommand {
           buttonText: "Select Event",
           pauseAfter: false,
         }),
-        {
-          // Read BFE result from state and queue firefight modifier if needed
+        factory.postBattleDispatch({
           id: `${baseId}-apply-bfe`,
-          type: "applyBattleFlowEvent",
-          status: "pending",
-          pauseAfter: false,
-          visible: false,
-          round,
-          execute(ctx) {
-            const bfeResult = ctx.state?.noMinis?.rounds?.[this.round]?.battleFlowEvent;
-            const needsKillZoneRoll = bfeResult?.value === "kill-zone";
-
-            ctx.pushCommandsToTop([
-              ctx.commandFactory.popupMessage({
-                id: `${baseId}-bfe-display`,
-                title: `Battle Flow Event: ${bfeResult?.label || "Unknown"}`,
-                message: bfeResult?.text
-                  ? `${bfeResult.text}${needsKillZoneRoll ? "\n\n🎲 Roll 1D6+10 now to determine the Kill Zone range in inches." : ""}`
-                  : "No battle flow event this round.",
-                buttonText: "OK",
-                pauseAfter: false,
-              }),
-            ]);
-
-            this.status = "complete";
-            ctx.setStatus("running");
-          },
-          toJSON() {
-            return removeUndefinedValues({ id: this.id, type: this.type, status: this.status, pauseAfter: this.pauseAfter, visible: this.visible, round: this.round });
-          },
-        }
+          dispatchKey: "applyBattleFlowEvent",
+          params: { baseId, round },
+        })
       );
     }
 
@@ -109,87 +81,20 @@ class NoMinisCombatRoundCommand extends BaseCommand {
         buttonText: "Confirm",
         pauseAfter: false,
       }),
-      {
+      factory.postBattleDispatch({
         id: `${baseId}-queue-initiative-actions`,
-        type: "queueInitiativeActions",
-        status: "pending",
-        pauseAfter: false,
-        visible: false,
-        round,
-        battleFlowEventsEnabled: bfe,
-        hecticCombatEnabled: hectic,
-        fasterCombatEnabled: faster,
-        execute(ctx) {
-          const count = ctx.state?.noMinis?.rounds?.[this.round]?.eligibleCount ?? 0;
-          const f = ctx.commandFactory;
-          const actionCmds = [];
-
-          for (let i = 1; i <= count; i += 1) {
-            actionCmds.push(
-              new NoMinisInitiativeCommand({
-                id: `no-minis-round-${this.round}-init-char-${i}`,
-                title: `Round ${this.round} — Initiative: Character ${i}`,
-                characterName: `Character ${i}`,
-                roundNumber: this.round,
-                pauseAfter: false,
-              })
-            );
-          }
-
-          if (actionCmds.length === 0) {
-            actionCmds.push(
-              f.popupMessage({
-                id: `no-minis-round-${this.round}-no-init`,
-                title: `Round ${this.round}: No Initiative Actions`,
-                message: "No crew members qualified for an Initiative Action this round. Proceeding to Firefight.",
-                buttonText: "OK",
-                pauseAfter: false,
-              })
-            );
-          }
-
-          ctx.pushCommandsToTop(actionCmds);
-          this.status = "complete";
-          ctx.setStatus("running");
-        },
-        toJSON() {
-          return removeUndefinedValues({ id: this.id, type: this.type, status: this.status, pauseAfter: this.pauseAfter, visible: this.visible, round: this.round });
-        },
-      }
+        dispatchKey: "queueInitiativeActions",
+        params: { baseId, round },
+      })
     );
 
     // Step 3: Firefight — modifier is read from BFE result when the command executes
     cmds.push(
-      {
+      factory.postBattleDispatch({
         id: `${baseId}-queue-firefight`,
-        type: "queueFirefight",
-        status: "pending",
-        pauseAfter: false,
-        visible: false,
-        round,
-        execute(ctx) {
-          const bfeResult = ctx.state?.noMinis?.rounds?.[this.round]?.battleFlowEvent;
-          const modifier = bfeResult?.firefightModifier ?? 0;
-          const blocksBrawling = bfeResult?.blocksBrawling ?? false;
-
-          ctx.pushCommandsToTop([
-            new NoMinisFirefightCommand({
-              id: `no-minis-round-${this.round}-firefight`,
-              title: `Round ${this.round}: Firefight`,
-              roundNumber: this.round,
-              firefightModifier: modifier,
-              blocksBrawling,
-              pauseAfter: false,
-            }),
-          ]);
-
-          this.status = "complete";
-          ctx.setStatus("running");
-        },
-        toJSON() {
-          return removeUndefinedValues({ id: this.id, type: this.type, status: this.status, pauseAfter: this.pauseAfter, visible: this.visible, round: this.round });
-        },
-      }
+        dispatchKey: "queueFirefight",
+        params: { round },
+      })
     );
 
     // Step 4: Morale & Retreat
@@ -388,35 +293,10 @@ export class NoMinisCombatCommand extends BaseCommand {
         pauseAfter: false,
         visible: false,
       }),
-      {
-        // Read option choices from state and start Round 1
+      factory.postBattleDispatch({
         id: `${this.id}-start-round-1`,
-        type: "startNoMinisRound1",
-        status: "pending",
-        pauseAfter: false,
-        visible: false,
-        execute(ctx) {
-          const bfe = ctx.state?.noMinis?.options?.battleFlowEventsEnabled === "true";
-          const hectic = ctx.state?.noMinis?.options?.hecticCombatEnabled === "true";
-          const faster = ctx.state?.noMinis?.options?.fasterCombatEnabled === "true";
-
-          ctx.pushCommandsToTop([
-            new NoMinisCombatRoundCommand({
-              id: "no-minis-round-1",
-              roundNumber: 1,
-              battleFlowEventsEnabled: bfe,
-              hecticCombatEnabled: hectic,
-              fasterCombatEnabled: faster,
-            }),
-          ]);
-
-          this.status = "complete";
-          ctx.setStatus("running");
-        },
-        toJSON() {
-          return removeUndefinedValues({ id: this.id, type: this.type, status: this.status, pauseAfter: this.pauseAfter, visible: this.visible });
-        },
-      }
+        dispatchKey: "startNoMinisRound1",
+      })
     );
 
     engineContext.pushCommandsToTop(cmds);

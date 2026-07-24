@@ -50,52 +50,6 @@ export class WorldChooseBattleCommand extends BaseCommand {
       description: "Take on a freelance job from the local area.",
     });
 
-    const missionPrepCmd = {
-      status: "pending",
-      execute(ctx) {
-        const missionType = ctx.getStateValue("encounter.missionType");
-
-        let message;
-        if (missionType === "patron") {
-          message = "Record the patron details in your Encounter Log.\nSet up the battlefield and generate enemy forces according to the patron's mission parameters.";
-        } else if (missionType === "rival") {
-          message = "Select a rival from your list.\nNote their faction for enemy force generation.";
-        } else if (missionType === "quest") {
-          message = "This is a Quest mission. If a Quest finale is pending, it's a Straight-up Fight with +1 opponent, and the opponents are Fearless.\nSet up the battlefield and generate enemy forces using the standard tables.";
-        } else {
-          message = "Roll for the Opportunity mission type and enemy forces using the standard tables.";
-        }
-
-        ctx.pushCommandsToTop([
-          ctx.commandFactory.popupMessage({
-            id: `${baseId}-mission-prep-msg`,
-            title: "Mission Prep",
-            message,
-            buttonText: "Ready",
-            pauseAfter: false,
-          }),
-          ctx.commandFactory.updateState({
-            id: `${baseId}-set-encounter-ready`,
-            title: "Encounter Ready",
-            operations: [{ op: "set", path: "encounter.phase", value: "ready" }],
-            pauseAfter: false,
-            visible: false,
-          }),
-        ]);
-
-        this.status = "complete";
-        ctx.setStatus("running");
-      },
-      toJSON() {
-        return removeUndefinedValues({
-          id: `${baseId}-mission-prep`,
-          type: "missionPrepDispatch",
-          status: this.status || "pending",
-          baseId,
-        });
-      },
-    };
-
     engineContext.pushCommandsToTop([
       factory.choice({
         id: `${baseId}-choose`,
@@ -107,7 +61,11 @@ export class WorldChooseBattleCommand extends BaseCommand {
         buttonText: "Choose",
         pauseAfter: false,
       }),
-      missionPrepCmd,
+      factory.postBattleDispatch({
+        id: `${baseId}-mission-prep`,
+        dispatchKey: "missionPrepDispatch",
+        params: { baseId },
+      }),
     ]);
 
     this.status = "complete";

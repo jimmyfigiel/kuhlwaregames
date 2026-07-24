@@ -1370,14 +1370,9 @@ export class FiveParsecsCommandFactory extends CommandFactory {
         return new WorldChooseBattleCommand(commandData);
 
       case "worldUpkeep":
-      case "worldRumors":
-      case "resolveCrewTask":
-      case "calcPatronSeek":
-      case "patronJobModifiers":
-      case "missionPrepDispatch":
-        // These are inline commands whose execute logic lives in the parent command.
-        // On page refresh they are re-hydrated as plain passthrough objects.
-        // The engine will skip them if already complete; if pending they will be a no-op.
+        // Inline command whose execute logic lives in WorldPhaseCommand. It always runs
+        // live (nothing pauses before it in the same push), so this is a defensive
+        // fallback only, not a real code path.
         return {
           ...commandData,
           execute(ctx) {
