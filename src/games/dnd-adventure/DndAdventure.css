@@ -97,3 +97,22 @@
   font-weight: 700;
 }
 .dnd-input-bar button:disabled { opacity: 0.4; }
+
+.dnd-typing-dots { display: inline-flex; gap: 4px; align-items: center; height: 1em; }
+.dnd-typing-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dnd-accent);
+  opacity: 0.3;
+  animation: dnd-typing-bounce 1.2s infinite ease-in-out;
+}
+.dnd-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.dnd-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dnd-typing-bounce {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dnd-typing-dots span { animation: none; opacity: 0.6; }
+}

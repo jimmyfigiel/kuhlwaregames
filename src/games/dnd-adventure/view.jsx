@@ -22,7 +22,9 @@ export default function DndAdventureView({ room, player, gameState, initializeMi
   const [character, setCharacter] = useState(null);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  const [pending, setPending] = useState(false);
   const logEndRef = useRef(null);
+  const entriesCountAtSendRef = useRef(0);
 
   useEffect(() => {
     if (!gameState) initializeMissingGameState();
@@ -35,7 +37,16 @@ export default function DndAdventureView({ room, player, gameState, initializeMi
     let cancelled = false;
     ensureSignedIn().then(() => {
       if (cancelled) return;
-      unsubLog = listenLog(sessionId, setEntries);
+      unsubLog = listenLog(sessionId, (newEntries) => {
+        setEntries(newEntries);
+        // The server echoes the player's own message to the log before the
+        // DM actually responds -- only clear on a *non-player* entry, or
+        // this flips off the instant our own line shows up.
+        const added = newEntries.slice(entriesCountAtSendRef.current);
+        if (added.some((entry) => entry.kind !== "player")) {
+          setPending(false);
+        }
+      });
       unsubChar = listenCharacter(sessionId, playerId, setCharacter);
     });
     return () => {
@@ -55,8 +66,12 @@ export default function DndAdventureView({ room, player, gameState, initializeMi
     if (!trimmed) return;
     setSending(true);
     setText("");
+    entriesCountAtSendRef.current = entries.length;
+    setPending(true);
     try {
       await sendCommand(sessionId, playerId, trimmed);
+    } catch (err) {
+      setPending(false);
     } finally {
       setSending(false);
     }
@@ -83,6 +98,14 @@ export default function DndAdventureView({ room, player, gameState, initializeMi
               <div className="text">{entry.text}</div>
             </div>
           ))}
+          {pending && (
+            <div className="dnd-entry narration">
+              <div className="speaker">DM</div>
+              <div className="text">
+                <span className="dnd-typing-dots"><span></span><span></span><span></span></span>
+              </div>
+            </div>
+          )}
           <div ref={logEndRef} />
         </div>
 
