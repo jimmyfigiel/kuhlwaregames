@@ -11,6 +11,10 @@ import NoMinisFirefightCommand from "./NoMinisFirefightCommand";
 import TabletopCombatCommand, { TabletopCombatRoundCommand } from "./TabletopCombatCommand";
 import TerrainGeneratorCommand from "./TerrainGeneratorCommand";
 import { buildTaskResolutionCommands } from "./WorldCrewTasksCommand";
+import { ENEMY_CATEGORY_TABLES, UNIQUE_INDIVIDUALS_TABLE, rollOpponentDice, rollEnemyWeapon, rollEnemySpecialistWeapon } from "../data/tables/enemyTables";
+import { buildEnemySubtable } from "./EnemyGenerationCommand";
+import { OBJECTIVE_TYPES } from "../data/tables/objectiveTables";
+import { rollDie, rollDice } from "./postBattleHelpers";
 import { makeCampaignTableRoll } from "./WorldJobOffersCommand";
 import { CAMPAIGN_TABLES, PATRON_BHC_THRESHOLDS } from "../data/tables/campaignTables";
 
@@ -544,7 +548,242 @@ function worldRumors(ctx, params) {
   popup(ctx, { id: `${baseId}-rumors-msg`, title: "Resolve Rumors", message, buttonText: total === 0 ? "Skip" : "Resolve" });
 }
 
+// ─── Enemy Generation ────────────────────────────────────────────────────────
+
+function normalizeSubtable(table) {
+  return {
+    id: table.id,
+    title: table.title,
+    dice: table.dice || "D100",
+    sides: 100,
+    entries: table.entries,
+  };
+}
+
+function extractSaveThrow(rules) {
+  const text = (rules || []).join(" ");
+  const match = text.match(/(\d)\+\s*(?:Armor\s+)?Saving Throw/i);
+  return match ? Number(match[1]) : null;
+}
+
+function enemyGenerationRollCategory(ctx, params) {
+  const { baseId, missionType, invasionBonus } = params;
+  const categoryId = ctx.getStateValue("postBattleTemp.enemyGen.category");
+
+  ctx.pushCommandsToTop([
+    ctx.commandFactory.tableRoll({
+      id: `${baseId}-specific`,
+      title: ENEMY_CATEGORY_TABLES[categoryId]?.label || "Enemy",
+      table: normalizeSubtable(buildEnemySubtable(categoryId)),
+      saveTo: "postBattleTemp.enemyGen.specific",
+      buttonText: "Select",
+      rollButtonText: "Roll D100",
+      afterSelectionCommands: [
+        ctx.commandFactory.postBattleDispatch({
+          id: `${baseId}-finalize`,
+          dispatchKey: "enemyGenerationFinalize",
+          params: { baseId, missionType, categoryId, invasionBonus },
+        }),
+      ],
+      pauseAfter: false,
+    }),
+  ]);
+}
+
+function enemyGenerationRollSpecific(ctx, params) {
+  const { baseId, categoryId, missionType, forcedEnemyName, rivalId, invasionBonus } = params;
+  const category = ENEMY_CATEGORY_TABLES[categoryId];
+  const row = category?.rows.find((r) => r.name === forcedEnemyName);
+
+  if (!row) return;
+
+  finalizeEnemyGeneration(ctx, { baseId, missionType, categoryId, row, rivalId, invasionBonus, isKnownRival: true });
+}
+
+function enemyGenerationFinalize(ctx, params) {
+  const { baseId, missionType, categoryId, invasionBonus } = params;
+  const specific = ctx.getStateValue("postBattleTemp.enemyGen.specific");
+  const category = ENEMY_CATEGORY_TABLES[categoryId];
+  const row = category?.rows.find((r) => r.name === (specific?.label || specific?.value)) || specific?.row;
+
+  if (!row) return;
+
+  let rivalId = null;
+  if (missionType === "rival") {
+    const rivalStateId = ctx.getStateValue("postBattleTemp.rivalStatus.rivalId") || ctx.getStateValue("encounter.selectedRivalId");
+    const rivals = ctx.getStateValue("worldLog.rivals") || [];
+    const rival = rivals.find((r) => r.id === rivalStateId) || rivals[0];
+    rivalId = rival?.id || null;
+  }
+
+  finalizeEnemyGeneration(ctx, { baseId, missionType, categoryId, row, rivalId, invasionBonus, isKnownRival: false });
+}
+
+function finalizeEnemyGeneration(ctx, { baseId, missionType, categoryId, row, rivalId, invasionBonus = 0, isKnownRival }) {
+  const state = ctx.state;
+  const category = ENEMY_CATEGORY_TABLES[categoryId];
+  const difficultyMode = state?.campaign?.difficultyMode || "normal";
+  const crewSize = Number(state?.campaign?.crewSize || 6);
+
+  // Number of opponents
+  const diceResult = rollOpponentDice(crewSize);
+  let picked = diceResult.picked;
+
+  if (["challenging", "hardcore", "insanity"].includes(difficultyMode)) {
+    const rerolled = diceResult.rolls.map((d) => (d <= 2 ? Math.ceil(Math.random() * 6) : d));
+    picked = diceResult.mode === "lower of 2D6" ? Math.min(...rerolled) : diceResult.mode === "higher of 2D6" ? Math.max(...rerolled) : rerolled[0];
+  }
+
+  let total = picked + Number(row.numbers || 0) + invasionBonus;
+
+  if (difficultyMode === "easy" && total >= 5) total -= 1;
+  if (difficultyMode === "hardcore" || difficultyMode === "insanity") total += 1;
+  total = Math.max(1, total);
+
+  // Specialists / Lieutenant
+  let specialistCount = total <= 2 ? 0 : total <= 6 ? 1 : 2;
+  if (difficultyMode === "insanity") specialistCount += 1;
+  specialistCount = Math.min(specialistCount, total);
+  const hasLieutenant = total >= 4;
+
+  // Weapons
+  let regularWeapon;
+  let specialistWeapon = null;
+  if (row.weapon?.fixed) {
+    regularWeapon = row.weapon.fixed;
+    specialistWeapon = row.weapon.specialistFixed || row.weapon.fixed;
+  } else {
+    regularWeapon = rollEnemyWeapon(row.weapon?.roll || 1);
+    if (specialistCount > 0) {
+      specialistWeapon = rollEnemySpecialistWeapon(row.weapon?.specialist || "A");
+    }
+  }
+
+  // Unique Individual(s)
+  const skipUniqueRoll = (categoryId === "rovingThreats" || missionType === "invasion") && difficultyMode !== "insanity";
+  const uniqueIndividuals = [];
+  if (!skipUniqueRoll) {
+    let uiModifier = 0;
+    if (categoryId === "interestedParties") uiModifier += 1;
+    if (difficultyMode === "hardcore") uiModifier += 1;
+    const forceUnique = difficultyMode === "insanity";
+    const { rolls: uiRolls, total: uiTotal } = rollDice(2, 6);
+    const modifiedUiTotal = forceUnique ? uiTotal : uiTotal + uiModifier;
+
+    if (forceUnique || modifiedUiTotal >= 9) {
+      const count = forceUnique && uiTotal >= 11 ? 2 : 1;
+      for (let i = 0; i < count; i += 1) {
+        const uiRoll = Math.ceil(Math.random() * 100);
+        const uiRow = UNIQUE_INDIVIDUALS_TABLE.rows.find((r) => uiRoll >= r.min && uiRoll <= r.max);
+        if (uiRow) uniqueIndividuals.push(uiRow);
+      }
+    }
+  }
+
+  const saveThrow = extractSaveThrow(row.rules);
+
+  // Build the individual enemy roster
+  const enemies = [];
+  for (let i = 0; i < total; i += 1) {
+    const isSpecialist = i < specialistCount;
+    const isLieutenant = !isSpecialist && hasLieutenant && i === specialistCount;
+    enemies.push({
+      id: `enemy-${i + 1}`,
+      name: `${row.name}${isSpecialist ? " (Specialist)" : isLieutenant ? " (Lieutenant)" : ""}`,
+      isSpecialist,
+      isLieutenant,
+      speed: row.speed,
+      combatSkill: Number(row.combatSkill || 0) + (isLieutenant ? 1 : 0),
+      toughness: row.toughness,
+      ai: row.ai,
+      panic: row.panic,
+      saveThrow,
+      weapon: isSpecialist ? specialistWeapon : regularWeapon,
+      extraWeapon: isLieutenant ? "Blade" : null,
+    });
+  }
+
+  uniqueIndividuals.forEach((ui, idx) => {
+    enemies.push({
+      id: `unique-${idx + 1}`,
+      name: ui.name,
+      isUnique: true,
+      speed: ui.speed ?? row.speed,
+      combatSkill: ui.combatSkill ?? row.combatSkill,
+      toughness: ui.toughness ?? row.toughness,
+      ai: ui.ai || row.ai,
+      luck: ui.luck || 0,
+      saveThrow: ui.saveThrow ? Number(String(ui.saveThrow).replace("+", "")) : saveThrow,
+      weapon: (ui.weapons || [])[0] || regularWeapon,
+      notes: ui.notes,
+    });
+  });
+
+  const roster = {
+    categoryId,
+    categoryLabel: category?.label,
+    enemyName: row.name,
+    numbers: total,
+    specialistCount,
+    hasLieutenant,
+    regularWeapon,
+    specialistWeapon,
+    panic: row.panic,
+    speed: row.speed,
+    combatSkill: row.combatSkill,
+    toughness: row.toughness,
+    ai: row.ai,
+    saveThrow,
+    rules: row.rules,
+    invasionThreat: Boolean(row.invasionThreat),
+    uniqueIndividuals,
+    enemies,
+  };
+
+  ctx.setStateValue("encounter.enemyRoster", roster);
+  ctx.setStateValue("encounter.enemyWasInvasionThreat", roster.invasionThreat ? "yes" : "no");
+
+  if (rivalId && !isKnownRival) {
+    const rivals = ctx.getStateValue("worldLog.rivals") || [];
+    ctx.setStateValue(
+      "worldLog.rivals",
+      rivals.map((r) => (r.id === rivalId ? { ...r, enemyCategory: categoryId, enemyName: row.name } : r))
+    );
+  }
+
+  const lines = [
+    `**${row.name}** (${category?.label || categoryId})`,
+    `Numbers: ${total}${specialistCount > 0 ? ` (${specialistCount} Specialist${specialistCount === 1 ? "" : "s"})` : ""}${hasLieutenant ? ", 1 Lieutenant" : ""}`,
+    `Speed ${row.speed}" | Combat Skill ${row.combatSkill >= 0 ? "+" : ""}${row.combatSkill} | Toughness ${row.toughness} | AI: ${row.ai}${saveThrow ? ` | ${saveThrow}+ Saving Throw` : ""}`,
+    `Panic range: ${(row.panic || []).join(", ") || "Fearless"}`,
+    `Weapon: ${regularWeapon}${specialistWeapon ? ` | Specialist weapon: ${specialistWeapon}` : ""}`,
+    roster.invasionThreat ? "⚠ Invasion Threat" : null,
+    uniqueIndividuals.length > 0 ? `Accompanied by: ${uniqueIndividuals.map((u) => u.name).join(", ")}` : null,
+    row.rules?.length ? `\nSpecial rules:\n${row.rules.map((r) => `• ${r}`).join("\n")}` : null,
+  ].filter(Boolean);
+
+  popup(ctx, { id: `${baseId}-result`, title: "Determine the Enemy", message: lines.join("\n") });
+}
+
+function objectiveDispatch(ctx, params) {
+  const { baseId } = params;
+  const objectiveId = ctx.getStateValue("postBattleTemp.objectiveRoll")?.value;
+  const objective = OBJECTIVE_TYPES[objectiveId];
+
+  ctx.setStateValue("encounter.objective", objectiveId);
+
+  popup(ctx, {
+    id: `${baseId}-result`,
+    title: `Determine the Objective — ${objective?.label || objectiveId}`,
+    message: objective?.text || "Objective determined.",
+  });
+}
+
 export const GAME_DISPATCH_HANDLERS = {
+  objectiveDispatch,
+  enemyGenerationRollCategory,
+  enemyGenerationRollSpecific,
+  enemyGenerationFinalize,
   calcPatronSeek,
   resolveCrewTask,
   patronJobModifiers,

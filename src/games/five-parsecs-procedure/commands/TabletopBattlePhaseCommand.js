@@ -32,6 +32,8 @@ export class TabletopBattlePhaseCommand extends BaseCommand {
         pauseAfter: false,
         visible: false,
       }),
+      factory.objective({ id: `${this.id}-objective`, missionType }),
+      factory.enemyGeneration({ id: `${this.id}-enemy-gen`, missionType }),
     ];
 
     // Terrain Generator — optional, if enabled in campaign options

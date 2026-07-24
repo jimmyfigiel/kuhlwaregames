@@ -53,6 +53,8 @@ import {
   CampaignEventCommand,
   CharacterEventCommand,
   GalacticWarProgressCommand,
+  EnemyGenerationCommand,
+  ObjectiveCommand,
 } from "../commands";
 import { buildCrewMemberTableResultUpdateCommands } from "../effects";
 import { EQUIPMENT_ROLL_TABLES_BY_ID, SHIP_TABLE_DEFINITION, CAMPAIGN_TABLES } from "../data/tables";
@@ -688,6 +690,14 @@ export class FiveParsecsCommandFactory extends CommandFactory {
 
   galacticWarProgress({ id, title = "Post-Battle: Galactic War Progress", pauseAfter = false, visible = true } = {}) {
     return new GalacticWarProgressCommand({ id, title, pauseAfter, visible });
+  }
+
+  enemyGeneration({ id, title = "Determine the Enemy", missionType = "opportunity", pauseAfter = false, visible = true } = {}) {
+    return new EnemyGenerationCommand({ id, title, missionType, pauseAfter, visible });
+  }
+
+  objective({ id, title = "Determine the Objective", missionType = "opportunity", pauseAfter = false, visible = true } = {}) {
+    return new ObjectiveCommand({ id, title, missionType, pauseAfter, visible });
   }
 
 
@@ -1506,6 +1516,12 @@ export class FiveParsecsCommandFactory extends CommandFactory {
 
       case "postBattleDispatch":
         return new PostBattleDispatchCommand(commandData);
+
+      case "enemyGeneration":
+        return new EnemyGenerationCommand(commandData);
+
+      case "objective":
+        return new ObjectiveCommand(commandData);
 
       default:
         console.warn(`Unknown command type: ${commandData.type}`);
