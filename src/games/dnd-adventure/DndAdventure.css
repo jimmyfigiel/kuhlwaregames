@@ -1,0 +1,99 @@
+.dnd-app {
+  --dnd-bg: #14171a;
+  --dnd-surface: #1d2220;
+  --dnd-ink: #e8e6dc;
+  --dnd-muted: #8b8f84;
+  --dnd-accent: #4fb3a2;
+  --dnd-accent-warm: #d99a52;
+  --dnd-danger: #c2534f;
+  --dnd-line: #2a302e;
+
+  display: flex;
+  flex-direction: column;
+  height: 70vh;
+  min-height: 420px;
+  background: var(--dnd-bg);
+  color: var(--dnd-ink);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dnd-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.7rem 1rem;
+  background: var(--dnd-surface);
+  border-bottom: 1px solid var(--dnd-line);
+}
+.dnd-stats .name { font-weight: 700; }
+.dnd-hp-track {
+  flex: 1;
+  height: 10px;
+  background: var(--dnd-line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.dnd-hp-fill { height: 100%; transition: width 0.3s ease, background 0.3s ease; }
+.dnd-stats .muted-text {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.78rem;
+  color: var(--dnd-muted);
+  white-space: nowrap;
+}
+
+.dnd-log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.dnd-entry .speaker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.15rem;
+}
+.dnd-entry .text { font-size: 0.95rem; line-height: 1.45; }
+.dnd-entry.system .speaker { color: var(--dnd-muted); }
+.dnd-entry.system .text { color: var(--dnd-muted); font-style: italic; }
+.dnd-entry.player { align-self: flex-end; text-align: right; max-width: 85%; }
+.dnd-entry.player .speaker { color: var(--dnd-accent-warm); }
+.dnd-entry.player .text {
+  background: var(--dnd-surface);
+  border-radius: 12px 12px 2px 12px;
+  padding: 0.5rem 0.75rem;
+  display: inline-block;
+  text-align: left;
+}
+.dnd-entry.narration .speaker { color: var(--dnd-accent); }
+
+.dnd-input-bar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.7rem;
+  background: var(--dnd-surface);
+  border-top: 1px solid var(--dnd-line);
+}
+.dnd-input-bar input {
+  flex: 1;
+  background: var(--dnd-bg);
+  border: 1px solid var(--dnd-line);
+  color: var(--dnd-ink);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 1rem;
+}
+.dnd-input-bar input:focus { outline: none; border-color: var(--dnd-accent); }
+.dnd-input-bar button {
+  background: var(--dnd-accent);
+  color: #0b0f0e;
+  border: none;
+  border-radius: 8px;
+  padding: 0 1.1rem;
+  font-weight: 700;
+}
+.dnd-input-bar button:disabled { opacity: 0.4; }
