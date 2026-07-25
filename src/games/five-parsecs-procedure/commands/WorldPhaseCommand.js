@@ -97,6 +97,7 @@ export class WorldPhaseCommand extends BaseCommand {
             buttonText: "Done",
             pauseAfter: false,
           }),
+          ctx.commandFactory.postBattleDispatch({ id: `${baseId}-ship-wreck-check`, dispatchKey: "checkShipWreckAndOffer", params: { baseId, seized } }),
         ]);
 
         this.status = "complete";

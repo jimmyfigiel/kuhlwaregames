@@ -34,6 +34,7 @@ import {
 } from "./combatResolution";
 import { makeCampaignTableRoll } from "./WorldJobOffersCommand";
 import { CAMPAIGN_TABLES, PATRON_BHC_THRESHOLDS } from "../data/tables/campaignTables";
+import { SHIP_TABLE_DEFINITION } from "../data/tables/shipTables";
 
 function popupCmd(ctx, { id, title, message, buttonText = "Continue" }) {
   return ctx.commandFactory.popupMessage({ id, title, message, buttonText, pauseAfter: false });
@@ -917,6 +918,154 @@ function worldRumors(ctx, params) {
   popup(ctx, { id: `${baseId}-rumors-msg`, title: "Resolve Rumors", message, buttonText: total === 0 ? "Skip" : "Resolve" });
 }
 
+// ─── Ship destruction / Getting a New Ship (Rulebook p.60, p.62) ────────────
+
+function checkShipWreckAndOffer(ctx, params) {
+  const { baseId, seized } = params;
+  const starship = ctx.getStateValue("crewLog.starship");
+  const hullDamage = num(ctx, "crewLog.starship.hullDamage");
+  const hullThreshold = num(ctx, "crewLog.starship.hullThreshold");
+  const wrecked = !seized && starship && hullThreshold > 0 && hullDamage >= hullThreshold;
+
+  const cmds = [];
+
+  if (wrecked) {
+    const crewCount = (ctx.getStateValue("crewLog.crewMembers") || []).length;
+    const keepCount = crewCount * 2;
+    const pool = collectAllItems(ctx.state);
+    const loseCount = Math.max(0, pool.length - keepCount);
+    const lostNames = loseRandomItems(ctx, loseCount);
+    const credits = num(ctx, "crewLog.credits");
+
+    ctx.setStateValue("crewLog.starship", null);
+    ctx.setStateValue("crewLog.credits", 0);
+
+    cmds.push(popupCmd(ctx, {
+      id: `${baseId}-ship-wrecked`,
+      title: "Ship Wrecked",
+      message: `${starship.name || "Your ship"} has taken more Hull damage than it can withstand and is now a wreck.\n\nYou lose all ${credits} credits and are limited to a Stash of ${keepCount} items (2 per crew member).${lostNames.length > 0 ? `\nLost: ${lostNames.join(", ")}.` : ""}`,
+    }));
+  }
+
+  if (!ctx.getStateValue("crewLog.starship")) {
+    cmds.push(...newShipOfferCmds(ctx, { baseId }));
+  }
+
+  if (cmds.length > 0) ctx.pushCommandsToTop(cmds);
+}
+
+function newShipOfferCmds(ctx, params) {
+  const { baseId } = params;
+  const cost = rollDice(2, 6).total + 3;
+  const priceInCredits = cost * 10;
+  ctx.setStateValue("worldPhase.newShipOfferPrice", priceInCredits);
+
+  return [
+    ctx.commandFactory.choice({
+      id: `${baseId}-new-ship-offer`,
+      title: "Getting a New Ship",
+      prompt: `You may look for a new vessel this campaign turn. A ship is available for ${priceInCredits} credits (you can finance up to 70 credits of the cost). Look for one, or pass?`,
+      options: [
+        { id: "look", label: "Look for a Ship", value: "look" },
+        { id: "pass", label: "Pass", value: "pass" },
+      ],
+      saveTo: "worldPhase.newShipChoice",
+      buttonText: "Confirm",
+      pauseAfter: false,
+    }),
+    ctx.commandFactory.postBattleDispatch({ id: `${baseId}-new-ship-offer-result`, dispatchKey: "newShipOfferResult", params: { baseId } }),
+  ];
+}
+
+function newShipOffer(ctx, params) {
+  ctx.pushCommandsToTop(newShipOfferCmds(ctx, params));
+}
+
+function newShipOfferResult(ctx, params) {
+  const { baseId } = params;
+  if (ctx.getStateValue("worldPhase.newShipChoice") !== "look") return;
+
+  ctx.pushCommandsToTop([
+    ctx.commandFactory.tableRoll({
+      id: `${baseId}-new-ship-roll`,
+      title: "Ship on Offer",
+      table: SHIP_TABLE_DEFINITION,
+      saveTo: "worldPhase.newShipRoll",
+      buttonText: "Select",
+      rollButtonText: "Roll D100",
+      afterSelectionCommands: [
+        ctx.commandFactory.postBattleDispatch({ id: `${baseId}-new-ship-buy`, dispatchKey: "newShipBuyOffer", params: { baseId } }),
+      ],
+      pauseAfter: false,
+    }),
+  ]);
+}
+
+function newShipBuyOffer(ctx, params) {
+  const { baseId } = params;
+  const roll = ctx.getStateValue("worldPhase.newShipRoll");
+  const price = num(ctx, "worldPhase.newShipOfferPrice");
+  const credits = num(ctx, "crewLog.credits");
+  const maxFinance = 70;
+  const canAfford = credits + maxFinance >= price;
+
+  if (!canAfford) {
+    popup(ctx, { id: `${baseId}-new-ship-cant-afford`, title: "Getting a New Ship", message: `${roll?.label} costs ${price} credits. Even financing 70 credits, you can't afford it (you have ${credits}). You pass for now.` });
+    return;
+  }
+
+  ctx.pushCommandsToTop([
+    ctx.commandFactory.choice({
+      id: `${baseId}-new-ship-confirm`,
+      title: `Buy ${roll?.label}?`,
+      prompt: `${roll?.label} — ${roll?.description}\nPrice: ${price} credits. You have ${credits}. Buy this ship?`,
+      options: [
+        { id: "buy", label: "Buy This Ship", value: "buy" },
+        { id: "pass", label: "Pass — Keep Looking Next Turn", value: "pass" },
+      ],
+      saveTo: "worldPhase.newShipConfirm",
+      buttonText: "Confirm",
+      pauseAfter: false,
+    }),
+    ctx.commandFactory.postBattleDispatch({ id: `${baseId}-new-ship-buy-apply`, dispatchKey: "newShipBuyApply", params: { baseId } }),
+  ]);
+}
+
+function newShipBuyApply(ctx, params) {
+  const { baseId } = params;
+  if (ctx.getStateValue("worldPhase.newShipConfirm") !== "buy") return;
+
+  const roll = ctx.getStateValue("worldPhase.newShipRoll");
+  const price = num(ctx, "worldPhase.newShipOfferPrice");
+  const credits = num(ctx, "crewLog.credits");
+  const financed = Math.max(0, Math.min(70, price - credits));
+  const paidNow = price - financed;
+
+  ctx.setStateValue("crewLog.credits", credits - paidNow);
+  ctx.setStateValue("crewLog.debt", financed);
+  ctx.setStateValue("crewLog.ship", roll?.label);
+  ctx.setStateValue("crewLog.starship", {
+    id: "crew-starship",
+    name: roll?.label,
+    shipType: roll?.label,
+    hasShip: true,
+    hullDamage: 0,
+    hullThreshold: Number(roll?.hull || 0),
+    debtOwed: financed,
+    financedAmount: financed,
+    traits: roll?.traits || [],
+    components: [],
+    source: "Getting a New Ship",
+    createdAt: new Date().toISOString(),
+  });
+
+  popup(ctx, {
+    id: `${baseId}-new-ship-bought`,
+    title: "New Ship Acquired",
+    message: `Bought ${roll?.label} for ${price} credits (paid ${paidNow} now${financed > 0 ? `, financed ${financed}` : ""}).`,
+  });
+}
+
 // ─── Travel cost (Rulebook p.71) ────────────────────────────────────────────
 
 function hasShipComponentLocal(ctx, componentId) {
@@ -925,9 +1074,63 @@ function hasShipComponentLocal(ctx, componentId) {
   return installed.some((c) => c.componentId === componentId && Number(c.installedAtTurn) < turnNumber);
 }
 
+function emergencyTakeoffResolve(ctx, params) {
+  const { baseId } = params;
+  const choice = ctx.getStateValue("worldPhase.emergencyTakeoffChoice");
+
+  if (choice !== "emergency") {
+    ctx.pushCommandsToTop([
+      ctx.commandFactory.updateState({
+        id: `${baseId}-travel-blocked`,
+        title: "Travel Blocked",
+        operations: [{ op: "set", path: "campaign.travelOccurredThisTurn", value: false }],
+        pauseAfter: false,
+        visible: false,
+      }),
+      ctx.commandFactory.popupMessage({
+        id: `${baseId}-travel-blocked-msg`,
+        title: "Waiting for Repairs",
+        message: "The crew stays on this world while the ship's Hull damage is repaired.",
+        buttonText: "Continue",
+        pauseAfter: false,
+      }),
+    ]);
+    return;
+  }
+
+  const roll = rollDice(3, 6).total;
+  ctx.setStateValue("crewLog.starship.hullDamage", num(ctx, "crewLog.starship.hullDamage") + roll);
+
+  ctx.pushCommandsToTop([
+    ctx.commandFactory.popupMessage({ id: `${baseId}-emergency-takeoff-result`, title: "Emergency Take-off", message: `The drive vents super-heated plasma throughout the vessel — rolled 3D6: ${roll} additional Hull Point damage.`, buttonText: "Continue", pauseAfter: false }),
+    ctx.commandFactory.postBattleDispatch({ id: `${baseId}-travel-cost-retry`, dispatchKey: "chargeTravelCostAndProceed", params: { ...params, emergencyResolved: true } }),
+  ]);
+}
+
 function chargeTravelCostAndProceed(ctx, params) {
-  const { baseId, turnPrefix, turnNumber, selectedReturn, targetWorldId, arrivalLabel } = params;
+  const { baseId, turnPrefix, turnNumber, selectedReturn, targetWorldId, arrivalLabel, emergencyResolved } = params;
   const hasShip = Boolean(ctx.getStateValue("crewLog.starship"));
+  const hullDamage = num(ctx, "crewLog.starship.hullDamage");
+
+  if (hasShip && hullDamage > 0 && !emergencyResolved) {
+    ctx.pushCommandsToTop([
+      ctx.commandFactory.choice({
+        id: `${baseId}-emergency-takeoff-offer`,
+        title: "Damaged Ship",
+        prompt: `Your ship has ${hullDamage} Hull Point${hullDamage === 1 ? "" : "s"} of damage and cannot safely leave for another planet. Wait for repairs (stay this turn), or force an Emergency Take-off (your ship suffers 3D6 more Hull Points of damage)?`,
+        options: [
+          { id: "wait", label: "Wait for Repairs (stay this turn)", value: "wait" },
+          { id: "emergency", label: "Emergency Take-off (3D6 Hull damage)", value: "emergency" },
+        ],
+        saveTo: "worldPhase.emergencyTakeoffChoice",
+        buttonText: "Confirm",
+        pauseAfter: false,
+      }),
+      ctx.commandFactory.postBattleDispatch({ id: `${baseId}-emergency-takeoff-resolve`, dispatchKey: "emergencyTakeoffResolve", params }),
+    ]);
+    return;
+  }
+
   const credits = num(ctx, "crewLog.credits");
   const crewCount = (ctx.getStateValue("crewLog.crewMembers") || []).length;
   const traitTitle = ctx.getStateValue("worldLog.currentWorld.trait")?.title;
@@ -1531,6 +1734,12 @@ export const GAME_DISPATCH_HANDLERS = {
   recruitResolve,
   trackResolve,
   repairKitResolve,
+  checkShipWreckAndOffer,
+  newShipOffer,
+  newShipOfferResult,
+  newShipBuyOffer,
+  newShipBuyApply,
+  emergencyTakeoffResolve,
   chargeTravelCostAndProceed,
   newWorldArrivalSteps,
   licenseResolve,
