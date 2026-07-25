@@ -917,6 +917,81 @@ function worldRumors(ctx, params) {
   popup(ctx, { id: `${baseId}-rumors-msg`, title: "Resolve Rumors", message, buttonText: total === 0 ? "Skip" : "Resolve" });
 }
 
+// ─── Travel cost (Rulebook p.71) ────────────────────────────────────────────
+
+function hasShipComponentLocal(ctx, componentId) {
+  const turnNumber = num(ctx, "campaign.turnNumber");
+  const installed = ctx.getStateValue("crewLog.starship.components") || [];
+  return installed.some((c) => c.componentId === componentId && Number(c.installedAtTurn) < turnNumber);
+}
+
+function chargeTravelCostAndProceed(ctx, params) {
+  const { baseId, turnPrefix, turnNumber, selectedReturn, targetWorldId, arrivalLabel } = params;
+  const hasShip = Boolean(ctx.getStateValue("crewLog.starship"));
+  const credits = num(ctx, "crewLog.credits");
+  const crewCount = (ctx.getStateValue("crewLog.crewMembers") || []).length;
+  const traitTitle = ctx.getStateValue("worldLog.currentWorld.trait")?.title;
+
+  let cost;
+  let costNote;
+  if (!hasShip) {
+    cost = crewCount;
+    costNote = `Commercial passage: ${cost} credit${cost === 1 ? "" : "s"} (1 per crew member). No packages or cargo may be carried, and no Starship Travel Event is rolled.`;
+  } else {
+    cost = traitTitle === "Fuel refinery" ? 3 : 5;
+    if (traitTitle === "Fuel shortage") {
+      const extra = rollDie(3);
+      cost += extra;
+      costNote = `Fuel and departure costs: ${cost} credits (base ${traitTitle === "Fuel refinery" ? 3 : 5} + ${extra} Fuel Shortage).`;
+    } else {
+      costNote = `Fuel and departure costs: ${cost} credits.`;
+    }
+    if (hasShipComponentLocal(ctx, "converters")) {
+      cost = Math.max(0, cost - 2);
+      costNote += " (Converters reduce cost by 2.)";
+    }
+  }
+
+  if (credits < cost) {
+    ctx.pushCommandsToTop([
+      ctx.commandFactory.updateState({
+        id: `${baseId}-travel-blocked`,
+        title: "Travel Blocked",
+        operations: [{ op: "set", path: "campaign.travelOccurredThisTurn", value: false }],
+        pauseAfter: false,
+        visible: false,
+      }),
+      ctx.commandFactory.popupMessage({
+        id: `${baseId}-travel-blocked-msg`,
+        title: "Can't Afford to Travel",
+        message: `Travel requires ${cost} credits, but you only have ${credits}. The crew stays on this world for now.`,
+        buttonText: "Continue",
+        pauseAfter: false,
+      }),
+    ]);
+    return;
+  }
+
+  ctx.setStateValue("crewLog.credits", credits - cost);
+
+  const arrivalCmds = selectedReturn
+    ? [ctx.commandFactory.returnToVisitedWorld({ id: `${turnPrefix}-return-to-visited-world`, title: arrivalLabel, targetWorldId, turnNumber, pauseAfter: false, visible: false })]
+    : [ctx.commandFactory.newWorldArrival({ id: `${turnPrefix}-new-world-arrival`, title: "Travel: New World Arrival", turnNumber, pauseAfter: false, visible: true })];
+
+  const costPopup = ctx.commandFactory.popupMessage({ id: `${baseId}-cost-msg`, title: "Travel Costs", message: costNote, buttonText: "Continue", pauseAfter: false });
+
+  if (!hasShip) {
+    ctx.pushCommandsToTop([costPopup, ...arrivalCmds]);
+    return;
+  }
+
+  ctx.pushCommandsToTop([
+    costPopup,
+    ctx.commandFactory.starshipTravelEventRoll({ id: `${turnPrefix}-starship-travel-event`, title: "Travel: Starship Travel Event", turnNumber, pauseAfter: false, visible: true }),
+    ...arrivalCmds,
+  ]);
+}
+
 // ─── New World Arrival Steps (Rulebook p.72-74) ─────────────────────────────
 
 function normalizeWorldTraitsTable() {
@@ -1456,6 +1531,7 @@ export const GAME_DISPATCH_HANDLERS = {
   recruitResolve,
   trackResolve,
   repairKitResolve,
+  chargeTravelCostAndProceed,
   newWorldArrivalSteps,
   licenseResolve,
   worldTraitApply,

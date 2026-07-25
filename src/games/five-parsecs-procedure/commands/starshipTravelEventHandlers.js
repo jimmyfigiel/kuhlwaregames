@@ -58,8 +58,17 @@ function getSavvy(state, memberId) {
   return Number(state?.crewLog?.crewDetails?.[memberId]?.stats?.savvy || 0);
 }
 
+function hasShipComponent(ctx, componentId) {
+  const turnNumber = num(ctx, "campaign.turnNumber");
+  const installed = ctx.getStateValue("crewLog.starship.components") || [];
+  return installed.some((c) => c.componentId === componentId && Number(c.installedAtTurn) < turnNumber);
+}
+
 function damageShip(ctx, amount) {
-  inc(ctx, "crewLog.starship.hullDamage", amount);
+  const reduction = hasShipComponent(ctx, "improvedShielding") ? 1 : 0;
+  const finalAmount = Math.max(0, amount - reduction);
+  inc(ctx, "crewLog.starship.hullDamage", finalAmount);
+  return finalAmount;
 }
 
 function repairRandomDamagedItem(ctx) {
@@ -182,6 +191,7 @@ function asteroidsResolve(ctx, params) {
   }
 
   const savvy = getSavvy(ctx.state, member.id);
+  const shielded = hasShipComponent(ctx, "improvedShielding");
   const lines = [`${member.name} navigates the field (1D6+${savvy}, need 4+ each attempt):`];
   let damage = 0;
   for (let i = 1; i <= 3; i += 1) {
@@ -191,11 +201,11 @@ function asteroidsResolve(ctx, params) {
     lines.push(`Attempt ${i}: rolled ${roll} + ${savvy} = ${total} — ${success ? "clear" : "hit! 1D6 Hull damage"}.`);
     if (!success) {
       const hullRoll = rollDie(6);
-      damage += hullRoll;
-      lines.push(`  Hull damage: ${hullRoll}.`);
+      const applied = damageShip(ctx, hullRoll);
+      damage += applied;
+      lines.push(`  Hull damage: ${hullRoll}${shielded ? ` (Improved Shielding reduces to ${applied})` : ""}.`);
     }
   }
-  if (damage > 0) damageShip(ctx, damage);
   lines.push(damage > 0 ? `Total Hull damage taken: ${damage}.` : "The ship comes through unscathed.");
 
   cmds.push(popupCmd(ctx, { id: `${baseId}-through-result`, title: "Asteroids — Through the Field", message: lines.join("\n") }));

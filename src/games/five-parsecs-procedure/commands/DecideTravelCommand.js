@@ -189,37 +189,19 @@ export class DecideTravelCommand extends BaseCommand {
 
     if (selectedTravel) {
       commands.push(
-        factory.starshipTravelEventRoll({
-          id: `${turnPrefix}-starship-travel-event`,
-          title: "Travel: Starship Travel Event",
-          turnNumber: this.turnNumber,
-          pauseAfter: false,
-          visible: true,
+        factory.postBattleDispatch({
+          id: `${turnPrefix}-travel-cost`,
+          dispatchKey: "chargeTravelCostAndProceed",
+          params: {
+            baseId: this.id,
+            turnPrefix,
+            turnNumber: this.turnNumber,
+            selectedReturn,
+            targetWorldId: selectedReturn ? selectedKind.replace(/^return:/, "") : null,
+            arrivalLabel: selectedOption.label,
+          },
         })
       );
-
-      if (selectedReturn) {
-        commands.push(
-          factory.returnToVisitedWorld({
-            id: `${turnPrefix}-return-to-visited-world`,
-            title: selectedOption.label,
-            targetWorldId: selectedKind.replace(/^return:/, ""),
-            turnNumber: this.turnNumber,
-            pauseAfter: false,
-            visible: false,
-          })
-        );
-      } else if (selectedNewWorld) {
-        commands.push(
-          factory.newWorldArrival({
-            id: `${turnPrefix}-new-world-arrival`,
-            title: "Travel: New World Arrival",
-            turnNumber: this.turnNumber,
-            pauseAfter: false,
-            visible: true,
-          })
-        );
-      }
     }
 
     engineContext.clearActiveCommand();

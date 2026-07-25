@@ -3,6 +3,7 @@ import { removeUndefinedValues } from "../../../procedure-core/utils";
 import WorldCrewTasksCommand from "./WorldCrewTasksCommand";
 import WorldJobOffersCommand from "./WorldJobOffersCommand";
 import WorldChooseBattleCommand from "./WorldChooseBattleCommand";
+import { rollDice } from "./postBattleHelpers";
 
 export class WorldPhaseCommand extends BaseCommand {
   constructor({
@@ -28,12 +29,30 @@ export class WorldPhaseCommand extends BaseCommand {
         const crewMembers = ctx.getStateValue("crewLog.crewMembers") || [];
         const credits = ctx.getStateValue("crewLog.credits") ?? 0;
         const hullDamage = ctx.getStateValue("crewLog.starship.hullDamage") ?? 0;
-        const upkeepCost = crewMembers.length;
+        const turnNumber = Number(ctx.getStateValue("campaign.turnNumber") || 0);
+        const components = ctx.getStateValue("crewLog.starship.components") || [];
+        const hasLivingQuarters = components.some((c) => c.componentId === "livingQuarters" && Number(c.installedAtTurn) < turnNumber);
+        const traitTitle = ctx.getStateValue("worldLog.currentWorld.trait")?.title;
+        const traitCrewModifier = traitTitle === "High cost" ? 2 : 0;
+        const upkeepCost = Math.max(0, crewMembers.length - (hasLivingQuarters ? 2 : 0) + traitCrewModifier);
         const remaining = credits - upkeepCost;
 
-        let message = `Upkeep cost: ${upkeepCost} credit${upkeepCost !== 1 ? "s" : ""} (1 per crew member).\nCurrent credits: ${credits}\nAfter upkeep: ${remaining}`;
+        let message = `Upkeep cost: ${upkeepCost} credit${upkeepCost !== 1 ? "s" : ""} (1 per crew member${hasLivingQuarters ? ", -2 Living Quarters" : ""}${traitCrewModifier ? ", +2 High cost world" : ""}).\nCurrent credits: ${credits}\nAfter upkeep: ${remaining}`;
         if (hullDamage > 0) {
           message += `\n\nYour ship has ${hullDamage} Hull Point${hullDamage !== 1 ? "s" : ""} of damage.\nShip repairs cost 1 credit per Hull Point. Resolve repairs now if desired.`;
+        }
+
+        const debt = Number(ctx.getStateValue("crewLog.debt") || 0);
+        let nextDebt = debt;
+        let seized = false;
+        if (debt > 0) {
+          nextDebt = debt + (debt <= 30 ? 1 : 2);
+          message += `\n\nShip debt owed: ${debt} → ${nextDebt} credits (interest accrues each turn).`;
+          if (nextDebt > 75) {
+            const seizeRoll = rollDice(2, 6).total;
+            seized = seizeRoll <= 6;
+            message += `\nDebt exceeds 75 — rolled 2D6: ${seizeRoll}. ${seized ? "Your ship is seized and lost!" : "The ship is not seized this time."}`;
+          }
         }
 
         const crewDetails = ctx.getStateValue("crewLog.crewDetails") || {};
@@ -55,11 +74,19 @@ export class WorldPhaseCommand extends BaseCommand {
           message += `\n\nRecovered from Sick Bay this turn: ${recoveredNames.join(", ")}.`;
         }
 
+        const debtOps = [];
+        if (debt > 0) {
+          debtOps.push({ op: "set", path: "crewLog.debt", value: seized ? 0 : nextDebt });
+          if (seized) {
+            debtOps.push({ op: "set", path: "crewLog.starship", value: null });
+          }
+        }
+
         ctx.pushCommandsToTop([
           ctx.commandFactory.updateState({
             id: `${baseId}-upkeep-deduct`,
             title: "Upkeep Costs",
-            operations: [{ op: "increment", path: "crewLog.credits", amount: -upkeepCost }, ...recoveryOps],
+            operations: [{ op: "increment", path: "crewLog.credits", amount: -upkeepCost }, ...recoveryOps, ...debtOps],
             pauseAfter: false,
             visible: false,
           }),

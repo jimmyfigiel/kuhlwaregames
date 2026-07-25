@@ -9,6 +9,7 @@ import { CAMPAIGN_TABLES } from "../data/tables/campaignTables";
 import { MOTIVATION_TABLE } from "../data/tables/motivationTables";
 import { rollD100, findByRoll } from "../data/tables/tableUtils";
 import { getLootTableById, resolveLootLeafItem } from "../data/tables/lootTables";
+import { SHIP_COMPONENTS, getShipComponentById } from "../data/tables/shipComponents";
 import { WEAPONS_TABLE, catalogItemToEquipment } from "../data/equipment/equipmentCatalog";
 import {
   rollDie,
@@ -867,6 +868,141 @@ function purchaseDirectBuyApply(ctx) {
   purchaseDirectOffer(ctx);
 }
 
+// ─── Ship Components (Rulebook p.63-64) ─────────────────────────────────────
+
+function purchaseComponentOffer(ctx) {
+  const turnNumber = num(ctx, "campaign.turnNumber");
+  const alreadyActedThisTurn = ctx.getStateValue("campaign.componentActionTurn") === turnNumber;
+  const credits = num(ctx, "crewLog.credits");
+  const installed = ctx.getStateValue("crewLog.starship.components") || [];
+  const installedIds = new Set(installed.map((c) => c.componentId));
+  const available = SHIP_COMPONENTS.filter((c) => !installedIds.has(c.id));
+  const cheapestCost = available.length > 0 ? Math.min(...available.map((c) => c.cost)) : Infinity;
+
+  if (alreadyActedThisTurn || !ctx.getStateValue("crewLog.starship") || (credits < cheapestCost && installed.length === 0)) {
+    purchaseRollOffer(ctx);
+    return;
+  }
+
+  const options = [{ id: "none", label: "No — Continue to Equipment", value: "none" }];
+  if (credits >= cheapestCost && available.length > 0) options.unshift({ id: "buy", label: "Buy a Ship Component", value: "buy" });
+  if (installed.length > 0) options.splice(options.length - 1, 0, { id: "remove", label: "Remove a Ship Component", value: "remove" });
+
+  ctx.pushCommandsToTop([
+    ctx.commandFactory.choice({
+      id: makeEquipmentId("component-offer"),
+      title: "Ship Components",
+      prompt: `You have ${credits} credits and ${installed.length} Component${installed.length === 1 ? "" : "s"} installed. Buy or remove a Component? (One Component action per campaign turn.)`,
+      options,
+      saveTo: "postBattleTemp.purchaseItems.componentOffer",
+      buttonText: "Confirm",
+      pauseAfter: false,
+    }),
+    ctx.commandFactory.postBattleDispatch({ id: makeEquipmentId("component-offer-result"), dispatchKey: "purchaseComponentOfferResult" }),
+  ]);
+}
+
+function purchaseComponentOfferResult(ctx) {
+  const choice = ctx.getStateValue("postBattleTemp.purchaseItems.componentOffer");
+
+  if (choice === "buy") {
+    const installed = ctx.getStateValue("crewLog.starship.components") || [];
+    const installedIds = new Set(installed.map((c) => c.componentId));
+    const credits = num(ctx, "crewLog.credits");
+    const available = SHIP_COMPONENTS.filter((c) => !installedIds.has(c.id) && c.cost <= credits);
+
+    ctx.pushCommandsToTop([
+      ctx.commandFactory.choice({
+        id: makeEquipmentId("component-pick"),
+        title: "Buy a Ship Component",
+        prompt: "Choose a Component to install.",
+        options: available.map((c) => ({ id: c.id, label: `${c.name} (${c.cost} credits)`, value: c.id, description: c.description })),
+        saveTo: "postBattleTemp.purchaseItems.componentPickId",
+        buttonText: "Buy",
+        pauseAfter: false,
+      }),
+      ctx.commandFactory.postBattleDispatch({ id: makeEquipmentId("component-buy-apply"), dispatchKey: "purchaseComponentBuyApply" }),
+    ]);
+    return;
+  }
+
+  if (choice === "remove") {
+    const installed = ctx.getStateValue("crewLog.starship.components") || [];
+    ctx.pushCommandsToTop([
+      ctx.commandFactory.choice({
+        id: makeEquipmentId("component-remove-pick"),
+        title: "Remove a Ship Component",
+        prompt: "Choose a Component to remove. You recoup 1 credit of scrap for every 5 credits' cost.",
+        options: installed.map((c, index) => {
+          const def = getShipComponentById(c.componentId);
+          return { id: String(index), label: def?.name || c.componentId, value: String(index) };
+        }),
+        saveTo: "postBattleTemp.purchaseItems.componentRemoveIndex",
+        buttonText: "Remove",
+        pauseAfter: false,
+      }),
+      ctx.commandFactory.postBattleDispatch({ id: makeEquipmentId("component-remove-apply"), dispatchKey: "purchaseComponentRemoveApply" }),
+    ]);
+    return;
+  }
+
+  purchaseRollOffer(ctx);
+}
+
+function purchaseComponentBuyApply(ctx) {
+  const componentId = ctx.getStateValue("postBattleTemp.purchaseItems.componentPickId");
+  const def = getShipComponentById(componentId);
+  const turnNumber = num(ctx, "campaign.turnNumber");
+
+  if (!def) {
+    purchaseRollOffer(ctx);
+    return;
+  }
+
+  const discounts = ctx.getStateValue("crewLog.shipComponentDiscounts") || [];
+  const usableDiscountIndex = discounts.findIndex((d) => Number(d.amount) > 0);
+  const discountAmount = usableDiscountIndex >= 0 ? Math.min(Number(discounts[usableDiscountIndex].amount), def.cost) : 0;
+  const finalCost = Math.max(0, def.cost - discountAmount);
+
+  if (usableDiscountIndex >= 0) {
+    ctx.setStateValue("crewLog.shipComponentDiscounts", discounts.filter((_, i) => i !== usableDiscountIndex));
+  }
+
+  inc(ctx, "crewLog.credits", -finalCost);
+  ctx.appendStateValue("crewLog.starship.components", { componentId, installedAtTurn: turnNumber });
+  ctx.setStateValue("campaign.componentActionTurn", turnNumber);
+
+  popup(ctx, {
+    id: makeEquipmentId("component-buy-result"),
+    title: "Ship Component Installed",
+    message: `Installed ${def.name} for ${finalCost} credit${finalCost === 1 ? "" : "s"}${discountAmount > 0 ? ` (${discountAmount}-credit Ship Part cashed in)` : ""}. Fully functional starting next campaign turn.`,
+  });
+
+  purchaseRollOffer(ctx);
+}
+
+function purchaseComponentRemoveApply(ctx) {
+  const index = Number(ctx.getStateValue("postBattleTemp.purchaseItems.componentRemoveIndex"));
+  const installed = ctx.getStateValue("crewLog.starship.components") || [];
+  const removed = installed[index];
+  const def = removed ? getShipComponentById(removed.componentId) : null;
+  const turnNumber = num(ctx, "campaign.turnNumber");
+
+  if (!removed || !def) {
+    purchaseRollOffer(ctx);
+    return;
+  }
+
+  ctx.setStateValue("crewLog.starship.components", installed.filter((_, i) => i !== index));
+  ctx.setStateValue("campaign.componentActionTurn", turnNumber);
+  const scrap = Math.floor(def.cost / 5);
+  inc(ctx, "crewLog.credits", scrap);
+
+  popup(ctx, { id: makeEquipmentId("component-remove-result"), title: "Ship Component Removed", message: `Removed ${def.name}, recouping ${scrap} credit${scrap === 1 ? "" : "s"} of scrap.` });
+
+  purchaseRollOffer(ctx);
+}
+
 function purchaseRollOffer(ctx) {
   const credits = num(ctx, "crewLog.credits");
 
@@ -1479,6 +1615,10 @@ export const POST_BATTLE_DISPATCH_HANDLERS = {
   advancedTrainingOffer,
   advancedTrainingApproval,
   advancedTrainingCourse,
+  purchaseComponentOffer,
+  purchaseComponentOfferResult,
+  purchaseComponentBuyApply,
+  purchaseComponentRemoveApply,
   purchaseRollOffer,
   purchaseRollOfferResult,
   purchaseRollTableApply,

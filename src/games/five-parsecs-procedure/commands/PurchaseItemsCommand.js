@@ -19,8 +19,8 @@ export class PurchaseItemsCommand extends BaseCommand {
         visible: false,
       }),
       factory.postBattleDispatch({
-        id: `${baseId}-roll-offer`,
-        dispatchKey: "purchaseRollOffer",
+        id: `${baseId}-component-offer`,
+        dispatchKey: "purchaseComponentOffer",
       }),
     ]);
 
