@@ -11,6 +11,7 @@ import NoMinisFirefightCommand from "./NoMinisFirefightCommand";
 import TabletopCombatCommand, { TabletopCombatRoundCommand } from "./TabletopCombatCommand";
 import TerrainGeneratorCommand from "./TerrainGeneratorCommand";
 import { buildTaskResolutionCommands } from "./WorldCrewTasksCommand";
+import CrewMemberNameCommand from "./CrewMemberNameCommand";
 import { ENEMY_CATEGORY_TABLES, UNIQUE_INDIVIDUALS_TABLE, rollOpponentDice, rollEnemyWeapon, rollEnemySpecialistWeapon } from "../data/tables/enemyTables";
 import { buildEnemySubtable } from "./EnemyGenerationCommand";
 import { OBJECTIVE_TYPES } from "../data/tables/objectiveTables";
@@ -639,6 +640,138 @@ function resolveCrewTask(ctx, params) {
   ctx.pushCommandsToTop(resCmds);
 }
 
+function nextCrewMemberNumber(crewMembers) {
+  return crewMembers.reduce((max, m) => Math.max(max, Number(m.number) || 0), 0) + 1;
+}
+
+function recruitAddMember(ctx, params) {
+  const { baseId } = params;
+  const crewMembers = ctx.getStateValue("crewLog.crewMembers") || [];
+  const nextNumber = nextCrewMemberNumber(crewMembers);
+
+  ctx.pushCommandsToTop([
+    new CrewMemberNameCommand({ id: `${baseId}-new-recruit-${nextNumber}`, crewMemberNumber: nextNumber, pauseAfter: false }),
+  ]);
+}
+
+function recruitResolve(ctx, params) {
+  const { baseId, memberId, memberName } = params;
+  const roll = ctx.getStateValue(`worldPhase.recruitRolls.${memberId}`) ?? 0;
+  const crewMembers = ctx.getStateValue("crewLog.crewMembers") || [];
+
+  let recruiters = 0;
+  for (const m of crewMembers) {
+    if (ctx.getStateValue(`worldPhase.crewTasks.${m.id}`) === "recruit") recruiters++;
+  }
+  const bonus = Math.max(0, recruiters - 1);
+  const total = roll + bonus;
+  const success = total >= 6;
+
+  if (!success) {
+    popup(ctx, {
+      id: `${baseId}-recruit-result-${memberId}`,
+      title: `${memberName}: Recruit — No Luck`,
+      message: `Rolled ${roll}${bonus ? ` + ${bonus} (extra crew members Recruiting)` : ""} = ${total}. No new recruit this turn.`,
+    });
+    return;
+  }
+
+  const nextNumber = nextCrewMemberNumber(crewMembers);
+  ctx.pushCommandsToTop([
+    ctx.commandFactory.popupMessage({
+      id: `${baseId}-recruit-result-${memberId}`,
+      title: `${memberName}: Recruit — Success!`,
+      message: `Rolled ${roll}${bonus ? ` + ${bonus} (extra crew members Recruiting)` : ""} = ${total}. A new recruit joins the crew!`,
+      buttonText: "Add Recruit",
+      pauseAfter: false,
+    }),
+    new CrewMemberNameCommand({ id: `${baseId}-new-recruit-${nextNumber}`, crewMemberNumber: nextNumber, pauseAfter: false }),
+  ]);
+}
+
+function trackResolve(ctx, params) {
+  const { baseId, memberId, memberName } = params;
+  const roll = ctx.getStateValue(`worldPhase.trackRolls.${memberId}`) ?? 0;
+  const crewMembers = ctx.getStateValue("crewLog.crewMembers") || [];
+
+  let trackers = 0;
+  for (const m of crewMembers) {
+    if (ctx.getStateValue(`worldPhase.crewTasks.${m.id}`) === "track") trackers++;
+  }
+  const bonus = Math.max(0, trackers - 1);
+  const total = roll + bonus;
+  const success = total >= 6;
+  const rivals = ctx.getStateValue("worldLog.rivals") || [];
+  const rival = success ? pickRandomElement(rivals) : null;
+
+  popup(ctx, {
+    id: `${baseId}-track-result-${memberId}`,
+    title: success ? `${memberName}: Track — Success!` : `${memberName}: Track — No Luck`,
+    message: success
+      ? `Rolled ${roll}${bonus ? ` + ${bonus} (extra trackers)` : ""} = ${total}. You locate ${rival?.name || "a Rival"} — choose Rival Encounter from Choose Your Battle to fight them this turn.`
+      : `Rolled ${roll}${bonus ? ` + ${bonus} (extra trackers)` : ""} = ${total}. No Rival located this turn.`,
+  });
+}
+
+function findDamagedItem(state, crewMemberId) {
+  const carried = state?.crewLog?.crewDetails?.[crewMemberId]?.equipment || [];
+  const carriedIndex = carried.findIndex((item) => item?.damaged && !item?.destroyed);
+  if (carriedIndex >= 0) {
+    return { path: `crewLog.crewDetails.${crewMemberId}.equipment`, index: carriedIndex, item: carried[carriedIndex] };
+  }
+
+  const stash = state?.crewLog?.inventory || [];
+  const stashIndex = stash.findIndex((item) => item?.damaged && !item?.destroyed);
+  if (stashIndex >= 0) {
+    return { path: "crewLog.inventory", index: stashIndex, item: stash[stashIndex] };
+  }
+
+  return null;
+}
+
+function repairKitResolve(ctx, params) {
+  const { baseId, memberId, memberName, savvy } = params;
+  const roll = ctx.getStateValue(`worldPhase.repairRolls.${memberId}`) ?? 0;
+  const total = roll + Number(savvy || 0);
+  const found = findDamagedItem(ctx.state, memberId);
+
+  if (!found) {
+    popup(ctx, {
+      id: `${baseId}-repair-result-${memberId}`,
+      title: `${memberName}: Repair Kit`,
+      message: `Rolled ${roll} + Savvy ${savvy} = ${total}. No damaged items to repair.`,
+    });
+    return;
+  }
+
+  const list = ctx.getStateValue(found.path) || [];
+
+  if (roll === 1) {
+    ctx.setStateValue(found.path, list.filter((_, i) => i !== found.index));
+    popup(ctx, {
+      id: `${baseId}-repair-result-${memberId}`,
+      title: `${memberName}: Repair Kit — Destroyed!`,
+      message: `Rolled a natural 1 — ${found.item.name} is destroyed beyond repair and removed.`,
+    });
+    return;
+  }
+
+  if (total >= 6) {
+    ctx.setStateValue(found.path, list.map((item, i) => (i === found.index ? { ...item, damaged: false } : item)));
+    popup(ctx, {
+      id: `${baseId}-repair-result-${memberId}`,
+      title: `${memberName}: Repair Kit — Success!`,
+      message: `Rolled ${roll} + Savvy ${savvy} = ${total}. ${found.item.name} is repaired.`,
+    });
+  } else {
+    popup(ctx, {
+      id: `${baseId}-repair-result-${memberId}`,
+      title: `${memberName}: Repair Kit — Failed`,
+      message: `Rolled ${roll} + Savvy ${savvy} = ${total}. ${found.item.name} remains damaged.`,
+    });
+  }
+}
+
 function patronJobModifiers(ctx, params) {
   const { baseId, jobIndex } = params;
   const patronTypeEntry = ctx.getStateValue(`worldPhase.patronJobs.${jobIndex}.patronType`);
@@ -996,6 +1129,10 @@ export const GAME_DISPATCH_HANDLERS = {
   enemyGenerationFinalize,
   calcPatronSeek,
   resolveCrewTask,
+  recruitAddMember,
+  recruitResolve,
+  trackResolve,
+  repairKitResolve,
   patronJobModifiers,
   missionPrepDispatch,
   worldRumors,

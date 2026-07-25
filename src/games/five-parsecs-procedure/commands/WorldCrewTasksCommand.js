@@ -110,16 +110,40 @@ export function buildTaskResolutionCommands(factory, baseId, member, taskId, eng
 
     case "recruit": {
       const crewCount = (state?.crewLog?.crewMembers || []).length;
-      const autoRecruit = crewCount < 6;
+
+      if (crewCount < 6) {
+        return [
+          factory.popupMessage({
+            id: `${baseId}-resolve-recruit-auto-${id}`,
+            title: `${name}: Recruit`,
+            message: `${name} is recruiting. Your crew has fewer than 6 members, so you automatically find a new recruit.`,
+            buttonText: "Add Recruit",
+            pauseAfter: false,
+          }),
+          factory.postBattleDispatch({
+            id: `${baseId}-resolve-recruit-add-${id}`,
+            dispatchKey: "recruitAddMember",
+            params: { baseId },
+          }),
+        ];
+      }
+
       return [
-        factory.popupMessage({
-          id: `${baseId}-resolve-recruit-${id}`,
+        factory.numberInput({
+          id: `${baseId}-resolve-recruit-roll-${id}`,
           title: `${name}: Recruit`,
-          message: autoRecruit
-            ? `${name} is recruiting. Your crew has fewer than 6 members, so you automatically find a new recruit.\nGenerate a new crew member and add them to your roster.`
-            : `${name} is recruiting. Roll 1D6 and add the number of crew members Recruiting. On 6+, you gain one new recruit.\nCrew currently has ${crewCount} members.`,
-          buttonText: "Done",
+          prompt: `${name} is recruiting.\nRoll 1D6 and enter the result below.`,
+          label: "D6 Roll",
+          min: 1,
+          max: 6,
+          saveTo: `worldPhase.recruitRolls.${id}`,
+          buttonText: "Submit Roll",
           pauseAfter: false,
+        }),
+        factory.postBattleDispatch({
+          id: `${baseId}-resolve-recruit-calc-${id}`,
+          dispatchKey: "recruitResolve",
+          params: { baseId, memberId: id, memberName: name },
         }),
       ];
     }
@@ -138,20 +162,22 @@ export function buildTaskResolutionCommands(factory, baseId, member, taskId, eng
         ];
       }
 
-      const crewMembers = state?.crewLog?.crewMembers || [];
-      let trackerCount = 0;
-      for (const m of crewMembers) {
-        const task = state?.worldPhase?.crewTasks?.[m.id];
-        if (task === "track") trackerCount++;
-      }
-
       return [
-        factory.popupMessage({
-          id: `${baseId}-resolve-track-${id}`,
+        factory.numberInput({
+          id: `${baseId}-resolve-track-roll-${id}`,
           title: `${name}: Track`,
-          message: `${name} is tracking a Rival.\nRoll 1D6 + ${trackerCount} (trackers) + any credits spent. On 6+, you locate a Rival of your choice for a battle this turn.\nYou have ${rivals.length} rival(s).`,
-          buttonText: "Done",
+          prompt: `${name} is tracking a Rival.\nRoll 1D6 and enter the result below.`,
+          label: "D6 Roll",
+          min: 1,
+          max: 6,
+          saveTo: `worldPhase.trackRolls.${id}`,
+          buttonText: "Submit Roll",
           pauseAfter: false,
+        }),
+        factory.postBattleDispatch({
+          id: `${baseId}-resolve-track-calc-${id}`,
+          dispatchKey: "trackResolve",
+          params: { baseId, memberId: id, memberName: name },
         }),
       ];
     }
@@ -159,12 +185,21 @@ export function buildTaskResolutionCommands(factory, baseId, member, taskId, eng
     case "repairKit": {
       const savvy = state?.crewLog?.crewDetails?.[id]?.stats?.savvy ?? 0;
       return [
-        factory.popupMessage({
-          id: `${baseId}-resolve-repairKit-${id}`,
+        factory.numberInput({
+          id: `${baseId}-resolve-repairKit-roll-${id}`,
           title: `${name}: Repair Kit`,
-          message: `${name} is repairing an item.\nRoll 1D6 + Savvy (${savvy}) + any credits spent on spare parts. On 6+, the item is repaired.\nA natural 1 always fails and the item is destroyed.`,
-          buttonText: "Done",
+          prompt: `${name} is repairing a damaged item.\nRoll 1D6 and enter the result below. (Savvy +${savvy} is added automatically.)`,
+          label: "D6 Roll",
+          min: 1,
+          max: 6,
+          saveTo: `worldPhase.repairRolls.${id}`,
+          buttonText: "Submit Roll",
           pauseAfter: false,
+        }),
+        factory.postBattleDispatch({
+          id: `${baseId}-resolve-repairKit-calc-${id}`,
+          dispatchKey: "repairKitResolve",
+          params: { baseId, memberId: id, memberName: name, savvy },
         }),
       ];
     }
