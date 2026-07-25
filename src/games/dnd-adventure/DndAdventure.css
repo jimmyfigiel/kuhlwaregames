@@ -116,3 +116,77 @@
 @media (prefers-reduced-motion: reduce) {
   .dnd-typing-dots span { animation: none; opacity: 0.6; }
 }
+
+.dnd-chargen-wrap {
+  justify-content: center;
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+.dnd-chargen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  max-width: 360px;
+  margin: 0 auto;
+  width: 100%;
+}
+.dnd-chargen h3 {
+  margin: 0 0 0.2rem;
+  color: var(--dnd-ink);
+}
+.dnd-chargen label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--dnd-muted);
+}
+.dnd-chargen input,
+.dnd-chargen select {
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-line);
+  color: var(--dnd-ink);
+  border-radius: 6px;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.95rem;
+}
+.dnd-chargen input:focus,
+.dnd-chargen select:focus { outline: none; border-color: var(--dnd-accent); }
+
+.dnd-chargen-abilities {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--dnd-surface);
+  border-radius: 8px;
+}
+.dnd-chargen-abilities label {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.dnd-chargen-abilities select { width: 5rem; }
+.dnd-chargen-hint {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  color: var(--dnd-muted);
+}
+
+.dnd-chargen-error {
+  color: var(--dnd-danger);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.dnd-chargen button {
+  background: var(--dnd-accent);
+  color: #0b0f0e;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.dnd-chargen button:disabled { opacity: 0.4; }

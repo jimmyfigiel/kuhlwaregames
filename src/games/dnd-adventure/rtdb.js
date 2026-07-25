@@ -7,7 +7,7 @@
 // touches kuhlwaregames' own Firestore data.
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
-import { getDatabase, onValue, push, ref } from "firebase/database";
+import { getDatabase, onValue, push, ref, set } from "firebase/database";
 
 const rtdbConfig = {
   apiKey: "AIzaSyADa_QRcOmjrssrxgh5b3EHRoZFD2BtGxU",
@@ -57,5 +57,26 @@ export function listenCharacter(sessionId, playerId, onCharacter) {
   return onValue(
     ref(rtdb, `sessions/${sessionId}/players/${playerId}/character`),
     (snapshot) => onCharacter(snapshot.val())
+  );
+}
+
+// Character sheets are keyed on the player's own stable identity (their
+// kuhlwaregames player code), not join order -- so `set` with that id as
+// the path, not `push` with an auto-generated key.
+export function submitCharacterRequest(sessionId, playerId, { name, race, charClass, abilities }) {
+  return set(ref(rtdb, `sessions/${sessionId}/character_requests/${playerId}`), {
+    name,
+    race,
+    char_class: charClass,
+    abilities,
+    status: "pending",
+    ts: Date.now(),
+  });
+}
+
+export function listenCharacterRequest(sessionId, playerId, onRequest) {
+  return onValue(
+    ref(rtdb, `sessions/${sessionId}/character_requests/${playerId}`),
+    (snapshot) => onRequest(snapshot.val())
   );
 }
