@@ -14,7 +14,20 @@ import { buildTaskResolutionCommands } from "./WorldCrewTasksCommand";
 import { ENEMY_CATEGORY_TABLES, UNIQUE_INDIVIDUALS_TABLE, rollOpponentDice, rollEnemyWeapon, rollEnemySpecialistWeapon } from "../data/tables/enemyTables";
 import { buildEnemySubtable } from "./EnemyGenerationCommand";
 import { OBJECTIVE_TYPES } from "../data/tables/objectiveTables";
-import { rollDie, rollDice } from "./postBattleHelpers";
+import { rollDie, rollDice, getActiveCrewMembers, pickRandomElement } from "./postBattleHelpers";
+import {
+  isMeleeOnly,
+  parseRangeInches,
+  getCrewWeapons,
+  pickBestRangedWeapon,
+  pickBestMeleeWeapon,
+  resolveToHit,
+  resolveDamage,
+  resolveBrawl,
+  weaponBonusForBrawl,
+  getWeaponDamage,
+  weaponHasTrait,
+} from "./combatResolution";
 import { makeCampaignTableRoll } from "./WorldJobOffersCommand";
 import { CAMPAIGN_TABLES, PATRON_BHC_THRESHOLDS } from "../data/tables/campaignTables";
 
@@ -166,6 +179,203 @@ function queueFirefight(ctx, params) {
       pauseAfter: false,
     }),
   ]);
+}
+
+function getRemainingEnemies(state) {
+  const roster = state?.encounter?.enemyRoster;
+  const defeatedIds = state?.encounter?.combat?.defeatedEnemyIds || [];
+  return (roster?.enemies || []).filter((e) => !defeatedIds.includes(e.id));
+}
+
+function getRemainingCrew(ctx) {
+  const casualtyIds = ctx.getStateValue("encounter.combat.crewCasualtyIds") || [];
+  return getActiveCrewMembers(ctx.state).filter((m) => !casualtyIds.includes(m.id));
+}
+
+function noMinisFirefightSetup(ctx, params) {
+  const { baseId, roundNumber, modifier, blocksBrawling } = params;
+  const state = ctx.state;
+  const remaining = getRemainingEnemies(state);
+
+  if (remaining.length === 0) {
+    popup(ctx, { id: `${baseId}-no-enemies`, title: `Firefight — Round ${roundNumber}`, message: "No enemies remain to engage this Firefight." });
+    return;
+  }
+
+  const baseActive = remaining.length >= 7 ? 4 : 3;
+  const activeEnemies = Math.max(0, Math.min(remaining.length, baseActive + Number(modifier || 0)));
+  const modNote = modifier ? ` (Battle Flow Event modifier: ${modifier > 0 ? "+" : ""}${modifier})` : "";
+  const brawlNote = blocksBrawling ? "\n\n⚠ Battle Flow Event: No Brawling combat this round. Melee-only enemies will not attack." : "";
+
+  const cmds = [
+    ctx.commandFactory.popupMessage({
+      id: `${baseId}-firefight-intro`,
+      title: `Firefight — Round ${roundNumber}`,
+      message: `${remaining.length} enem${remaining.length === 1 ? "y" : "ies"} remain → ${activeEnemies} will engage this Firefight phase${modNote}.${brawlNote}`,
+      buttonText: "Begin Firefight",
+      pauseAfter: false,
+    }),
+  ];
+
+  for (let i = 1; i <= activeEnemies; i += 1) {
+    cmds.push(
+      ctx.commandFactory.postBattleDispatch({
+        id: `${baseId}-engagement-${i}`,
+        dispatchKey: "noMinisFirefightEngagement",
+        params: { baseId, roundNumber, engagementIndex: i, totalActive: activeEnemies, blocksBrawling },
+      })
+    );
+  }
+
+  ctx.pushCommandsToTop(cmds);
+}
+
+function fireShot(ctx, { lines, attackerLabel, attackerCombatSkill, weaponName, targetNumber, targetToughness, targetSaveThrow, targetLuck }) {
+  const toHit = resolveToHit({ combatSkill: attackerCombatSkill, targetNumber });
+  lines.push(`${attackerLabel} fires (${weaponName}): rolled ${toHit.roll} + ${attackerCombatSkill} = ${toHit.total} vs ${targetNumber}+.`);
+
+  if (!toHit.hit) {
+    lines.push("Miss.");
+    return null;
+  }
+
+  return resolveDamage({
+    damage: getWeaponDamage(weaponName),
+    toughness: targetToughness,
+    saveThrow: targetSaveThrow,
+    piercing: weaponHasTrait(weaponName, "Piercing"),
+    luck: targetLuck,
+  });
+}
+
+function reportDamage(lines, targetLabel, dmgResult, onCasualty) {
+  lines.push(`Damage: rolled ${dmgResult.roll} + weapon = ${dmgResult.total}.`);
+  if (!dmgResult.wouldBeCasualty) {
+    lines.push(`${targetLabel} is Stunned but holds on.`);
+  } else if (dmgResult.savedByArmor) {
+    lines.push(`${targetLabel}'s armor saves them (Stunned).`);
+  } else if (dmgResult.savedByLuck) {
+    lines.push(`${targetLabel}'s Luck saves them! (-1 Luck, dives to safety)`);
+    onCasualty("luckSaved");
+  } else {
+    lines.push(`${targetLabel} is taken out!`);
+    onCasualty("casualty");
+  }
+}
+
+function noMinisFirefightEngagement(ctx, params) {
+  const { baseId, engagementIndex, totalActive, blocksBrawling } = params;
+  const state = ctx.state;
+  const remainingEnemies = getRemainingEnemies(state);
+  const remainingCrew = getRemainingCrew(ctx);
+
+  if (remainingEnemies.length === 0) {
+    popup(ctx, { id: `${baseId}-eng-${engagementIndex}-none`, title: `Engagement ${engagementIndex} of ${totalActive}`, message: "No enemies remain." });
+    return;
+  }
+  if (remainingCrew.length === 0) {
+    popup(ctx, { id: `${baseId}-eng-${engagementIndex}-nocrew`, title: `Engagement ${engagementIndex} of ${totalActive}`, message: "No crew members remain to engage." });
+    return;
+  }
+
+  const enemy = pickRandomElement(remainingEnemies);
+  const crewMember = pickRandomElement(remainingCrew);
+  const crewStats = state?.crewLog?.crewDetails?.[crewMember.id]?.stats || {};
+  const crewWeapons = getCrewWeapons(state, crewMember.id);
+  const crewRanged = pickBestRangedWeapon(crewWeapons);
+  const crewMelee = pickBestMeleeWeapon(crewWeapons);
+  const crewCombatSkill = crewStats.combatSkill ?? 0;
+  const crewToughness = crewStats.toughness ?? 3;
+  const crewLuck = Number(crewStats.luck || 0);
+
+  const enemyMeleeOnly = isMeleeOnly(enemy.weapon);
+  const crewHasRanged = Boolean(crewRanged);
+  const lines = [`**${crewMember.name}** vs **${enemy.name}**`];
+
+  let enemyDefeated = false;
+  let crewCasualty = false;
+  let crewLuckLost = false;
+
+  const onEnemyResult = (outcome) => {
+    if (outcome === "casualty") enemyDefeated = true;
+  };
+  const onCrewResult = (outcome) => {
+    if (outcome === "casualty") crewCasualty = true;
+    if (outcome === "luckSaved") crewLuckLost = true;
+  };
+
+  if (blocksBrawling && enemyMeleeOnly && !crewHasRanged) {
+    lines.push(`${enemy.name} is melee-only and cannot attack this round (Battle Flow Event).`);
+  } else if (!enemyMeleeOnly && crewHasRanged) {
+    // Both ranged — longer range fires first; both stationary & in Cover, target 6+.
+    const enemyFiresFirst = parseRangeInches(enemy.weapon) > parseRangeInches(crewRanged);
+    const order = enemyFiresFirst ? ["enemy", "crew"] : ["crew", "enemy"];
+
+    for (const side of order) {
+      if (side === "enemy" && enemyDefeated) continue;
+      if (side === "crew" && crewCasualty) continue;
+
+      if (side === "enemy") {
+        const dmg = fireShot(ctx, { lines, attackerLabel: enemy.name, attackerCombatSkill: enemy.combatSkill, weaponName: enemy.weapon, targetNumber: 6, targetToughness: crewToughness, targetSaveThrow: null, targetLuck: crewLuck });
+        if (dmg) reportDamage(lines, crewMember.name, dmg, onCrewResult);
+      } else {
+        const dmg = fireShot(ctx, { lines, attackerLabel: crewMember.name, attackerCombatSkill: crewCombatSkill, weaponName: crewRanged, targetNumber: 6, targetToughness: enemy.toughness, targetSaveThrow: enemy.saveThrow, targetLuck: 0 });
+        if (dmg) reportDamage(lines, enemy.name, dmg, onEnemyResult);
+      }
+    }
+  } else if (enemyMeleeOnly || !crewHasRanged) {
+    // One side is melee-only — the ranged side fires first at 5+ (6" range, target in Cover).
+    if (crewHasRanged) {
+      const dmg = fireShot(ctx, { lines, attackerLabel: `${crewMember.name} (defensive fire)`, attackerCombatSkill: crewCombatSkill, weaponName: crewRanged, targetNumber: 5, targetToughness: enemy.toughness, targetSaveThrow: enemy.saveThrow, targetLuck: 0 });
+      if (dmg) reportDamage(lines, enemy.name, dmg, onEnemyResult);
+    } else if (!enemyMeleeOnly) {
+      const dmg = fireShot(ctx, { lines, attackerLabel: `${enemy.name} (defensive fire)`, attackerCombatSkill: enemy.combatSkill, weaponName: enemy.weapon, targetNumber: 5, targetToughness: crewToughness, targetSaveThrow: null, targetLuck: crewLuck });
+      if (dmg) reportDamage(lines, crewMember.name, dmg, onCrewResult);
+    }
+
+    if (!enemyDefeated && !crewCasualty) {
+      if (blocksBrawling) {
+        lines.push("No Brawling combat this round (Battle Flow Event) — engagement ends.");
+      } else {
+        resolveBrawlExchange();
+      }
+    }
+  } else if (blocksBrawling) {
+    lines.push("Both sides are melee-only and Brawling is blocked this round (Battle Flow Event) — no engagement.");
+  } else {
+    resolveBrawlExchange();
+  }
+
+  function resolveBrawlExchange() {
+    const meleeWeapon = crewMelee || crewRanged;
+    const aBonus = weaponBonusForBrawl(meleeWeapon);
+    const bBonus = weaponBonusForBrawl(enemy.weapon) + (enemy.extraWeapon ? 2 : 0);
+    const brawl = resolveBrawl({ aCombatSkill: crewCombatSkill, aWeaponBonus: aBonus, bCombatSkill: enemy.combatSkill, bWeaponBonus: bBonus });
+    lines.push(`Brawl: ${crewMember.name} rolled ${brawl.aRoll} (+${crewCombatSkill}+${aBonus}=${brawl.aTotal}) vs ${enemy.name} rolled ${brawl.bRoll} (+${enemy.combatSkill}+${bBonus}=${brawl.bTotal}).`);
+
+    if (brawl.bHitsA) {
+      const dmg = resolveDamage({ damage: getWeaponDamage(enemy.weapon) || (enemy.extraWeapon ? getWeaponDamage(enemy.extraWeapon) : 0), toughness: crewToughness, luck: crewLuck });
+      lines.push(`${crewMember.name} takes a Hit.`);
+      reportDamage(lines, crewMember.name, dmg, onCrewResult);
+    }
+    if (brawl.aHitsB && !enemyDefeated) {
+      const dmg = resolveDamage({ damage: getWeaponDamage(meleeWeapon), toughness: enemy.toughness, saveThrow: enemy.saveThrow });
+      lines.push(`${enemy.name} takes a Hit.`);
+      reportDamage(lines, enemy.name, dmg, onEnemyResult);
+    }
+  }
+
+  if (enemyDefeated) {
+    ctx.setStateValue("encounter.combat.defeatedEnemyIds", [...(ctx.getStateValue("encounter.combat.defeatedEnemyIds") || []), enemy.id]);
+  }
+  if (crewCasualty) {
+    ctx.setStateValue("encounter.combat.crewCasualtyIds", [...(ctx.getStateValue("encounter.combat.crewCasualtyIds") || []), crewMember.id]);
+  }
+  if (crewLuckLost) {
+    ctx.setStateValue(`crewLog.crewDetails.${crewMember.id}.stats.luck`, Math.max(0, crewLuck - 1));
+  }
+
+  popup(ctx, { id: `${baseId}-eng-${engagementIndex}-result`, title: `Engagement ${engagementIndex} of ${totalActive}`, message: lines.join("\n") });
 }
 
 function startNoMinisRound1(ctx) {
@@ -568,7 +778,7 @@ function extractSaveThrow(rules) {
 
 function enemyGenerationRollCategory(ctx, params) {
   const { baseId, missionType, invasionBonus } = params;
-  const categoryId = ctx.getStateValue("postBattleTemp.enemyGen.category");
+  const categoryId = ctx.getStateValue("postBattleTemp.enemyGen.category")?.value;
 
   ctx.pushCommandsToTop([
     ctx.commandFactory.tableRoll({
@@ -802,4 +1012,6 @@ export const GAME_DISPATCH_HANDLERS = {
   tabletopMoraleRoll,
   tabletopSeizeResult,
   tabletopStartRound1,
+  noMinisFirefightSetup,
+  noMinisFirefightEngagement,
 };
