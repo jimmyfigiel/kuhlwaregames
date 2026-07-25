@@ -2,8 +2,13 @@ import BaseCommand from "../../../procedure-core/commands/BaseCommand";
 import { removeUndefinedValues } from "../../../procedure-core/utils";
 import { POST_BATTLE_DISPATCH_HANDLERS } from "./postBattleDispatchHandlers";
 import { GAME_DISPATCH_HANDLERS } from "./gameDispatchHandlers";
+import { STARSHIP_TRAVEL_EVENT_HANDLERS } from "./starshipTravelEventHandlers";
 
-const ALL_DISPATCH_HANDLERS = { ...POST_BATTLE_DISPATCH_HANDLERS, ...GAME_DISPATCH_HANDLERS };
+const ALL_DISPATCH_HANDLERS = {
+  ...POST_BATTLE_DISPATCH_HANDLERS,
+  ...GAME_DISPATCH_HANDLERS,
+  ...STARSHIP_TRAVEL_EVENT_HANDLERS,
+};
 
 // A single, real, factory-registered command used module-wide for every "run this
 // logic after a choice/tableRoll resolves" step (Post-Battle, World Phase, Terrain

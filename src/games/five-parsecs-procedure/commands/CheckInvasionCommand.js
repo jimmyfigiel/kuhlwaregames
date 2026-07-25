@@ -13,6 +13,29 @@ export class CheckInvasionCommand extends BaseCommand {
     const baseId = this.id;
 
     const isInvasionThreat = state?.encounter?.enemyWasInvasionThreat === "yes";
+    const isImmune = state?.worldLog?.currentWorld?.invasion === "immune";
+
+    if (isImmune) {
+      engineContext.pushCommandsToTop([
+        factory.updateState({
+          id: `${baseId}-clear-immunity`,
+          title: "Clear Invasion Immunity",
+          operations: [{ op: "set", path: "worldLog.currentWorld.invasion", value: "" }],
+          pauseAfter: false,
+          visible: false,
+        }),
+        factory.popupMessage({
+          id: `${baseId}-immune`,
+          title: "Check for Invasion",
+          message: "Skipped — a Unity patrol escort means this world cannot be Invaded.",
+          buttonText: "Continue",
+          pauseAfter: false,
+        }),
+      ]);
+      this.status = "complete";
+      engineContext.setStatus("running");
+      return;
+    }
 
     if (!isInvasionThreat) {
       engineContext.pushCommandsToTop([

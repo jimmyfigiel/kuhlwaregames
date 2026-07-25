@@ -126,12 +126,15 @@ export class NewWorldArrivalCommand extends BaseCommand {
           archivedFromTurn: this.turnNumber || engineContext.getStateValue("campaign.turnNumber") || null,
         }
       : null;
+    const invasionImmune = engineContext.getStateValue("campaign.pendingInvasionImmunity") === true;
+    const groundedTurns = Number(engineContext.getStateValue("campaign.pendingGroundedTurns") || 0);
     const newWorld = {
       id: makeId("world"),
       name: worldName,
       traits: [],
       license: "",
-      invasion: "",
+      invasion: invasionImmune ? "immune" : "",
+      groundedTurns,
       notes: "",
       arrivedAt: now,
       arrivalTurn: this.turnNumber || engineContext.getStateValue("campaign.turnNumber") || null,
@@ -158,6 +161,13 @@ export class NewWorldArrivalCommand extends BaseCommand {
       { op: "set", path: "campaign.currentStep", value: "newWorldArrival" },
       { op: "set", path: "campaign.currentWorldName", value: worldName },
     ];
+
+    if (invasionImmune) {
+      operations.push({ op: "set", path: "campaign.pendingInvasionImmunity", value: false });
+    }
+    if (groundedTurns > 0) {
+      operations.push({ op: "set", path: "campaign.pendingGroundedTurns", value: 0 });
+    }
 
     if (previousWorldRecord) {
       operations.push({

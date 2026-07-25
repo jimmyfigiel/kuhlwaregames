@@ -121,20 +121,29 @@ function resolveRivalNewRoll(ctx, params) {
   const roll = rollDie(6);
   const becomesRival = roll === 1;
   const enemyLabel = ctx.state?.encounter?.missionTypeLabel || "Unknown Hostiles";
+  const pardonPending = ctx.getStateValue("worldPhase.pardonedCriminalPending") === true;
+
+  const lines = [`Rolled 1D6: ${roll}.`];
 
   if (becomesRival) {
-    ctx.appendStateValue("worldLog.rivals", makeContactRecord({ type: "rival", name: enemyLabel, source: "Post-Battle: Resolve Rival Status" }));
+    if (pardonPending) {
+      ctx.setStateValue("worldPhase.pardonedCriminalPending", false);
+      const pardonRoll = rollDie(6);
+      if (pardonRoll >= 4) {
+        lines.push(`These opponents (${enemyLabel}) hold a grudge — they'd become a Rival, but the criminal you pardoned calls in a favor (rolled ${pardonRoll}, 4+) and the grudge disappears.`);
+      } else {
+        ctx.appendStateValue("worldLog.rivals", makeContactRecord({ type: "rival", name: enemyLabel, source: "Post-Battle: Resolve Rival Status" }));
+        lines.push(`These opponents (${enemyLabel}) hold a grudge — they are now a Rival. Your pardoned contact tried to help (rolled ${pardonRoll}, needed 4+) but couldn't stop it this time.`);
+      }
+    } else {
+      ctx.appendStateValue("worldLog.rivals", makeContactRecord({ type: "rival", name: enemyLabel, source: "Post-Battle: Resolve Rival Status" }));
+      lines.push(`These opponents (${enemyLabel}) hold a grudge — they are now a Rival.`);
+    }
+  } else {
+    lines.push("They've had enough, or it was just business. No new Rival.");
   }
 
-  popup(ctx, {
-    id: `${params.baseId}-result`,
-    title: "Resolve Rival Status",
-    message: `Rolled 1D6: ${roll}.\n${
-      becomesRival
-        ? `These opponents (${enemyLabel}) hold a grudge — they are now a Rival.`
-        : "They've had enough, or it was just business. No new Rival."
-    }`,
-  });
+  popup(ctx, { id: `${params.baseId}-result`, title: "Resolve Rival Status", message: lines.join("\n") });
 }
 
 // ─── Resolve Patron Status ──────────────────────────────────────────────────
@@ -334,9 +343,9 @@ function lootDrillStep(ctx, params) {
 }
 
 function startLootChain(ctx, params) {
-  const { chainId, rollCount = 1, doneDispatchKey, doneParams = {} } = params;
+  const { chainId, rollCount = 1, doneDispatchKey, doneParams = {}, startTableId = "loot", damaged = false } = params;
   ctx.setStateValue(`postBattleTemp.lootChain.${chainId}`, {
-    pendingDrills: Array.from({ length: Math.max(1, rollCount) }, () => ({ tableId: "loot", damaged: false })),
+    pendingDrills: Array.from({ length: Math.max(1, rollCount) }, () => ({ tableId: startTableId, damaged })),
     collected: [],
     doneDispatchKey,
     doneParams,

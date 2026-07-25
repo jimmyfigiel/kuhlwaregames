@@ -67,14 +67,10 @@ export class ApplyStarshipTravelEventCommand extends BaseCommand {
         pauseAfter: false,
         visible: false,
       }),
-      engineContext.commandFactory.popupMessage({
-        id: `${this.id}-summary`,
-        title: `Starship Travel Event: ${eventTitle}`,
-        message: event.description
-          ? `${event.description}\n\nThis event has been recorded in the campaign and world logs. Resolve any listed effects manually for now.`
-          : "This event has been recorded in the campaign and world logs. Resolve any listed effects manually for now.",
-        buttonText: "Continue",
-        pauseAfter: false,
+      engineContext.commandFactory.postBattleDispatch({
+        id: `${this.id}-resolve`,
+        dispatchKey: "starshipTravelEventResolve",
+        params: { baseId: this.id, eventValue: event.value, eventTitle },
       }),
     ]);
 

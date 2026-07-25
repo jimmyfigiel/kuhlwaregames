@@ -643,7 +643,7 @@ function resolveCrewTask(ctx, params) {
   ctx.pushCommandsToTop(resCmds);
 }
 
-function nextCrewMemberNumber(crewMembers) {
+export function nextCrewMemberNumber(crewMembers) {
   return crewMembers.reduce((max, m) => Math.max(max, Number(m.number) || 0), 0) + 1;
 }
 
@@ -716,7 +716,7 @@ function trackResolve(ctx, params) {
   });
 }
 
-function findDamagedItem(state, crewMemberId) {
+export function findDamagedItem(state, crewMemberId) {
   const carried = state?.crewLog?.crewDetails?.[crewMemberId]?.equipment || [];
   const carriedIndex = carried.findIndex((item) => item?.damaged && !item?.destroyed);
   if (carriedIndex >= 0) {
@@ -896,7 +896,7 @@ function worldRumors(ctx, params) {
 
 // ─── Flee Invasion ───────────────────────────────────────────────────────────
 
-function collectAllItems(state) {
+export function collectAllItems(state) {
   const items = [];
   const crewMembers = state?.crewLog?.crewMembers || [];
   for (const member of crewMembers) {
@@ -910,7 +910,7 @@ function collectAllItems(state) {
   return items;
 }
 
-function loseRandomItems(ctx, count) {
+export function loseRandomItems(ctx, count) {
   const lostNames = [];
   for (let i = 0; i < count; i += 1) {
     const pool = collectAllItems(ctx.state);
