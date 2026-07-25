@@ -622,6 +622,149 @@ function tabletopStartRound1(ctx, params) {
   ctx.addLogEntry({ type: "commandCompleted", text: `Tabletop battle started. Battle Events: ${battleEventsEnabled ? "ON" : "OFF"}.` });
 }
 
+// ─── Assign Equipment (Rulebook World step 4, p.87) ─────────────────────────
+
+function equipmentSourceLabel(ctx, sourceId) {
+  if (sourceId === "stash") return "Stash";
+  const member = (ctx.getStateValue("crewLog.crewMembers") || []).find((m) => m.id === sourceId);
+  return member?.name || sourceId;
+}
+
+function equipmentSourceItems(ctx, sourceId) {
+  if (sourceId === "stash") return ctx.getStateValue("crewLog.inventory") || [];
+  return ctx.getStateValue(`crewLog.crewDetails.${sourceId}.equipment`) || [];
+}
+
+function equipmentSourcePath(sourceId) {
+  return sourceId === "stash" ? "crewLog.inventory" : `crewLog.crewDetails.${sourceId}.equipment`;
+}
+
+function assignEquipmentOfferCmds(ctx, params) {
+  const { baseId } = params;
+  const crewMembers = ctx.getStateValue("crewLog.crewMembers") || [];
+  const stashCount = (ctx.getStateValue("crewLog.inventory") || []).length;
+  const carriedCount = crewMembers.reduce((sum, m) => sum + ((ctx.getStateValue(`crewLog.crewDetails.${m.id}.equipment`) || []).length), 0);
+
+  return [
+    ctx.commandFactory.choice({
+      id: `${baseId}-offer`,
+      title: "Assign Equipment",
+      prompt: `Review your Stash (${stashCount} item${stashCount === 1 ? "" : "s"}) and crew loadouts (${carriedCount} item${carriedCount === 1 ? "" : "s"} carried) before choosing the battle. Move an item between the Stash and a crew member?`,
+      options: [
+        { id: "yes", label: "Yes — Move an Item", value: "yes" },
+        { id: "no", label: "No — Done", value: "no" },
+      ],
+      saveTo: "worldPhase.assignEquipmentOffer",
+      buttonText: "Confirm",
+      pauseAfter: false,
+    }),
+    ctx.commandFactory.postBattleDispatch({ id: `${baseId}-offer-result`, dispatchKey: "assignEquipmentOfferResult", params: { baseId } }),
+  ];
+}
+
+function assignEquipmentOffer(ctx, params) {
+  ctx.pushCommandsToTop(assignEquipmentOfferCmds(ctx, params));
+}
+
+function assignEquipmentOfferResult(ctx, params) {
+  const { baseId } = params;
+  if (ctx.getStateValue("worldPhase.assignEquipmentOffer") !== "yes") {
+    popup(ctx, { id: `${baseId}-done`, title: "Assign Equipment", message: "Done assigning equipment for this campaign turn." });
+    return;
+  }
+
+  const crewMembers = ctx.getStateValue("crewLog.crewMembers") || [];
+  const sources = [
+    { id: "stash", label: `Stash (${(ctx.getStateValue("crewLog.inventory") || []).length} items)`, value: "stash" },
+    ...crewMembers.map((m) => ({ id: m.id, label: `${m.name} (${(ctx.getStateValue(`crewLog.crewDetails.${m.id}.equipment`) || []).length} carried)`, value: m.id })),
+  ].filter((opt) => equipmentSourceItems(ctx, opt.value).length > 0);
+
+  if (sources.length === 0) {
+    popup(ctx, { id: `${baseId}-no-items`, title: "Assign Equipment", message: "There are no items to move." });
+    return;
+  }
+
+  ctx.pushCommandsToTop([
+    ctx.commandFactory.choice({
+      id: `${baseId}-pick-source`,
+      title: "Move an Item",
+      prompt: "Move an item from:",
+      options: sources,
+      saveTo: "worldPhase.assignEquipmentSource",
+      buttonText: "Confirm",
+      pauseAfter: false,
+    }),
+    ctx.commandFactory.postBattleDispatch({ id: `${baseId}-pick-source-result`, dispatchKey: "assignEquipmentPickItem", params: { baseId } }),
+  ]);
+}
+
+function assignEquipmentPickItem(ctx, params) {
+  const { baseId } = params;
+  const sourceId = ctx.getStateValue("worldPhase.assignEquipmentSource");
+  const items = equipmentSourceItems(ctx, sourceId);
+
+  ctx.pushCommandsToTop([
+    ctx.commandFactory.choice({
+      id: `${baseId}-pick-item`,
+      title: `Move an Item from ${equipmentSourceLabel(ctx, sourceId)}`,
+      prompt: "Choose an item to move.",
+      options: items.map((item, index) => ({ id: String(index), label: `${item.name}${item.damaged ? " (Damaged)" : ""}`, value: String(index) })),
+      saveTo: "worldPhase.assignEquipmentItemIndex",
+      buttonText: "Confirm",
+      pauseAfter: false,
+    }),
+    ctx.commandFactory.postBattleDispatch({ id: `${baseId}-pick-item-result`, dispatchKey: "assignEquipmentPickDestination", params: { baseId } }),
+  ]);
+}
+
+function assignEquipmentPickDestination(ctx, params) {
+  const { baseId } = params;
+  const sourceId = ctx.getStateValue("worldPhase.assignEquipmentSource");
+  const crewMembers = ctx.getStateValue("crewLog.crewMembers") || [];
+
+  const destinations = [
+    { id: "stash", label: "Stash", value: "stash" },
+    ...crewMembers.map((m) => ({ id: m.id, label: m.name, value: m.id })),
+  ].filter((opt) => opt.value !== sourceId);
+
+  ctx.pushCommandsToTop([
+    ctx.commandFactory.choice({
+      id: `${baseId}-pick-destination`,
+      title: "Move To",
+      prompt: "Choose the destination.",
+      options: destinations,
+      saveTo: "worldPhase.assignEquipmentDestination",
+      buttonText: "Move",
+      pauseAfter: false,
+    }),
+    ctx.commandFactory.postBattleDispatch({ id: `${baseId}-pick-destination-result`, dispatchKey: "assignEquipmentApply", params: { baseId } }),
+  ]);
+}
+
+function assignEquipmentApply(ctx, params) {
+  const { baseId } = params;
+  const sourceId = ctx.getStateValue("worldPhase.assignEquipmentSource");
+  const destinationId = ctx.getStateValue("worldPhase.assignEquipmentDestination");
+  const index = Number(ctx.getStateValue("worldPhase.assignEquipmentItemIndex"));
+  const sourcePath = equipmentSourcePath(sourceId);
+  const destPath = equipmentSourcePath(destinationId);
+  const sourceItems = ctx.getStateValue(sourcePath) || [];
+  const item = sourceItems[index];
+
+  if (!item) {
+    assignEquipmentOffer(ctx, { baseId });
+    return;
+  }
+
+  ctx.setStateValue(sourcePath, sourceItems.filter((_, i) => i !== index));
+  ctx.appendStateValue(destPath, item);
+
+  ctx.pushCommandsToTop([
+    popupCmd(ctx, { id: `${baseId}-move-result`, title: "Item Moved", message: `Moved ${item.name} from ${equipmentSourceLabel(ctx, sourceId)} to ${equipmentSourceLabel(ctx, destinationId)}.` }),
+    ...assignEquipmentOfferCmds(ctx, { baseId }),
+  ]);
+}
+
 // ─── World Phase (crew tasks, patron seek) ──────────────────────────────────
 
 function calcPatronSeek(ctx, params) {
@@ -1728,6 +1871,11 @@ export const GAME_DISPATCH_HANDLERS = {
   enemyGenerationRollCategory,
   enemyGenerationRollSpecific,
   enemyGenerationFinalize,
+  assignEquipmentOffer,
+  assignEquipmentOfferResult,
+  assignEquipmentPickItem,
+  assignEquipmentPickDestination,
+  assignEquipmentApply,
   calcPatronSeek,
   resolveCrewTask,
   recruitAddMember,

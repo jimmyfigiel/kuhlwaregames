@@ -127,12 +127,10 @@ export class WorldPhaseCommand extends BaseCommand {
       upkeepCmd,
       new WorldCrewTasksCommand({ id: `${baseId}-crew-tasks` }),
       new WorldJobOffersCommand({ id: `${baseId}-job-offers` }),
-      factory.popupMessage({
+      factory.postBattleDispatch({
         id: `${baseId}-assign-equipment`,
-        title: "Assign Equipment",
-        message: "Review your Stash and assign weapons and gear to your crew before choosing the battle.",
-        buttonText: "Done",
-        pauseAfter: false,
+        dispatchKey: "assignEquipmentOffer",
+        params: { baseId: `${baseId}-assign-equipment` },
       }),
       factory.postBattleDispatch({
         id: `${baseId}-rumors`,
