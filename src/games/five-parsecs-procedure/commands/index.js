@@ -11,6 +11,7 @@ export { ResolveCreditRollCommand, default as ResolveCreditRollCommandDefault } 
 
 export { default as StartTurnCommand } from "./StartTurnCommand";
 export { default as TravelPhaseCommand } from "./TravelPhaseCommand";
+export { default as FleeInvasionCommand } from "./FleeInvasionCommand";
 export { default as DecideTravelCommand } from "./DecideTravelCommand";
 export { default as NewWorldArrivalCommand } from "./NewWorldArrivalCommand";
 export { default as ReturnToVisitedWorldCommand } from "./ReturnToVisitedWorldCommand";

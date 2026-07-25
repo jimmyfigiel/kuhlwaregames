@@ -6,6 +6,7 @@ import {
   BuildStartingCrewCommand,
   StartTurnCommand,
   TravelPhaseCommand,
+  FleeInvasionCommand,
   DecideTravelCommand,
   NewWorldArrivalCommand,
   ReturnToVisitedWorldCommand,
@@ -434,6 +435,22 @@ export class FiveParsecsCommandFactory extends CommandFactory {
     visible = true,
   } = {}) {
     return new TravelPhaseCommand({
+      id,
+      title,
+      turnNumber,
+      pauseAfter,
+      visible,
+    });
+  }
+
+  fleeInvasion({
+    id,
+    title = "Travel: Flee Invasion",
+    turnNumber = null,
+    pauseAfter = false,
+    visible = true,
+  } = {}) {
+    return new FleeInvasionCommand({
       id,
       title,
       turnNumber,
@@ -1354,6 +1371,9 @@ export class FiveParsecsCommandFactory extends CommandFactory {
 
       case "travelPhase":
         return new TravelPhaseCommand(commandData);
+
+      case "fleeInvasion":
+        return new FleeInvasionCommand(commandData);
 
       case "decideTravel":
         return new DecideTravelCommand(commandData);

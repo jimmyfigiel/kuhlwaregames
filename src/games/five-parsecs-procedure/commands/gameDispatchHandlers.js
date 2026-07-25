@@ -12,6 +12,9 @@ import TabletopCombatCommand, { TabletopCombatRoundCommand } from "./TabletopCom
 import TerrainGeneratorCommand from "./TerrainGeneratorCommand";
 import { buildTaskResolutionCommands } from "./WorldCrewTasksCommand";
 import CrewMemberNameCommand from "./CrewMemberNameCommand";
+import DecideTravelCommand from "./DecideTravelCommand";
+import CharacterEventCommand from "./CharacterEventCommand";
+import TabletopBattlePhaseCommand from "./TabletopBattlePhaseCommand";
 import { ENEMY_CATEGORY_TABLES, UNIQUE_INDIVIDUALS_TABLE, rollOpponentDice, rollEnemyWeapon, rollEnemySpecialistWeapon } from "../data/tables/enemyTables";
 import { buildEnemySubtable } from "./EnemyGenerationCommand";
 import { OBJECTIVE_TYPES } from "../data/tables/objectiveTables";
@@ -891,6 +894,159 @@ function worldRumors(ctx, params) {
   popup(ctx, { id: `${baseId}-rumors-msg`, title: "Resolve Rumors", message, buttonText: total === 0 ? "Skip" : "Resolve" });
 }
 
+// ─── Flee Invasion ───────────────────────────────────────────────────────────
+
+function collectAllItems(state) {
+  const items = [];
+  const crewMembers = state?.crewLog?.crewMembers || [];
+  for (const member of crewMembers) {
+    const equipment = state?.crewLog?.crewDetails?.[member.id]?.equipment || [];
+    equipment.forEach((item, index) => {
+      items.push({ path: `crewLog.crewDetails.${member.id}.equipment`, index, name: item.name });
+    });
+  }
+  const stash = state?.crewLog?.inventory || [];
+  stash.forEach((item, index) => items.push({ path: "crewLog.inventory", index, name: item.name }));
+  return items;
+}
+
+function loseRandomItems(ctx, count) {
+  const lostNames = [];
+  for (let i = 0; i < count; i += 1) {
+    const pool = collectAllItems(ctx.state);
+    if (pool.length === 0) break;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    const list = ctx.getStateValue(pick.path) || [];
+    ctx.setStateValue(pick.path, list.filter((_, idx) => idx !== pick.index));
+    lostNames.push(pick.name);
+  }
+  return lostNames;
+}
+
+function fleeInvasionResolve(ctx, params) {
+  const { baseId, turnNumber } = params;
+  const roll = ctx.getStateValue("worldPhase.fleeInvasionRoll") ?? 0;
+  const success = roll >= 8;
+
+  if (!success) {
+    ctx.setStateValue("worldLog.currentWorld.invasion", "");
+    ctx.pushCommandsToTop([
+      ctx.commandFactory.popupMessage({
+        id: `${baseId}-fail`,
+        title: "Flee Invasion — Failed",
+        message: `Rolled ${roll} — needed 8+. There's no time for anything but Assign Equipment before the fighting reaches you.\n\nYou must fight a mandatory Invasion Battle. If you survive, you still make it off-world — remember to pay the usual departure costs (5 credits, or evacuate and lose all credits plus 1D6 items) and that all local Rivals and Patrons are left behind.`,
+        buttonText: "Assign Equipment",
+        pauseAfter: false,
+      }),
+      ctx.commandFactory.popupMessage({
+        id: `${baseId}-assign-equipment`,
+        title: "Assign Equipment",
+        message: "Review your Stash and assign weapons and gear to your crew before the battle.",
+        buttonText: "Fight",
+        pauseAfter: false,
+      }),
+      ctx.commandFactory.updateState({
+        id: `${baseId}-force-invasion-mission`,
+        title: "Force Invasion Battle",
+        operations: [
+          { op: "set", path: "encounter.missionType", value: "invasion" },
+          { op: "set", path: "encounter.missionTypeLabel", value: "Invasion Battle" },
+        ],
+        pauseAfter: false,
+        visible: false,
+      }),
+      new TabletopBattlePhaseCommand({ id: `${baseId}-invasion-battle`, turnNumber, pauseAfter: false }),
+    ]);
+    return;
+  }
+
+  const hasShip = Boolean(ctx.getStateValue("crewLog.starship"));
+  const credits = Number(ctx.getStateValue("crewLog.credits") || 0);
+  const rivals = ctx.getStateValue("worldLog.rivals") || [];
+  const patrons = ctx.getStateValue("worldLog.patrons") || [];
+
+  ctx.setStateValue("worldLog.currentWorld.invasion", "");
+
+  const lines = [`Rolled ${roll} — you make it safely off-world!`];
+
+  if (hasShip && credits >= 5) {
+    ctx.setStateValue("crewLog.credits", credits - 5);
+    lines.push("Paid 5 credits in fuel and departure costs.");
+  } else {
+    const lostNames = loseRandomItems(ctx, rollDice(1, 6).total);
+    ctx.setStateValue("crewLog.credits", 0);
+    lines.push(
+      hasShip
+        ? "Couldn't afford the 5-credit fuel cost — abandoned the ship and took evacuation passage."
+        : "No ship — took evacuation passage."
+    );
+    if (credits > 0) lines.push(`Lost all ${credits} credits.`);
+    lines.push(lostNames.length > 0 ? `Lost items: ${lostNames.join(", ")}.` : "No items available to lose.");
+  }
+
+  if (rivals.length > 0 || patrons.length > 0) {
+    ctx.setStateValue("worldLog.rivals", []);
+    ctx.setStateValue("worldLog.patrons", []);
+    lines.push(`Left behind ${rivals.length} Rival${rivals.length === 1 ? "" : "s"} and ${patrons.length} Patron${patrons.length === 1 ? "" : "s"} on this world.`);
+  }
+
+  ctx.pushCommandsToTop([
+    ctx.commandFactory.popupMessage({
+      id: `${baseId}-escape-summary`,
+      title: "Flee Invasion — Escaped!",
+      message: lines.join("\n"),
+      buttonText: "Continue",
+      pauseAfter: false,
+    }),
+    ctx.commandFactory.choice({
+      id: `${baseId}-character-event-offer`,
+      title: "Optional Character Event",
+      prompt: "You may roll up a Character Event for a crew member (optional).",
+      options: [
+        { id: "yes", label: "Yes — roll a Character Event", value: "yes" },
+        { id: "no", label: "No — skip", value: "no" },
+      ],
+      saveTo: "worldPhase.fleeCharacterEventChoice",
+      buttonText: "Confirm",
+      pauseAfter: false,
+    }),
+    ctx.commandFactory.postBattleDispatch({
+      id: `${baseId}-character-event-dispatch`,
+      dispatchKey: "fleeInvasionCharacterEventCheck",
+      params: { baseId },
+    }),
+  ]);
+}
+
+function fleeInvasionCharacterEventCheck(ctx, params) {
+  const { baseId } = params;
+  const wantsEvent = ctx.getStateValue("worldPhase.fleeCharacterEventChoice") === "yes";
+  const cmds = [];
+
+  if (wantsEvent) {
+    cmds.push(new CharacterEventCommand({ id: `${baseId}-flee-character-event` }));
+  }
+
+  cmds.push(
+    new DecideTravelCommand({
+      id: `${baseId}-decide-travel`,
+      title: "Travel: Stay or Travel?",
+      options: [
+        {
+          id: "newWorld",
+          label: "Travel to a new world",
+          value: "newWorld",
+          description: "Roll a starship travel event, then create a new current world.",
+        },
+      ],
+      pauseAfter: false,
+      visible: true,
+    })
+  );
+
+  ctx.pushCommandsToTop(cmds);
+}
+
 // ─── Enemy Generation ────────────────────────────────────────────────────────
 
 function normalizeSubtable(table) {
@@ -1133,6 +1289,8 @@ export const GAME_DISPATCH_HANDLERS = {
   recruitResolve,
   trackResolve,
   repairKitResolve,
+  fleeInvasionResolve,
+  fleeInvasionCharacterEventCheck,
   patronJobModifiers,
   missionPrepDispatch,
   worldRumors,
