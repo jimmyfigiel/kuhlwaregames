@@ -35,10 +35,28 @@ import {
 import { makeCampaignTableRoll } from "./WorldJobOffersCommand";
 import { CAMPAIGN_TABLES, PATRON_BHC_THRESHOLDS } from "../data/tables/campaignTables";
 
-function popup(ctx, { id, title, message, buttonText = "Continue" }) {
-  ctx.pushCommandsToTop([
-    ctx.commandFactory.popupMessage({ id, title, message, buttonText, pauseAfter: false }),
-  ]);
+function popupCmd(ctx, { id, title, message, buttonText = "Continue" }) {
+  return ctx.commandFactory.popupMessage({ id, title, message, buttonText, pauseAfter: false });
+}
+
+function popup(ctx, options) {
+  ctx.pushCommandsToTop([popupCmd(ctx, options)]);
+}
+
+function num(ctx, path) {
+  return Number(ctx.getStateValue(path) || 0);
+}
+
+function inc(ctx, path, amount) {
+  ctx.setStateValue(path, num(ctx, path) + amount);
+}
+
+function pickCrewMember(state) {
+  return pickRandomElement(getActiveCrewMembers(state));
+}
+
+function getSavvy(state, memberId) {
+  return Number(state?.crewLog?.crewDetails?.[memberId]?.stats?.savvy || 0);
 }
 
 // ─── Terrain Generator ──────────────────────────────────────────────────────
@@ -617,7 +635,9 @@ function calcPatronSeek(ctx, params) {
   }
 
   const existingPatrons = (ctx.getStateValue("worldLog.patrons") || []).length;
-  const total = roll + patronSeekers + existingPatrons;
+  const traitTitle = ctx.getStateValue("worldLog.currentWorld.trait")?.title;
+  const traitBonus = traitTitle === "Opportunities" ? 1 : traitTitle === "Corporate state" ? 2 : 0;
+  const total = roll + patronSeekers + existingPatrons + traitBonus;
   const found = total >= 6 ? 2 : total >= 5 ? 1 : 0;
 
   const currentFound = ctx.getStateValue("worldPhase.patronJobsFound") ?? 0;
@@ -666,7 +686,9 @@ function recruitResolve(ctx, params) {
   for (const m of crewMembers) {
     if (ctx.getStateValue(`worldPhase.crewTasks.${m.id}`) === "recruit") recruiters++;
   }
-  const bonus = Math.max(0, recruiters - 1);
+  const traitTitle = ctx.getStateValue("worldLog.currentWorld.trait")?.title;
+  const traitBonus = traitTitle === "Easy recruiting" ? 1 : 0;
+  const bonus = Math.max(0, recruiters - 1) + traitBonus;
   const total = roll + bonus;
   const success = total >= 6;
 
@@ -735,7 +757,8 @@ export function findDamagedItem(state, crewMemberId) {
 function repairKitResolve(ctx, params) {
   const { baseId, memberId, memberName, savvy } = params;
   const roll = ctx.getStateValue(`worldPhase.repairRolls.${memberId}`) ?? 0;
-  const total = roll + Number(savvy || 0);
+  const traitBonus = ctx.getStateValue("worldLog.currentWorld.trait")?.title === "Technical knowledge" ? 1 : 0;
+  const total = roll + Number(savvy || 0) + traitBonus;
   const found = findDamagedItem(ctx.state, memberId);
 
   if (!found) {
@@ -892,6 +915,150 @@ function worldRumors(ctx, params) {
   }
 
   popup(ctx, { id: `${baseId}-rumors-msg`, title: "Resolve Rumors", message, buttonText: total === 0 ? "Skip" : "Resolve" });
+}
+
+// ─── New World Arrival Steps (Rulebook p.72-74) ─────────────────────────────
+
+function normalizeWorldTraitsTable() {
+  const table = CAMPAIGN_TABLES.worldTraits;
+  return {
+    id: table.id,
+    title: table.label,
+    dice: table.dice || "D100",
+    sides: 100,
+    entries: (table.rows || []).map((row) => ({ min: row.min, max: row.max, label: row.title, value: row.title, description: row.description })),
+  };
+}
+
+function newWorldArrivalSteps(ctx, params) {
+  const { baseId, isStartingCampaign } = params;
+  const cmds = [];
+
+  if (!isStartingCampaign) {
+    const rivals = ctx.getStateValue("worldLog.rivals") || [];
+    if (rivals.length > 0) {
+      const kept = [];
+      const lines = [];
+      for (const rival of rivals) {
+        const roll = rollDie(6);
+        const follows = roll >= 5;
+        if (follows) kept.push(rival);
+        lines.push(`${rival.name}: rolled ${roll} — ${follows ? "follows you" : "stays behind"}.`);
+      }
+      ctx.setStateValue("worldLog.rivals", kept);
+      cmds.push(popupCmd(ctx, { id: `${baseId}-check-rivals`, title: "Check for Rivals", message: lines.join("\n") }));
+    }
+
+    const patrons = ctx.getStateValue("worldLog.patrons") || [];
+    const keptPatrons = patrons.filter((p) => p.persistent === true);
+    if (patrons.length > 0) {
+      ctx.setStateValue("worldLog.patrons", keptPatrons);
+      const dismissedCount = patrons.length - keptPatrons.length;
+      cmds.push(popupCmd(ctx, { id: `${baseId}-dismiss-patrons`, title: "Dismiss Patrons", message: dismissedCount > 0 ? `${dismissedCount} Patron${dismissedCount === 1 ? "" : "s"} dismissed (none were Persistent).` : "No Patrons to dismiss." }));
+    }
+  }
+
+  const licenseRoll = rollDie(6);
+  const requiresLicense = licenseRoll >= 5;
+
+  if (!requiresLicense) {
+    cmds.push(popupCmd(ctx, { id: `${baseId}-licensing`, title: "Check for Licensing Requirements", message: `Rolled ${licenseRoll} — no Freelancer License required on this world.` }));
+    ctx.pushCommandsToTop([...cmds, worldTraitsRollCmd(ctx, baseId)]);
+    return;
+  }
+
+  const costRoll = rollDie(6);
+  ctx.setStateValue("worldLog.currentWorld.license", { required: true, cost: costRoll, purchased: false });
+  cmds.push(
+    popupCmd(ctx, { id: `${baseId}-licensing`, title: "Check for Licensing Requirements", message: `Rolled ${licenseRoll} — this world requires a Freelancer License to perform Patron jobs. Cost: ${costRoll} credits.` }),
+    ctx.commandFactory.choice({
+      id: `${baseId}-license-choice`,
+      title: "Freelancer License",
+      prompt: `Pay ${costRoll} credits for the License, attempt to forge one, or skip for now (no Patron jobs on this world until licensed)?`,
+      options: [
+        { id: "pay", label: `Pay ${costRoll} credits`, value: "pay" },
+        { id: "forge", label: "Attempt to forge one (1D6+Savvy, 6+)", value: "forge" },
+        { id: "skip", label: "Skip for now", value: "skip" },
+      ],
+      saveTo: "worldPhase.licenseChoice",
+      buttonText: "Confirm",
+      pauseAfter: false,
+    }),
+    ctx.commandFactory.postBattleDispatch({ id: `${baseId}-license-resolve`, dispatchKey: "licenseResolve", params: { baseId } })
+  );
+  ctx.pushCommandsToTop(cmds);
+}
+
+function worldTraitsRollCmd(ctx, baseId) {
+  return ctx.commandFactory.tableRoll({
+    id: `${baseId}-world-traits`,
+    title: "World Traits",
+    table: normalizeWorldTraitsTable(),
+    saveTo: "postBattleTemp.worldTraitRoll",
+    buttonText: "Apply",
+    rollButtonText: "Roll D100",
+    afterSelectionCommands: [
+      ctx.commandFactory.postBattleDispatch({ id: `${baseId}-world-traits-apply`, dispatchKey: "worldTraitApply", params: { baseId } }),
+    ],
+    pauseAfter: false,
+  });
+}
+
+function licenseResolve(ctx, params) {
+  const { baseId } = params;
+  const choice = ctx.getStateValue("worldPhase.licenseChoice");
+  const license = ctx.getStateValue("worldLog.currentWorld.license") || {};
+
+  if (choice === "pay") {
+    const credits = num(ctx, "crewLog.credits");
+    if (credits >= license.cost) {
+      inc(ctx, "crewLog.credits", -license.cost);
+      ctx.setStateValue("worldLog.currentWorld.license", { ...license, purchased: true });
+      ctx.pushCommandsToTop([popupCmd(ctx, { id: `${baseId}-license-result`, title: "Freelancer License", message: `Paid ${license.cost} credits for the License.` }), worldTraitsRollCmd(ctx, baseId)]);
+    } else {
+      ctx.pushCommandsToTop([popupCmd(ctx, { id: `${baseId}-license-result`, title: "Freelancer License", message: `Can't afford ${license.cost} credits (you have ${credits}). Remaining unlicensed for now.` }), worldTraitsRollCmd(ctx, baseId)]);
+    }
+    return;
+  }
+
+  if (choice === "forge") {
+    const member = pickCrewMember(ctx.state);
+    if (!member) {
+      ctx.pushCommandsToTop([popupCmd(ctx, { id: `${baseId}-license-result`, title: "Freelancer License", message: "No crew member available to attempt the forgery." }), worldTraitsRollCmd(ctx, baseId)]);
+      return;
+    }
+    const savvy = getSavvy(ctx.state, member.id);
+    const roll = rollDie(6);
+    const total = roll + savvy;
+    let message;
+    if (roll === 1) {
+      ctx.appendStateValue("worldLog.rivals", { id: `rival-${Date.now()}-${Math.floor(Math.random() * 1000000)}`, name: "Local Law Enforcement", type: "rival", source: "New World Arrival: Forged License", status: "active", notes: "", createdAt: new Date().toISOString() });
+      message = `${member.name} rolled a natural 1 — local law enforcement takes a dim view of the attempt. You gain a Rival.`;
+    } else if (total >= 6) {
+      ctx.setStateValue("worldLog.currentWorld.license", { ...license, purchased: true, forged: true });
+      message = `${member.name} rolled ${roll} + Savvy ${savvy} = ${total} — the forged License passes inspection, free of charge.`;
+    } else {
+      message = `${member.name} rolled ${roll} + Savvy ${savvy} = ${total} — not enough. Remaining unlicensed for now.`;
+    }
+    ctx.pushCommandsToTop([popupCmd(ctx, { id: `${baseId}-license-result`, title: "Freelancer License — Forgery Attempt", message }), worldTraitsRollCmd(ctx, baseId)]);
+    return;
+  }
+
+  ctx.pushCommandsToTop([popupCmd(ctx, { id: `${baseId}-license-result`, title: "Freelancer License", message: "Skipped for now — you cannot perform Patron jobs on this world until licensed." }), worldTraitsRollCmd(ctx, baseId)]);
+}
+
+function worldTraitApply(ctx, params) {
+  const { baseId } = params;
+  const result = ctx.getStateValue("postBattleTemp.worldTraitRoll");
+  const title = result?.label || result?.value;
+
+  ctx.setStateValue("worldLog.currentWorld.trait", { title, description: result?.description || "" });
+
+  if (title === "Invasion risk") ctx.setStateValue("worldLog.currentWorld.invasionRollModifier", 1);
+  if (title === "Imminent invasion" || title === "Military outpost") ctx.setStateValue("worldLog.currentWorld.invasionRollModifier", 2);
+  if (title === "Unity safe sector") ctx.setStateValue("worldLog.currentWorld.invasion", "immune");
+
+  popup(ctx, { id: `${baseId}-world-trait-result`, title: `World Trait: ${title}`, message: result?.description || "" });
 }
 
 // ─── Flee Invasion ───────────────────────────────────────────────────────────
@@ -1289,6 +1456,9 @@ export const GAME_DISPATCH_HANDLERS = {
   recruitResolve,
   trackResolve,
   repairKitResolve,
+  newWorldArrivalSteps,
+  licenseResolve,
+  worldTraitApply,
   fleeInvasionResolve,
   fleeInvasionCharacterEventCheck,
   patronJobModifiers,

@@ -196,6 +196,11 @@ export class NewWorldArrivalCommand extends BaseCommand {
         buttonText: "Continue",
         pauseAfter: false,
       }),
+      factory.postBattleDispatch({
+        id: `${this.id}-arrival-steps`,
+        dispatchKey: "newWorldArrivalSteps",
+        params: { baseId: this.id, isStartingCampaign: !previousWorldRecord },
+      }),
     ]);
 
     this.status = "complete";
