@@ -173,6 +173,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 1,
         max: 7,
+        value: "asteroids",
         title: "Asteroids",
         description:
           "Rocky debris everywhere, maybe from a recent collision? If you wish to avoid it, roll 1D6, requiring a 5+ to chart a safe path. If successful, roll again on this table. To go through the field, select a crew member and roll 1D6+Savvy three times, requiring a 4+ to succeed each time. Each failed roll inflicts 1D6 Hull Point damage to the ship.",
@@ -180,6 +181,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 8,
         max: 12,
+        value: "navigationTrouble",
         title: "Navigation trouble",
         description:
           "Is this place even on the star maps? Lose 1 story point as you drift through empty space, then roll again on this table. If your ship is currently suffering from Hull Point damage, and you roll this event, a random crew member must roll on the Injury Table, as system failures cause life support malfunctions across the vessel.",
@@ -187,6 +189,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 13,
         max: 17,
+        value: "raided",
         title: "Raided",
         description:
           "Your vessel catches the eye of some pirates. Intimidation might work: Select a crew member and roll 1D6+Savvy. A 6+ is required to avoid conflict. Otherwise, set up a battle in cramped territory, using the Criminal Elements Encounter Table. Enemy numbers are determined by rolling 3D6, picking the highest die, with smaller campaign crews rolling fewer dice as appropriate. Add the numbers indicated in the enemy table, +1 extra figure. There is no objective. If you drive them off, they flee back to their ship. If you lose, you lose all credits and everything in your Stash, though you keep the ship. If you win, you get normal rewards for winning an Opportunity mission, plus a bonus roll on the Loot Table. This is an out-of-sequence encounter and does not count as the main Battle stage for the campaign turn.",
@@ -194,6 +197,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 18,
         max: 25,
+        value: "deepSpaceWreckage",
         title: "Deep space wreckage",
         description:
           "You find an old wreck drifting through empty space. Scanning it, you get 2 rolls on the Gear Subtable. Both items are damaged and need to be Repaired.",
@@ -201,6 +205,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 26,
         max: 29,
+        value: "driveTrouble",
         title: "Drive trouble",
         description:
           "It’s not supposed to make that sound. Select 3 crew members and have each roll 1D6+Savvy. A 6+ is required for success. For each failure, you are grounded on the next world for one campaign turn while the drive is reset. Taking off before the drive is reset inflicts 2D6 Hull Point damage to the ship.",
@@ -208,6 +213,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 30,
         max: 38,
+        value: "downTime",
         title: "Down-time",
         description:
           "It’s a long time to just sit here. Select a crew member of choice and add +1 XP. The crew has time to do maintenance tasks, and can Repair 1 damaged item with no roll required.",
@@ -215,6 +221,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 39,
         max: 44,
+        value: "distressCall",
         title: "Distress call",
         description:
           "“This is Licensed Trader Cyberwolf”. If you come to their aid, roll 1D6. 1: The ship’s drive must have detonated moments after you received the signal. Your ship is struck by debris, suffering 1D6+1 Hull Point damage. 2: You only find drifting wreckage. 3-4: You can rescue a crew member. Treat this as the Escape Pod event. 5-6: You arrive in time to help save the ship from a drive malfunction. Select a crew member and roll 1D6+Savvy. A 7+ is required to succeed, but you may make three attempts. If you succeed, roll three times on the gear loot table. If you fail, the drive detonates and your ship is damaged as if you had rolled a 1 on this subtable.",
@@ -222,6 +229,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 45,
         max: 50,
+        value: "patrolShip",
         title: "Patrol ship",
         description:
           "A Unity patrol vessel hails you. Roll 1D6-3 twice. Each die that scores above 0 results in that number of items being confiscated as contraband. You can give them any items carried or in your Stash. Due to the military presence, the next world you visit cannot be Invaded.",
@@ -229,6 +237,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 51,
         max: 53,
+        value: "cosmicPhenomenon",
         title: "Cosmic phenomenon",
         description:
           "A crew member sees a strange manifestation in space. Nobody else saw anything, and the ship’s computers confirm nothing was there. The crew member adds +1 Luck if able. This event can only happen once in a campaign; treat it as nothing happening if it happens again. If you have a Precursor in the crew, they predict it is a good omen. Add +1 story point as well.",
@@ -236,6 +245,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 54,
         max: 60,
+        value: "escapePod",
         title: "Escape pod",
         description:
           "You find an escape pod drifting through space. If you rescue them, roll 1D6. 1: They’re a wanted criminal. If you let them go on the next world, the next time you make a new Rival, roll 4+ on 1D6 to immediately remove the Rivals from the campaign. If you turn them in, claim 1D6 credits but get a Rival from their old gang. 2-3: They reward you with 1D3 credits and a roll on the Loot Table when you arrive. 4: They have interesting information. Add 1 Quest Rumor and 1 story point. 5: They join your crew as a new character with no equipment. 6: As 5, but the character begins with 10 unspent XP.",
@@ -243,6 +253,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 61,
         max: 66,
+        value: "accident",
         title: "Accident",
         description:
           "A crew member gets Injured while doing routine maintenance. They must rest up for one campaign turn to recover from the Injury, and one item they carry is damaged.",
@@ -250,6 +261,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 67,
         max: 75,
+        value: "travelTime",
         title: "Travel-time",
         description:
           "Local conditions force you to jump to the edge of the system and approach under standard drives. Any Injured crew may rest for one campaign turn.",
@@ -257,6 +269,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 76,
         max: 85,
+        value: "uneventfulTrip",
         title: "Uneventful trip",
         description:
           "A lot of time playing cards and cleaning guns. You can Repair one damaged item.",
@@ -264,12 +277,14 @@ export const CAMPAIGN_TABLES = {
       {
         min: 86,
         max: 91,
+        value: "timeToReflect",
         title: "Time to reflect",
         description: "How is the story unfolding? Add +1 story point.",
       },
       {
         min: 92,
         max: 95,
+        value: "timeToReadABook",
         title: "Time to read a book",
         description:
           "There’s time to sit, have a read, and maybe indulge in education. Roll 1D6. On 1-2, a random crew member earns +3 XP. On 3-4, a random crew member earns +2 XP and a second random crew member earns +1 XP. On 5-6, three random crew each earn +1 XP.",
@@ -277,6 +292,7 @@ export const CAMPAIGN_TABLES = {
       {
         min: 96,
         max: 100,
+        value: "lockedInTheLibrary",
         title: "Locked in the library data by night",
         description:
           "Pouring over old records and fragments of data, the captain has unearthed intriguing information about the sector. You can roll up the planetary info for three worlds and select which to visit. Due to fuel limitations, you must visit one of the three generated. All three worlds remain in the campaign and can be visited later.",

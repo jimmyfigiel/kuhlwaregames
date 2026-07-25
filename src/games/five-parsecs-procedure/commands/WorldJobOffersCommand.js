@@ -23,7 +23,7 @@ function normalizeCampaignTable(table) {
   };
 }
 
-function makeCampaignTableRoll(factory, { id, table, saveTo, title, pauseAfter = false }) {
+export function makeCampaignTableRoll(factory, { id, table, saveTo, title, pauseAfter = false }) {
   const normalized = normalizeCampaignTable(table);
   return factory.tableRoll({
     id,
@@ -85,91 +85,13 @@ export class WorldJobOffersCommand extends BaseCommand {
           })
         );
 
-        // Inline command to handle BHC modifiers
-        const bhcCmd = {
-          status: "pending",
-          execute(ctx) {
-            const patronTypeEntry = ctx.getStateValue(`worldPhase.patronJobs.${jobIndex}.patronType`);
-            const patronTypeName = patronTypeEntry?.label || patronTypeEntry?.value || String(patronTypeEntry || "");
-            const thresholds = PATRON_BHC_THRESHOLDS[patronTypeName] || { benefits: 8, hazards: 8, conditions: 8 };
-
-            const benefitsRoll = Math.floor(Math.random() * 10) + 1;
-            const hazardsRoll = Math.floor(Math.random() * 10) + 1;
-            const conditionsRoll = Math.floor(Math.random() * 10) + 1;
-
-            const subCmds = [];
-
-            if (benefitsRoll >= thresholds.benefits) {
-              subCmds.push(
-                makeCampaignTableRoll(ctx.commandFactory, {
-                  id: `${baseId}-job${jobIndex}-benefits`,
-                  table: CAMPAIGN_TABLES.benefitsSubtable,
-                  saveTo: `worldPhase.patronJobs.${jobIndex}.benefit`,
-                  title: `Job ${jobIndex + 1}: Benefit`,
-                })
-              );
-            }
-
-            if (hazardsRoll >= thresholds.hazards) {
-              subCmds.push(
-                makeCampaignTableRoll(ctx.commandFactory, {
-                  id: `${baseId}-job${jobIndex}-hazards`,
-                  table: CAMPAIGN_TABLES.hazardsSubtable,
-                  saveTo: `worldPhase.patronJobs.${jobIndex}.hazard`,
-                  title: `Job ${jobIndex + 1}: Hazard`,
-                })
-              );
-            }
-
-            if (conditionsRoll >= thresholds.conditions) {
-              subCmds.push(
-                makeCampaignTableRoll(ctx.commandFactory, {
-                  id: `${baseId}-job${jobIndex}-conditions`,
-                  table: CAMPAIGN_TABLES.conditionsSubtable,
-                  saveTo: `worldPhase.patronJobs.${jobIndex}.condition`,
-                  title: `Job ${jobIndex + 1}: Condition`,
-                })
-              );
-            }
-
-            const hasBenefit = benefitsRoll >= thresholds.benefits;
-            const hasHazard = hazardsRoll >= thresholds.hazards;
-            const hasCondition = conditionsRoll >= thresholds.conditions;
-
-            const modifierLines = [];
-            if (hasBenefit) modifierLines.push(`• Benefit roll: ${benefitsRoll} (threshold ${thresholds.benefits}) — roll on Benefits table`);
-            else modifierLines.push(`• No benefit (rolled ${benefitsRoll}, need ${thresholds.benefits})`);
-            if (hasHazard) modifierLines.push(`• Hazard roll: ${hazardsRoll} (threshold ${thresholds.hazards}) — roll on Hazards table`);
-            else modifierLines.push(`• No hazard (rolled ${hazardsRoll}, need ${thresholds.hazards})`);
-            if (hasCondition) modifierLines.push(`• Condition roll: ${conditionsRoll} (threshold ${thresholds.conditions}) — roll on Conditions table`);
-            else modifierLines.push(`• No condition (rolled ${conditionsRoll}, need ${thresholds.conditions})`);
-
-            subCmds.push(
-              ctx.commandFactory.popupMessage({
-                id: `${baseId}-job${jobIndex}-summary`,
-                title: `Job ${jobIndex + 1}: Summary`,
-                message: `Patron: ${patronTypeName || "Unknown"}\n${modifierLines.join("\n")}`,
-                buttonText: "Continue",
-                pauseAfter: false,
-              })
-            );
-
-            ctx.pushCommandsToTop(subCmds);
-            this.status = "complete";
-            ctx.setStatus("running");
-          },
-          toJSON() {
-            return removeUndefinedValues({
-              id: `${baseId}-job${jobIndex}-bhc`,
-              type: "patronJobModifiers",
-              status: this.status || "pending",
-              jobIndex,
-              baseId,
-            });
-          },
-        };
-
-        cmds.push(bhcCmd);
+        cmds.push(
+          factory.postBattleDispatch({
+            id: `${baseId}-job${jobIndex}-bhc`,
+            dispatchKey: "patronJobModifiers",
+            params: { baseId, jobIndex },
+          })
+        );
       }
     }
 

@@ -23,7 +23,7 @@ function normalizeCampaignTable(table) {
   };
 }
 
-function buildTaskResolutionCommands(factory, baseId, member, taskId, engineContext) {
+export function buildTaskResolutionCommands(factory, baseId, member, taskId, engineContext) {
   const state = engineContext.state;
   const { id, name } = member;
 
@@ -58,59 +58,6 @@ function buildTaskResolutionCommands(factory, baseId, member, taskId, engineCont
       ];
 
     case "findPatron": {
-      const patronSeekCalcCmd = {
-        status: "pending",
-        execute(ctx) {
-          const roll = ctx.getStateValue(`worldPhase.patronSeekRolls.${id}`) ?? 0;
-
-          const crewMembers = ctx.getStateValue("crewLog.crewMembers") || [];
-          let patronSeekers = 0;
-          for (const m of crewMembers) {
-            const task = ctx.getStateValue(`worldPhase.crewTasks.${m.id}`);
-            if (task === "findPatron") patronSeekers++;
-          }
-
-          const existingPatrons = (ctx.getStateValue("worldLog.patrons") || []).length;
-          const total = roll + patronSeekers + existingPatrons;
-          const found = total >= 6 ? 2 : total >= 5 ? 1 : 0;
-
-          const currentFound = ctx.getStateValue("worldPhase.patronJobsFound") ?? 0;
-          const newTotal = Math.min(currentFound + found, 2);
-
-          ctx.pushCommandsToTop([
-            ctx.commandFactory.updateState({
-              id: `${baseId}-resolve-findPatron-save-${id}`,
-              title: `${name}: Find Patron`,
-              operations: [{ op: "set", path: "worldPhase.patronJobsFound", value: newTotal }],
-              pauseAfter: false,
-              visible: false,
-            }),
-            ctx.commandFactory.popupMessage({
-              id: `${baseId}-resolve-findPatron-msg-${id}`,
-              title: `${name}: Find Patron`,
-              message: found === 0
-                ? `${name} rolled ${roll}. Total: ${total} (roll + ${patronSeekers} seekers + ${existingPatrons} contacts).\nNo patron jobs found.`
-                : `${name} rolled ${roll}. Total: ${total} (roll + ${patronSeekers} seekers + ${existingPatrons} contacts).\n${found === 2 ? "Two patron jobs found!" : "One patron job found!"}`,
-              buttonText: "OK",
-              pauseAfter: false,
-            }),
-          ]);
-
-          this.status = "complete";
-          ctx.setStatus("running");
-        },
-        toJSON() {
-          return removeUndefinedValues({
-            id: `${baseId}-resolve-findPatron-calc-${id}`,
-            type: "calcPatronSeek",
-            status: this.status || "pending",
-            memberId: id,
-            memberName: name,
-            baseId,
-          });
-        },
-      };
-
       return [
         factory.numberInput({
           id: `${baseId}-resolve-findPatron-roll-${id}`,
@@ -123,7 +70,11 @@ function buildTaskResolutionCommands(factory, baseId, member, taskId, engineCont
           buttonText: "Submit Roll",
           pauseAfter: false,
         }),
-        patronSeekCalcCmd,
+        factory.postBattleDispatch({
+          id: `${baseId}-resolve-findPatron-calc-${id}`,
+          dispatchKey: "calcPatronSeek",
+          params: { baseId, memberId: id, memberName: name },
+        }),
       ];
     }
 
@@ -159,16 +110,40 @@ function buildTaskResolutionCommands(factory, baseId, member, taskId, engineCont
 
     case "recruit": {
       const crewCount = (state?.crewLog?.crewMembers || []).length;
-      const autoRecruit = crewCount < 6;
+
+      if (crewCount < 6) {
+        return [
+          factory.popupMessage({
+            id: `${baseId}-resolve-recruit-auto-${id}`,
+            title: `${name}: Recruit`,
+            message: `${name} is recruiting. Your crew has fewer than 6 members, so you automatically find a new recruit.`,
+            buttonText: "Add Recruit",
+            pauseAfter: false,
+          }),
+          factory.postBattleDispatch({
+            id: `${baseId}-resolve-recruit-add-${id}`,
+            dispatchKey: "recruitAddMember",
+            params: { baseId },
+          }),
+        ];
+      }
+
       return [
-        factory.popupMessage({
-          id: `${baseId}-resolve-recruit-${id}`,
+        factory.numberInput({
+          id: `${baseId}-resolve-recruit-roll-${id}`,
           title: `${name}: Recruit`,
-          message: autoRecruit
-            ? `${name} is recruiting. Your crew has fewer than 6 members, so you automatically find a new recruit.\nGenerate a new crew member and add them to your roster.`
-            : `${name} is recruiting. Roll 1D6 and add the number of crew members Recruiting. On 6+, you gain one new recruit.\nCrew currently has ${crewCount} members.`,
-          buttonText: "Done",
+          prompt: `${name} is recruiting.\nRoll 1D6 and enter the result below.`,
+          label: "D6 Roll",
+          min: 1,
+          max: 6,
+          saveTo: `worldPhase.recruitRolls.${id}`,
+          buttonText: "Submit Roll",
           pauseAfter: false,
+        }),
+        factory.postBattleDispatch({
+          id: `${baseId}-resolve-recruit-calc-${id}`,
+          dispatchKey: "recruitResolve",
+          params: { baseId, memberId: id, memberName: name },
         }),
       ];
     }
@@ -187,20 +162,22 @@ function buildTaskResolutionCommands(factory, baseId, member, taskId, engineCont
         ];
       }
 
-      const crewMembers = state?.crewLog?.crewMembers || [];
-      let trackerCount = 0;
-      for (const m of crewMembers) {
-        const task = state?.worldPhase?.crewTasks?.[m.id];
-        if (task === "track") trackerCount++;
-      }
-
       return [
-        factory.popupMessage({
-          id: `${baseId}-resolve-track-${id}`,
+        factory.numberInput({
+          id: `${baseId}-resolve-track-roll-${id}`,
           title: `${name}: Track`,
-          message: `${name} is tracking a Rival.\nRoll 1D6 + ${trackerCount} (trackers) + any credits spent. On 6+, you locate a Rival of your choice for a battle this turn.\nYou have ${rivals.length} rival(s).`,
-          buttonText: "Done",
+          prompt: `${name} is tracking a Rival.\nRoll 1D6 and enter the result below.`,
+          label: "D6 Roll",
+          min: 1,
+          max: 6,
+          saveTo: `worldPhase.trackRolls.${id}`,
+          buttonText: "Submit Roll",
           pauseAfter: false,
+        }),
+        factory.postBattleDispatch({
+          id: `${baseId}-resolve-track-calc-${id}`,
+          dispatchKey: "trackResolve",
+          params: { baseId, memberId: id, memberName: name },
         }),
       ];
     }
@@ -208,12 +185,21 @@ function buildTaskResolutionCommands(factory, baseId, member, taskId, engineCont
     case "repairKit": {
       const savvy = state?.crewLog?.crewDetails?.[id]?.stats?.savvy ?? 0;
       return [
-        factory.popupMessage({
-          id: `${baseId}-resolve-repairKit-${id}`,
+        factory.numberInput({
+          id: `${baseId}-resolve-repairKit-roll-${id}`,
           title: `${name}: Repair Kit`,
-          message: `${name} is repairing an item.\nRoll 1D6 + Savvy (${savvy}) + any credits spent on spare parts. On 6+, the item is repaired.\nA natural 1 always fails and the item is destroyed.`,
-          buttonText: "Done",
+          prompt: `${name} is repairing a damaged item.\nRoll 1D6 and enter the result below. (Savvy +${savvy} is added automatically.)`,
+          label: "D6 Roll",
+          min: 1,
+          max: 6,
+          saveTo: `worldPhase.repairRolls.${id}`,
+          buttonText: "Submit Roll",
           pauseAfter: false,
+        }),
+        factory.postBattleDispatch({
+          id: `${baseId}-resolve-repairKit-calc-${id}`,
+          dispatchKey: "repairKitResolve",
+          params: { baseId, memberId: id, memberName: name, savvy },
         }),
       ];
     }
@@ -312,37 +298,13 @@ export class WorldCrewTasksCommand extends BaseCommand {
     );
 
     for (const member of crewMembers) {
-      const memberId = member.id;
-      const memberName = member.name;
-
-      const resolutionCmd = {
-        status: "pending",
-        execute(ctx) {
-          const taskId = ctx.getStateValue(`worldPhase.crewTasks.${memberId}`) || "doNothing";
-          const resCmds = buildTaskResolutionCommands(
-            ctx.commandFactory,
-            baseId,
-            { id: memberId, name: memberName },
-            taskId,
-            ctx
-          );
-          ctx.pushCommandsToTop(resCmds);
-          this.status = "complete";
-          ctx.setStatus("running");
-        },
-        toJSON() {
-          return removeUndefinedValues({
-            id: `${baseId}-resolve-dispatch-${memberId}`,
-            type: "resolveCrewTask",
-            status: this.status || "pending",
-            memberId,
-            memberName,
-            baseId,
-          });
-        },
-      };
-
-      cmds.push(resolutionCmd);
+      cmds.push(
+        factory.postBattleDispatch({
+          id: `${baseId}-resolve-dispatch-${member.id}`,
+          dispatchKey: "resolveCrewTask",
+          params: { baseId, memberId: member.id, memberName: member.name },
+        })
+      );
     }
 
     engineContext.pushCommandsToTop(cmds);

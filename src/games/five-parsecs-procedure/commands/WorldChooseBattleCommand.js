@@ -12,6 +12,7 @@ export class WorldChooseBattleCommand extends BaseCommand {
 
     const patronJobsFound = engineContext.getStateValue("worldPhase.patronJobsFound") ?? 0;
     const rivals = engineContext.getStateValue("worldLog.rivals") || [];
+    const questRumors = engineContext.getStateValue("worldLog.questRumors") ?? 0;
 
     const options = [];
 
@@ -33,56 +34,21 @@ export class WorldChooseBattleCommand extends BaseCommand {
       });
     }
 
+    if (questRumors > 0) {
+      options.push({
+        id: "quest",
+        label: "Pursue a Quest",
+        value: "quest",
+        description: `Follow up on a Quest lead (${questRumors} Quest Rumor${questRumors === 1 ? "" : "s"} accumulated).`,
+      });
+    }
+
     options.push({
       id: "opportunity",
       label: "Opportunity Mission",
       value: "opportunity",
       description: "Take on a freelance job from the local area.",
     });
-
-    const missionPrepCmd = {
-      status: "pending",
-      execute(ctx) {
-        const missionType = ctx.getStateValue("encounter.missionType");
-
-        let message;
-        if (missionType === "patron") {
-          message = "Record the patron details in your Encounter Log.\nSet up the battlefield and generate enemy forces according to the patron's mission parameters.";
-        } else if (missionType === "rival") {
-          message = "Select a rival from your list.\nNote their faction for enemy force generation.";
-        } else {
-          message = "Roll for the Opportunity mission type and enemy forces using the standard tables.";
-        }
-
-        ctx.pushCommandsToTop([
-          ctx.commandFactory.popupMessage({
-            id: `${baseId}-mission-prep-msg`,
-            title: "Mission Prep",
-            message,
-            buttonText: "Ready",
-            pauseAfter: false,
-          }),
-          ctx.commandFactory.updateState({
-            id: `${baseId}-set-encounter-ready`,
-            title: "Encounter Ready",
-            operations: [{ op: "set", path: "encounter.phase", value: "ready" }],
-            pauseAfter: false,
-            visible: false,
-          }),
-        ]);
-
-        this.status = "complete";
-        ctx.setStatus("running");
-      },
-      toJSON() {
-        return removeUndefinedValues({
-          id: `${baseId}-mission-prep`,
-          type: "missionPrepDispatch",
-          status: this.status || "pending",
-          baseId,
-        });
-      },
-    };
 
     engineContext.pushCommandsToTop([
       factory.choice({
@@ -95,7 +61,11 @@ export class WorldChooseBattleCommand extends BaseCommand {
         buttonText: "Choose",
         pauseAfter: false,
       }),
-      missionPrepCmd,
+      factory.postBattleDispatch({
+        id: `${baseId}-mission-prep`,
+        dispatchKey: "missionPrepDispatch",
+        params: { baseId },
+      }),
     ]);
 
     this.status = "complete";

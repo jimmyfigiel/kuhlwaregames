@@ -111,46 +111,14 @@ export class TabletopCombatRoundCommand extends BaseCommand {
         );
       }
 
-      // Inline: sort crew into quick/slow and show the phase split
-      cmds.push({
-        id: `${baseId}-show-reaction-result`,
-        type: "showReactionResult",
-        status: "pending",
-        pauseAfter: false,
-        visible: false,
-        baseId,
-        execute(ctx) {
-          const crewList = getCrewList(ctx.state);
-          const quick = [];
-          const slow = [];
-          for (const member of crewList) {
-            const roll = ctx.state?.encounter?.reactionRolls?.[member.id] ?? 1;
-            const reactions = getCrewReaction(ctx.state, member.id);
-            if (Number(roll) <= reactions) {
-              quick.push(`${member.name} (rolled ${roll}, Reactions ${reactions})`);
-            } else {
-              slow.push(`${member.name} (rolled ${roll}, Reactions ${reactions})`);
-            }
-          }
-          const quickText = quick.length ? quick.join(", ") : "None";
-          const slowText = slow.length ? slow.join(", ") : "None";
-          ctx.pushCommandsToTop([
-            ctx.commandFactory.popupMessage({
-              id: `${this.baseId}-reaction-split`,
-              title: `Round ${this.roundNumber ?? ""} — Initiative`,
-              message: `**Quick Actions:** ${quickText}\n\n**Slow Actions:** ${slowText}\n\nAll enemies act in the Enemy Actions phase.`,
-              buttonText: "Begin Quick Actions",
-              pauseAfter: false,
-            }),
-          ]);
-          ctx.addLogEntry({ type: "commandCompleted", text: `Round reaction roll complete. Quick: ${quickText}. Slow: ${slowText}.` });
-          this.status = "complete";
-          ctx.setStatus("running");
-        },
-        toJSON() {
-          return removeUndefinedValues({ id: this.id, type: this.type, status: this.status, pauseAfter: this.pauseAfter, visible: this.visible, baseId: this.baseId });
-        },
-      });
+      // Sort crew into quick/slow and show the phase split
+      cmds.push(
+        factory.postBattleDispatch({
+          id: `${baseId}-show-reaction-result`,
+          dispatchKey: "showReactionResult",
+          params: { baseId, roundNumber: this.roundNumber },
+        })
+      );
     } else {
       // No crew in state yet — just prompt
       cmds.push(
@@ -215,42 +183,13 @@ export class TabletopCombatRoundCommand extends BaseCommand {
       })
     );
 
-    cmds.push({
-      id: `${baseId}-morale-roll`,
-      type: "tabletopMoraleRoll",
-      status: "pending",
-      pauseAfter: false,
-      visible: false,
-      baseId,
-      roundNumber: this.roundNumber,
-      execute(ctx) {
-        const casualties = Number(ctx.state?.encounter?.rounds?.[this.roundNumber]?.casualties ?? 0);
-        if (casualties === 0) {
-          ctx.addLogEntry({ type: "commandCompleted", text: `Round ${this.roundNumber} end phase: No enemy casualties — no Morale check needed.` });
-          this.status = "complete";
-          ctx.setStatus("running");
-          return;
-        }
-        const panicRange = ctx.state?.encounter?.enemyPanicRange ?? "1-2";
-        ctx.pushCommandsToTop([
-          ctx.commandFactory.numberInput({
-            id: `${this.baseId}-morale-dice-entry`,
-            title: `Round ${this.roundNumber} — Enemy Morale`,
-            prompt: `Roll ${casualties}D6 (one per casualty this round). Enter the number of dice that fall within the enemy's **Panic range** (${panicRange}).\n\nEach die in the Panic range causes 1 enemy figure to Bail — remove from the table starting with the figure closest to the enemy battlefield edge.\n\nFearless enemies are never affected by Morale.`,
-            min: 0,
-            max: casualties,
-            saveTo: `encounter.rounds.${this.roundNumber}.moraleFailures`,
-            buttonText: "Confirm",
-            pauseAfter: false,
-          }),
-        ]);
-        this.status = "complete";
-        ctx.setStatus("running");
-      },
-      toJSON() {
-        return removeUndefinedValues({ id: this.id, type: this.type, status: this.status, pauseAfter: this.pauseAfter, visible: this.visible, baseId: this.baseId, roundNumber: this.roundNumber });
-      },
-    });
+    cmds.push(
+      factory.postBattleDispatch({
+        id: `${baseId}-morale-roll`,
+        dispatchKey: "tabletopMoraleRoll",
+        params: { baseId, roundNumber: this.roundNumber },
+      })
+    );
 
     // ── Battle Events (end of round 2 and round 4) ───────────────────────
     if (this.battleEventsEnabled && (this.roundNumber === 2 || this.roundNumber === 4)) {
@@ -491,37 +430,13 @@ export default class TabletopCombatCommand extends BaseCommand {
       })
     );
 
-    // Inline: show seize result
-    cmds.push({
-      id: `${baseId}-seize-result`,
-      type: "tabletopSeizeResult",
-      status: "pending",
-      pauseAfter: false,
-      visible: false,
-      baseId,
-      execute(ctx) {
-        const roll = Number(ctx.state?.encounter?.seizeInitiativeRoll ?? 0);
-        const success = roll >= 10;
-        const msg = success
-          ? `**Seized the Initiative!** (rolled ${roll})\n\nYour crew caught the opposition flat-footed. Each crew member may take a normal Move or fire before Round 1 begins. Shots fired now only Hit on a natural 6.`
-          : `**Did not Seize the Initiative** (rolled ${roll}, needed 10+)\n\nProceed directly to Round 1.`;
-        ctx.pushCommandsToTop([
-          ctx.commandFactory.popupMessage({
-            id: `${this.baseId}-seize-result-popup`,
-            title: success ? "Initiative Seized!" : "Initiative Not Seized",
-            message: msg,
-            buttonText: success ? "Take Pre-Battle Actions" : "Begin Round 1",
-            pauseAfter: false,
-          }),
-        ]);
-        ctx.addLogEntry({ type: "commandCompleted", text: `Seize the Initiative: rolled ${roll} — ${success ? "SUCCESS" : "failed"}.` });
-        this.status = "complete";
-        ctx.setStatus("running");
-      },
-      toJSON() {
-        return removeUndefinedValues({ id: this.id, type: this.type, status: this.status, pauseAfter: this.pauseAfter, visible: this.visible, baseId: this.baseId });
-      },
-    });
+    cmds.push(
+      factory.postBattleDispatch({
+        id: `${baseId}-seize-result`,
+        dispatchKey: "tabletopSeizeResult",
+        params: { baseId },
+      })
+    );
 
     // ── Battle Events toggle ──────────────────────────────────────────────
     cmds.push(
@@ -539,34 +454,13 @@ export default class TabletopCombatCommand extends BaseCommand {
       })
     );
 
-    // Inline: start Round 1
-    cmds.push({
-      id: `${baseId}-start-round-1`,
-      type: "tabletopStartRound1",
-      status: "pending",
-      pauseAfter: false,
-      visible: false,
-      baseId,
-      missionType,
-      execute(ctx) {
-        const battleEventsEnabled = ctx.state?.encounter?.battleEventsEnabled === "yes";
-        ctx.pushCommandsToTop([
-          new TabletopCombatRoundCommand({
-            id: `tabletop-round-1`,
-            roundNumber: 1,
-            battleEventsEnabled,
-            missionType: this.missionType,
-            pauseAfter: false,
-          }),
-        ]);
-        ctx.addLogEntry({ type: "commandCompleted", text: `Tabletop battle started. Battle Events: ${battleEventsEnabled ? "ON" : "OFF"}.` });
-        this.status = "complete";
-        ctx.setStatus("running");
-      },
-      toJSON() {
-        return removeUndefinedValues({ id: this.id, type: this.type, status: this.status, pauseAfter: this.pauseAfter, visible: this.visible, baseId: this.baseId, missionType: this.missionType });
-      },
-    });
+    cmds.push(
+      factory.postBattleDispatch({
+        id: `${baseId}-start-round-1`,
+        dispatchKey: "tabletopStartRound1",
+        params: { baseId, missionType },
+      })
+    );
 
     engineContext.pushCommandsToTop(cmds);
     this.status = "complete";

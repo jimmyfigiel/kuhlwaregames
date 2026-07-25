@@ -48,26 +48,27 @@ export class TravelPhaseCommand extends BaseCommand {
     ];
 
     if (isActiveInvasion(worldInvasion)) {
+      // FleeInvasionCommand decides for itself whether the crew makes it off-world
+      // (and pushes the normal decideTravel step) or is forced into a mandatory
+      // Invasion Battle — either way it fully replaces the ordinary travel choice.
       commands.push(
-        factory.popupMessage({
+        factory.fleeInvasion({
           id: `${this.id}-flee-invasion`,
-          title: "Travel: Flee Invasion",
-          message: "Resolve Flee Invasion because the World Log indicates an active invasion. This is a placeholder step; the full flee-invasion roll will be added later.",
-          buttonText: "Done",
+          turnNumber: this.turnNumber,
           pauseAfter: false,
         })
       );
+    } else {
+      commands.push(
+        factory.decideTravel({
+          id: `${this.id}-decide-travel`,
+          title: "Travel: Stay or Travel?",
+          turnNumber: this.turnNumber,
+          pauseAfter: false,
+          visible: true,
+        })
+      );
     }
-
-    commands.push(
-      factory.decideTravel({
-        id: `${this.id}-decide-travel`,
-        title: "Travel: Stay or Travel?",
-        turnNumber: this.turnNumber,
-        pauseAfter: false,
-        visible: true,
-      })
-    );
 
     engineContext.pushCommandsToTop(commands);
 

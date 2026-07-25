@@ -105,6 +105,35 @@ export class DecideTravelCommand extends BaseCommand {
   }
 
   execute(engineContext) {
+    const groundedTurns = Number(engineContext.getStateValue("worldLog.currentWorld.groundedTurns") || 0);
+
+    if (groundedTurns > 0) {
+      engineContext.pushCommandsToTop([
+        engineContext.commandFactory.updateState({
+          id: `${this.id}-grounded`,
+          title: "Record Travel Decision: Grounded",
+          operations: [
+            { op: "set", path: "worldLog.currentWorld.groundedTurns", value: groundedTurns - 1 },
+            { op: "set", path: "campaign.travelDecision", value: "stay" },
+            { op: "set", path: "campaign.travelDecisionLabel", value: "Grounded — drive being reset" },
+            { op: "set", path: "campaign.travelOccurredThisTurn", value: false },
+          ],
+          pauseAfter: false,
+          visible: false,
+        }),
+        engineContext.commandFactory.popupMessage({
+          id: `${this.id}-grounded-msg`,
+          title: "Grounded",
+          message: "The ship's drive is still being reset after Drive Trouble — you're stuck on this world for the campaign turn.",
+          buttonText: "Continue",
+          pauseAfter: false,
+        }),
+      ]);
+      this.status = "complete";
+      engineContext.setStatus("running");
+      return;
+    }
+
     this.status = "waitingForUser";
 
     const options = buildTravelOptions(engineContext.state, this.options);
@@ -160,37 +189,19 @@ export class DecideTravelCommand extends BaseCommand {
 
     if (selectedTravel) {
       commands.push(
-        factory.starshipTravelEventRoll({
-          id: `${turnPrefix}-starship-travel-event`,
-          title: "Travel: Starship Travel Event",
-          turnNumber: this.turnNumber,
-          pauseAfter: false,
-          visible: true,
+        factory.postBattleDispatch({
+          id: `${turnPrefix}-travel-cost`,
+          dispatchKey: "chargeTravelCostAndProceed",
+          params: {
+            baseId: this.id,
+            turnPrefix,
+            turnNumber: this.turnNumber,
+            selectedReturn,
+            targetWorldId: selectedReturn ? selectedKind.replace(/^return:/, "") : null,
+            arrivalLabel: selectedOption.label,
+          },
         })
       );
-
-      if (selectedReturn) {
-        commands.push(
-          factory.returnToVisitedWorld({
-            id: `${turnPrefix}-return-to-visited-world`,
-            title: selectedOption.label,
-            targetWorldId: selectedKind.replace(/^return:/, ""),
-            turnNumber: this.turnNumber,
-            pauseAfter: false,
-            visible: false,
-          })
-        );
-      } else if (selectedNewWorld) {
-        commands.push(
-          factory.newWorldArrival({
-            id: `${turnPrefix}-new-world-arrival`,
-            title: "Travel: New World Arrival",
-            turnNumber: this.turnNumber,
-            pauseAfter: false,
-            visible: true,
-          })
-        );
-      }
     }
 
     engineContext.clearActiveCommand();
