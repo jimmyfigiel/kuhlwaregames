@@ -788,8 +788,147 @@ function ShipDebtRollPanel({ command, onConfirm }) {
   );
 }
 
+function equipmentLocationLabel(item, sourceId, crewMembers) {
+  if (sourceId === "stash") return "Stash";
+  const member = crewMembers.find((m) => m.id === sourceId);
+  return member?.name || "Crew";
+}
+
+function AssignEquipmentItemRow({ item, index, sourceId, sourcePath, crewMembers, onMove }) {
+  const destinations = [
+    { value: "crewLog.inventory", label: "Stash" },
+    ...crewMembers.map((m) => ({ value: `crewLog.crewDetails.${m.id}.equipment`, label: m.name || "Unnamed Crew" })),
+  ].filter((opt) => opt.value !== sourcePath);
+
+  return (
+    <div className="fp-equip-row">
+      <div className="fp-equip-row-main">
+        <span className="fp-equip-row-name">{item.name}{item.damaged ? " (Damaged)" : ""}</span>
+        {item.category && <span className="fp-equip-row-category">{item.category}</span>}
+      </div>
+      <select
+        className="fp-equip-select"
+        defaultValue=""
+        onChange={(event) => {
+          const destinationPath = event.target.value;
+          if (!destinationPath) return;
+          onMove({ sourcePath, index, destinationPath });
+          event.target.value = "";
+        }}
+      >
+        <option value="" disabled>Move to…</option>
+        {destinations.map((opt) => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function AssignEquipmentPanel({ command, crewLog, onAction }) {
+  const crewMembers = Array.isArray(crewLog?.crewMembers) ? crewLog.crewMembers : [];
+  const crewDetails = crewLog?.crewDetails || {};
+  const inventory = Array.isArray(crewLog?.inventory) ? crewLog.inventory : [];
+
+  const allRows = [
+    ...inventory.map((item) => ({ item, sourceId: "stash" })),
+    ...crewMembers.flatMap((m) =>
+      (crewDetails[m.id]?.equipment || []).map((item) => ({ item, sourceId: m.id }))
+    ),
+  ];
+
+  function handleMove(payload) {
+    onAction({ action: "move", ...payload });
+  }
+
+  return (
+    <div className="fp-command-card fp-assign-equipment-panel">
+      <h2>{command.title || "Assign Equipment"}</h2>
+      <p className="fp-muted">Review your Stash and assign weapons and gear to your crew before choosing the battle.</p>
+
+      <AccordionSection title="Inventory Summary" defaultOpen>
+        <div className="fp-table-wrap">
+          <table className="fp-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              {allRows.map(({ item, sourceId }, rowIndex) => (
+                <tr key={`${sourceId}-${item.equipmentId || item.name}-${rowIndex}`}>
+                  <td>{item.name}{item.damaged ? " (Damaged)" : ""}</td>
+                  <td>{item.category || "—"}</td>
+                  <td>{equipmentLocationLabel(item, sourceId, crewMembers)}</td>
+                </tr>
+              ))}
+              {allRows.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="fp-table-empty">No equipment yet.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </AccordionSection>
+
+      <AccordionSection title="Stash" defaultOpen={false}>
+        {inventory.length === 0 ? (
+          <div className="fp-muted">No items in Stash.</div>
+        ) : (
+          inventory.map((item, index) => (
+            <AssignEquipmentItemRow
+              key={item.equipmentId || `${item.name}-${index}`}
+              item={item}
+              index={index}
+              sourceId="stash"
+              sourcePath="crewLog.inventory"
+              crewMembers={crewMembers}
+              onMove={handleMove}
+            />
+          ))
+        )}
+      </AccordionSection>
+
+      {crewMembers.map((member) => {
+        const memberEquipment = crewDetails[member.id]?.equipment || [];
+        return (
+          <AccordionSection
+            key={member.id}
+            title={member.name || "Unnamed Crew Member"}
+            defaultOpen={false}
+          >
+            {memberEquipment.length === 0 ? (
+              <div className="fp-muted">No carried equipment.</div>
+            ) : (
+              memberEquipment.map((item, index) => (
+                <AssignEquipmentItemRow
+                  key={item.equipmentId || `${item.name}-${index}`}
+                  item={item}
+                  index={index}
+                  sourceId={member.id}
+                  sourcePath={`crewLog.crewDetails.${member.id}.equipment`}
+                  crewMembers={crewMembers}
+                  onMove={handleMove}
+                />
+              ))
+            )}
+          </AccordionSection>
+        );
+      })}
+
+      <button className="fp-primary-button" onClick={() => onAction({ action: "done" })}>
+        Done
+      </button>
+    </div>
+  );
+}
+
 function ActiveCommandPanel({
   command,
+  crewLog,
   onPopupOk,
   onNumberSubmit,
   onTextSubmit,
@@ -798,6 +937,7 @@ function ActiveCommandPanel({
   onCreditConfirm,
   onShipDebtConfirm,
   onStartingStoryPointsConfirm,
+  onAssignEquipmentAction,
 }) {
   if (!command) {
     return null;
@@ -889,6 +1029,15 @@ function ActiveCommandPanel({
         />
       )}
 
+      {command.type === "assignEquipmentPanel" && (
+        <AssignEquipmentPanel
+          key={command.id}
+          command={command}
+          crewLog={crewLog}
+          onAction={onAssignEquipmentAction}
+        />
+      )}
+
       {![
         "popupMessage",
         "startTurn",
@@ -899,6 +1048,7 @@ function ActiveCommandPanel({
         "choice",
         "decideTravel",
         "tableRoll",
+        "assignEquipmentPanel",
         "resolveCreditRoll",
         "resolveStartingStoryPoints",
         "resolveShipDebt",
@@ -1026,6 +1176,7 @@ function QueueManager({ gameState, submitAction, showStackInspectorButton = fals
             {activeCommand ? (
               <ActiveCommandPanel
                 command={activeCommand}
+                crewLog={gameState.crewLog}
                 onPopupOk={handlePopupOk}
                 onNumberSubmit={handleNumberSubmit}
                 onTextSubmit={handleTextSubmit}
@@ -1034,6 +1185,7 @@ function QueueManager({ gameState, submitAction, showStackInspectorButton = fals
                 onCreditConfirm={resolveActiveCommand}
                 onShipDebtConfirm={resolveActiveCommand}
                 onStartingStoryPointsConfirm={resolveActiveCommand}
+                onAssignEquipmentAction={resolveActiveCommand}
               />
             ) : (
               <div className="fp-command-card fp-empty-active-command-card">
