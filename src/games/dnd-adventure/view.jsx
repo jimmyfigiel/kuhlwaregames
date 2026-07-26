@@ -91,7 +91,11 @@ function CharacterCreationForm({ onSubmit, pendingError }) {
               }
             >
               <option value="">—</option>
-              {(scores[key] !== undefined ? [scores[key], ...remainingFor(key)] : remainingFor(key)).map((v) => (
+              {/* remainingFor(key) already keeps this ability's own current
+                  value in the pool (it only excludes values other abilities
+                  have taken) -- re-adding it here would render two <option>s
+                  with the same value/key. */}
+              {remainingFor(key).map((v) => (
                 <option key={v} value={v}>{v}</option>
               ))}
             </select>
