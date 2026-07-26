@@ -55,4 +55,5 @@ export { default as CampaignEventCommand } from "./CampaignEventCommand";
 export { default as CharacterEventCommand } from "./CharacterEventCommand";
 export { default as GalacticWarProgressCommand } from "./GalacticWarProgressCommand";
 export { default as EnemyGenerationCommand } from "./EnemyGenerationCommand";
+export { default as AssignEquipmentPanelCommand } from "./AssignEquipmentPanelCommand";
 export { default as ObjectiveCommand } from "./ObjectiveCommand";

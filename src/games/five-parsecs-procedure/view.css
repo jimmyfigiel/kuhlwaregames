@@ -1269,3 +1269,87 @@
 .fp-modal-download-btn {
   width: 100%;
 }
+
+/* Assign Equipment panel — compact table + collapsible per-crew sections */
+
+.fp-assign-equipment-panel .fp-accordion-section {
+  margin-top: 10px;
+}
+
+.fp-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.fp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.fp-table th,
+.fp-table td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid #f3f4f6;
+  white-space: nowrap;
+}
+
+.fp-table th {
+  color: #6b7280;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.fp-table td {
+  color: #111827;
+}
+
+.fp-table-empty {
+  text-align: center;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.fp-equip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.fp-equip-row:last-child {
+  border-bottom: none;
+}
+
+.fp-equip-row-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fp-equip-row-name {
+  color: #111827;
+  font-weight: 700;
+  overflow-wrap: break-word;
+}
+
+.fp-equip-row-category {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.fp-equip-select {
+  flex-shrink: 0;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+  font-size: 0.85rem;
+}

@@ -56,6 +56,7 @@ import {
   GalacticWarProgressCommand,
   EnemyGenerationCommand,
   ObjectiveCommand,
+  AssignEquipmentPanelCommand,
 } from "../commands";
 import { buildCrewMemberTableResultUpdateCommands } from "../effects";
 import { EQUIPMENT_ROLL_TABLES_BY_ID, SHIP_TABLE_DEFINITION, CAMPAIGN_TABLES } from "../data/tables";
@@ -715,6 +716,10 @@ export class FiveParsecsCommandFactory extends CommandFactory {
 
   objective({ id, title = "Determine the Objective", missionType = "opportunity", pauseAfter = false, visible = true } = {}) {
     return new ObjectiveCommand({ id, title, missionType, pauseAfter, visible });
+  }
+
+  assignEquipmentPanel({ id, title = "Assign Equipment", pauseAfter = false, visible = true } = {}) {
+    return new AssignEquipmentPanelCommand({ id, title, pauseAfter, visible });
   }
 
 
@@ -1542,6 +1547,9 @@ export class FiveParsecsCommandFactory extends CommandFactory {
 
       case "objective":
         return new ObjectiveCommand(commandData);
+
+      case "assignEquipmentPanel":
+        return new AssignEquipmentPanelCommand(commandData);
 
       default:
         console.warn(`Unknown command type: ${commandData.type}`);
