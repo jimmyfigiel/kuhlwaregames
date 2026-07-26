@@ -1445,7 +1445,7 @@ function CampaignSheet({ campaign }) {
 
 const STASH_VALUE = "__stash__";
 
-function EquipmentMoveSelect({ sourceCrewId, index, crewMembers, submitAction }) {
+function EquipmentMoveSelect({ sourceCrewId, index, crewMembers, submitAction, gameState }) {
   const destinations = [
     { value: STASH_VALUE, label: "Stash" },
     ...crewMembers.map((m) => ({ value: m.id, label: m.name || "Unnamed Crew" })),
@@ -1456,6 +1456,7 @@ function EquipmentMoveSelect({ sourceCrewId, index, crewMembers, submitAction })
     if (!raw) return;
     submitAction({
       type: "MOVE_EQUIPMENT",
+      stateSnapshot: gameState,
       sourceCrewId: sourceCrewId || null,
       index,
       destinationCrewId: raw === STASH_VALUE ? null : raw,
@@ -1473,7 +1474,7 @@ function EquipmentMoveSelect({ sourceCrewId, index, crewMembers, submitAction })
   );
 }
 
-function CrewEquipmentList({ items, sourceCrewId, crewMembers, submitAction, emptyText }) {
+function CrewEquipmentList({ items, sourceCrewId, crewMembers, submitAction, emptyText, gameState }) {
   if (items.length === 0) {
     return <div className="fp-muted">{emptyText}</div>;
   }
@@ -1491,6 +1492,7 @@ function CrewEquipmentList({ items, sourceCrewId, crewMembers, submitAction, emp
             index={index}
             crewMembers={crewMembers}
             submitAction={submitAction}
+            gameState={gameState}
           />
         </div>
       ))}
@@ -1498,7 +1500,7 @@ function CrewEquipmentList({ items, sourceCrewId, crewMembers, submitAction, emp
   );
 }
 
-function CrewSheet({ crewLog, submitAction }) {
+function CrewSheet({ crewLog, submitAction, gameState }) {
   const members = Array.isArray(crewLog.crewMembers) ? crewLog.crewMembers : [];
   const crewDetails = crewLog.crewDetails || {};
 
@@ -1569,6 +1571,7 @@ function CrewSheet({ crewLog, submitAction }) {
                 crewMembers={members}
                 submitAction={submitAction}
                 emptyText="No carried equipment."
+                gameState={gameState}
               />
             </AccordionSection>
           );
@@ -1620,7 +1623,7 @@ function ShipSheet({ crewLog }) {
   );
 }
 
-function StashSheet({ crewLog, submitAction }) {
+function StashSheet({ crewLog, submitAction, gameState }) {
   const inventory = Array.isArray(crewLog.inventory) ? crewLog.inventory : [];
   const members = Array.isArray(crewLog.crewMembers) ? crewLog.crewMembers : [];
 
@@ -1632,6 +1635,7 @@ function StashSheet({ crewLog, submitAction }) {
         crewMembers={members}
         submitAction={submitAction}
         emptyText="No stash equipment yet."
+        gameState={gameState}
       />
     </AccordionSection>
   );
@@ -2234,9 +2238,9 @@ export default function FiveParsecsProcedureView({ gameState, submitAction, play
 
       <section className="fp-record-sheets">
         <CampaignSheet campaign={safeGameState.campaign} />
-        <CrewSheet crewLog={safeGameState.crewLog} submitAction={submitAction} />
+        <CrewSheet crewLog={safeGameState.crewLog} submitAction={submitAction} gameState={safeGameState} />
         <ShipSheet crewLog={safeGameState.crewLog} />
-        <StashSheet crewLog={safeGameState.crewLog} submitAction={submitAction} />
+        <StashSheet crewLog={safeGameState.crewLog} submitAction={submitAction} gameState={safeGameState} />
         <EncounterLogSheet encounterLog={safeGameState.encounterLog} />
         <WorldLogSheet worldLog={safeGameState.worldLog} campaign={safeGameState.campaign} />
       </section>
