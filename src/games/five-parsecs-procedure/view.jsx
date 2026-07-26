@@ -1979,7 +1979,10 @@ function buildStoryPrompt({ crewLog, worldLog, campaign, logEntries, startTurn, 
       const n = Number(turnNum);
       if (n < startTurn || n > endTurn) return false;
     }
-    return e.type !== "commandCompleted" || (e.text && !e.text.startsWith("Loaded") && !e.text.startsWith("Queued"));
+    if (e.type === "narrative") return true;
+    if (e.type !== "commandCompleted") return false;
+    const text = e.text || "";
+    return Boolean(text) && !text.startsWith("Loaded") && !text.startsWith("Queued") && !text.startsWith("Applied state update");
   });
 
   const logLines = narrativeEntries.map((e) => {

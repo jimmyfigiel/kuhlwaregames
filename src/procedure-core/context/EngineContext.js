@@ -151,6 +151,7 @@ export default class EngineContext {
       removeUndefinedValues({
         id: `log-${Date.now()}-${this.logEntries.length}`,
         createdAt: new Date().toISOString(),
+        turnNumber: this.getStateValue("campaign.turnNumber") ?? null,
         ...entry,
       })
     );

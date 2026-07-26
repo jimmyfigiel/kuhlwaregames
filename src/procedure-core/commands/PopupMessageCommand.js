@@ -47,8 +47,10 @@ export class PopupMessageCommand extends BaseCommand {
     engineContext.setStatus("idle");
 
     engineContext.addLogEntry({
-      type: "commandCompleted",
-      text: `Completed command: ${this.title}`,
+      type: "narrative",
+      text: this.message ? `${this.title}\n${this.message}` : `Completed command: ${this.title}`,
+      title: this.title,
+      message: this.message,
       commandId: this.id,
     });
   }
