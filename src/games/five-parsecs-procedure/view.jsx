@@ -1287,34 +1287,6 @@ function formatStats(stats) {
     .join(" · ");
 }
 
-function summarizeList(values, formatter) {
-  if (!Array.isArray(values) || values.length === 0) {
-    return "";
-  }
-
-  return values.map(formatter).filter(Boolean).join("; ");
-}
-
-function formatPendingEffect(effect) {
-  if (!effect || typeof effect !== "object") {
-    return "";
-  }
-
-  const label = effect.label || effect.effectType || effect.type || "Effect";
-  const source = effect.source ? ` — ${effect.source}` : "";
-  return `${label}${source}`;
-}
-
-function formatInventoryItem(item) {
-  if (!item || typeof item !== "object") {
-    return "";
-  }
-
-  const category = item.category ? `${item.category}: ` : "";
-  const source = item.source ? ` — ${item.source}` : "";
-  return `${category}${item.name || "Unknown Item"}${source}`;
-}
-
 function formatPlainValue(value) {
   if (value === undefined || value === null || value === "") {
     return "";
@@ -1330,18 +1302,6 @@ function formatPlainValue(value) {
 
   return String(value);
 }
-
-function formatFlagSummary(flags) {
-  if (!flags || typeof flags !== "object" || Array.isArray(flags)) {
-    return "";
-  }
-
-  return Object.entries(flags)
-    .map(([key, value]) => `${key}: ${formatPlainValue(value)}`)
-    .join("; ");
-}
-
-
 
 function CardField({ label, value }) {
   const hasValue = value || value === 0;
@@ -1382,39 +1342,6 @@ function DetailSection({ title, children, emptyText = "None yet." }) {
   );
 }
 
-function StatGrid({ stats, title = "Stats" }) {
-  if (!stats || typeof stats !== "object") {
-    return null;
-  }
-
-  const statRows = [
-    ["reactions", "Reactions"],
-    ["speed", "Speed"],
-    ["combatSkill", "Combat"],
-    ["toughness", "Toughness"],
-    ["savvy", "Savvy"],
-    ["luck", "Luck"],
-  ].filter(([key]) => stats[key] !== undefined && stats[key] !== null);
-
-  if (statRows.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="fp-stat-block">
-      <h4>{title}</h4>
-      <div className="fp-stat-grid">
-        {statRows.map(([key, label]) => (
-          <div className="fp-stat-cell" key={key}>
-            <span>{label}</span>
-            <strong>{stats[key]}</strong>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function TagList({ values }) {
   const list = Array.isArray(values)
     ? values.filter((value) => value !== undefined && value !== null && value !== "")
@@ -1432,66 +1359,6 @@ function TagList({ values }) {
         </span>
       ))}
     </div>
-  );
-}
-
-function RuleCardList({ groups }) {
-  const visibleGroups = groups
-    .map((group) => ({
-      ...group,
-      values: Array.isArray(group.values)
-        ? group.values.filter((value) => value !== undefined && value !== null && value !== "")
-        : [],
-    }))
-    .filter((group) => group.values.length > 0);
-
-  if (visibleGroups.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="fp-rule-card-list">
-      {visibleGroups.map((group) => (
-        <article className="fp-rule-card" key={group.title}>
-          <h4>{group.title}</h4>
-          <ul>
-            {group.values.map((value, index) => (
-              <li key={`${group.title}-${index}`}>{formatPlainValue(value)}</li>
-            ))}
-          </ul>
-        </article>
-      ))}
-    </div>
-  );
-}
-
-function ItemCard({ item, fallbackTitle = "Item" }) {
-  if (!item || typeof item !== "object") {
-    return null;
-  }
-
-  const traits = Array.isArray(item.traits) ? item.traits : [];
-  const title = item.name || item.label || item.title || fallbackTitle;
-  const subtitleParts = [item.category, item.type, item.source].filter(Boolean);
-
-  return (
-    <DetailCard
-      title={title}
-      subtitle={subtitleParts.join(" · ")}
-      badge={item.equipped ? "Equipped" : item.status}
-      className="fp-item-card"
-    >
-      <div className="fp-card-field-grid">
-        {item.range !== undefined && <CardField label="Range" value={item.range} />}
-        {item.shots !== undefined && <CardField label="Shots" value={item.shots} />}
-        {item.damage !== undefined && <CardField label="Damage" value={item.damage} />}
-        {item.hands !== undefined && <CardField label="Hands" value={item.hands} />}
-      </div>
-      <TagList values={traits} />
-      {(item.description || item.effect || item.notes) && (
-        <p className="fp-card-note">{item.description || item.effect || item.notes}</p>
-      )}
-    </DetailCard>
   );
 }
 
@@ -1576,115 +1443,73 @@ function CampaignSheet({ campaign }) {
   );
 }
 
-function CrewLogSheet({ crewLog }) {
-  const members = Array.isArray(crewLog.crewMembers)
-    ? crewLog.crewMembers
-    : [];
-  const crewDetails = crewLog.crewDetails || {};
-  const inventory = Array.isArray(crewLog.inventory) ? crewLog.inventory : [];
-  const pendingEffects = Array.isArray(crewLog.pendingEffects) ? crewLog.pendingEffects : [];
-  const starship = crewLog.starship && typeof crewLog.starship === "object" ? crewLog.starship : null;
+const STASH_VALUE = "__stash__";
 
-  function renderCrewDetail(member, index) {
-    const detail = crewDetails[member.id] || {};
-    const equipment = Array.isArray(detail.equipment) ? detail.equipment : [];
-    const pendingMemberEffects = Array.isArray(detail.pendingEffects) ? detail.pendingEffects : [];
-    const creationResults = [
-      ["Crew Type", detail.crewType],
-      ["Primary Alien", detail.primaryAlien],
-      ["Strange Character", detail.strangeCharacter],
-      ["Background", detail.background],
-      ["Background 1", detail.background1],
-      ["Background 2", detail.background2],
-      ["Motivation", detail.motivation],
-      ["Motivation 1", detail.motivation1],
-      ["Motivation 2", detail.motivation2],
-      ["Class", detail.class],
-    ].filter(([, result]) => result);
+function EquipmentMoveSelect({ sourceCrewId, index, crewMembers, submitAction }) {
+  const destinations = [
+    { value: STASH_VALUE, label: "Stash" },
+    ...crewMembers.map((m) => ({ value: m.id, label: m.name || "Unnamed Crew" })),
+  ].filter((opt) => opt.value !== (sourceCrewId || STASH_VALUE));
 
-    const ruleGroups = [
-      { title: "Special Rules", values: detail.specialRules },
-      { title: "Restrictions", values: detail.restrictions },
-      { title: "Battle Rules", values: detail.battleRules },
-      { title: "Movement Rules", values: detail.movementRules },
-      { title: "Campaign Rules", values: detail.campaignRules },
-      { title: "Campaign Turn Rules", values: detail.campaignTurnRules },
-      { title: "Campaign Event Rules", values: detail.campaignEventRules },
-      { title: "Post-Battle Rules", values: detail.postBattleRules },
-      { title: "Injury Rules", values: detail.injuryRules },
-      { title: "Equipment Rules", values: detail.equipmentRules },
-      { title: "Advancement Rules", values: detail.advancementRules },
-      { title: "Task Rules", values: detail.campaignTaskRules },
-      { title: "Task Restrictions", values: detail.campaignTaskRestrictions },
-      { title: "Event Rules", values: detail.eventRules },
-      { title: "Creation Rules", values: detail.creationRules },
-      { title: "Notes", values: detail.resultNotes },
-    ];
-
-    const flagSummary = formatFlagSummary(detail.flags);
-    const saveSummary = summarizeList(detail.saves, (save) => {
-      const type = save.type || "Save";
-      const level = save.level || "";
-      const source = save.source ? ` — ${save.source}` : "";
-      return `${type} ${level}${source}`.trim();
+  function handleChange(event) {
+    const raw = event.target.value;
+    if (!raw) return;
+    submitAction({
+      type: "MOVE_EQUIPMENT",
+      sourceCrewId: sourceCrewId || null,
+      index,
+      destinationCrewId: raw === STASH_VALUE ? null : raw,
     });
-
-    return (
-      <DetailCard
-        title={`${member.number || index + 1}. ${member.name || "Unnamed Crew Member"}`}
-        subtitle={[detail.characterType, detail.class?.label, detail.background?.label].filter(Boolean).join(" · ")}
-        badge={detail.creationComplete ? "Complete" : "Creating"}
-        className="fp-crew-member-card"
-      >
-        <StatGrid stats={detail.stats} />
-        <StatGrid stats={detail.maxStats} title="Maximums" />
-
-        <DetailSection title="Profile">
-          <div className="fp-card-field-grid">
-            <CardField label="Character Type" value={detail.characterType} />
-            <CardField label="Implant Limit" value={detail.implantLimit} />
-            <CardField label="Injury Table" value={detail.injuryTable} />
-            <CardField label="Saves" value={saveSummary} />
-            <CardField label="Flags" value={flagSummary} />
-          </div>
-        </DetailSection>
-
-        <DetailSection title="Weapons & Gear" emptyText="No personal equipment yet.">
-          {equipment.length > 0 ? (
-            <div className="fp-card-list">
-              {equipment.map((item, itemIndex) => (
-                <ItemCard item={item} key={item.id || item.name || itemIndex} />
-              ))}
-            </div>
-          ) : null}
-        </DetailSection>
-
-        <DetailSection title="Special Rules" emptyText="No special rules yet.">
-          <RuleCardList groups={ruleGroups} />
-        </DetailSection>
-
-        <DetailSection title="Creation Results" emptyText="No creation results yet.">
-          {creationResults.length > 0 ? (
-            <div className="fp-card-list fp-compact-card-list">
-              {creationResults.map(([label, result]) => (
-                <TableResultCard label={label} result={result} key={`${member.id}-${label}`} />
-              ))}
-            </div>
-          ) : null}
-        </DetailSection>
-
-        <DetailSection title="Pending Effects" emptyText="No pending effects.">
-          {pendingMemberEffects.length > 0 ? (
-            <div className="fp-card-list fp-compact-card-list">
-              {pendingMemberEffects.map((effect, effectIndex) => (
-                <PendingEffectCard effect={effect} key={effect.id || effectIndex} />
-              ))}
-            </div>
-          ) : null}
-        </DetailSection>
-      </DetailCard>
-    );
+    event.target.value = "";
   }
+
+  return (
+    <select className="fp-equip-select" defaultValue="" onChange={handleChange}>
+      <option value="" disabled>Move to…</option>
+      {destinations.map((opt) => (
+        <option key={opt.value} value={opt.value}>{opt.label}</option>
+      ))}
+    </select>
+  );
+}
+
+function CrewEquipmentList({ items, sourceCrewId, crewMembers, submitAction, emptyText }) {
+  if (items.length === 0) {
+    return <div className="fp-muted">{emptyText}</div>;
+  }
+
+  return (
+    <div>
+      {items.map((item, index) => (
+        <div className="fp-equip-row" key={item.equipmentId || item.id || `${item.name}-${index}`}>
+          <div className="fp-equip-row-main">
+            <span className="fp-equip-row-name">{item.name}{item.damaged ? " (Damaged)" : ""}</span>
+            {item.category && <span className="fp-equip-row-category">{item.category}</span>}
+          </div>
+          <EquipmentMoveSelect
+            sourceCrewId={sourceCrewId}
+            index={index}
+            crewMembers={crewMembers}
+            submitAction={submitAction}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CrewSheet({ crewLog, submitAction }) {
+  const members = Array.isArray(crewLog.crewMembers) ? crewLog.crewMembers : [];
+  const crewDetails = crewLog.crewDetails || {};
+
+  const statColumns = [
+    ["reactions", "Rct"],
+    ["speed", "Spd"],
+    ["combatSkill", "CS"],
+    ["toughness", "Tgh"],
+    ["savvy", "Sav"],
+    ["luck", "Lck"],
+  ];
 
   return (
     <AccordionSection title="Crew">
@@ -1693,12 +1518,74 @@ function CrewLogSheet({ crewLog }) {
           <div className="fp-card-field-grid">
             <CardField label="Starting Crew" value={crewLog.startingCrewCount} />
             <CardField label="Credits" value={crewLog.credits ?? 0} />
-            <CardField label="Pending Effects" value={pendingEffects.length} />
-            <CardField label="Stash Items" value={inventory.length} />
+            <CardField label="Crew Size" value={members.length} />
           </div>
         </DetailCard>
 
-        {starship && (
+        <div className="fp-table-wrap">
+          <table className="fp-table fp-crew-stat-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                {statColumns.map(([key, label]) => <th key={key}>{label}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {members.map((member, index) => {
+                const detail = crewDetails[member.id] || {};
+                const stats = detail.stats || {};
+                return (
+                  <tr key={member.id || `${member.name}-${index}`}>
+                    <td className="fp-wrap-cell">
+                      <strong>{member.number || index + 1}. {member.name || "Unnamed"}</strong>
+                      <div className="fp-equip-row-category">
+                        {[detail.characterType, detail.class?.label, detail.background?.label].filter(Boolean).join(" · ") || "—"}
+                      </div>
+                    </td>
+                    {statColumns.map(([key]) => (
+                      <td key={key}>{stats[key] ?? "—"}</td>
+                    ))}
+                  </tr>
+                );
+              })}
+              {members.length === 0 && (
+                <tr><td colSpan={1 + statColumns.length} className="fp-table-empty">No crew members yet.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {members.map((member, index) => {
+          const detail = crewDetails[member.id] || {};
+          const equipment = Array.isArray(detail.equipment) ? detail.equipment : [];
+          return (
+            <AccordionSection
+              key={member.id || `${member.name}-${index}`}
+              title={`${member.name || "Unnamed Crew Member"} — Weapons & Gear`}
+            >
+              <CrewEquipmentList
+                items={equipment}
+                sourceCrewId={member.id}
+                crewMembers={members}
+                submitAction={submitAction}
+                emptyText="No carried equipment."
+              />
+            </AccordionSection>
+          );
+        })}
+      </div>
+    </AccordionSection>
+  );
+}
+
+function ShipSheet({ crewLog }) {
+  const starship = crewLog.starship && typeof crewLog.starship === "object" ? crewLog.starship : null;
+  const components = Array.isArray(starship?.components) ? starship.components : [];
+
+  return (
+    <AccordionSection title="Ship">
+      {starship ? (
+        <div className="fp-card-stack">
           <DetailCard
             title={starship.name || crewLog.ship || "Starship"}
             subtitle={starship.shipType || "Ship"}
@@ -1711,32 +1598,41 @@ function CrewLogSheet({ crewLog }) {
             </div>
             <TagList values={starship.traits} />
           </DetailCard>
-        )}
 
-        <DetailSection title="Crew Stash" emptyText="No stash equipment yet.">
-          {inventory.length > 0 ? (
-            <div className="fp-card-list">
-              {inventory.map((item, itemIndex) => (
-                <ItemCard item={item} key={item.id || item.name || itemIndex} />
-              ))}
-            </div>
-          ) : null}
-        </DetailSection>
+          <DetailSection title="Components" emptyText="No Components installed.">
+            {components.length > 0 ? (
+              <div className="fp-card-list fp-compact-card-list">
+                {components.map((component, index) => (
+                  <TableResultCard
+                    label={component.componentId}
+                    result={{ label: component.componentId, description: `Installed turn ${component.installedAtTurn}` }}
+                    key={`${component.componentId}-${index}`}
+                  />
+                ))}
+              </div>
+            ) : null}
+          </DetailSection>
+        </div>
+      ) : (
+        <div className="fp-muted">No ship.</div>
+      )}
+    </AccordionSection>
+  );
+}
 
-        <DetailSection title="Crew Members" emptyText="No crew members yet.">
-          {members.length > 0 ? (
-            <div className="fp-card-stack">
-              {members.map((member, index) => (
-                <div key={member.id || `${member.name}-${index}`}>{renderCrewDetail(member, index)}</div>
-              ))}
-            </div>
-          ) : null}
-        </DetailSection>
+function StashSheet({ crewLog, submitAction }) {
+  const inventory = Array.isArray(crewLog.inventory) ? crewLog.inventory : [];
+  const members = Array.isArray(crewLog.crewMembers) ? crewLog.crewMembers : [];
 
-        <DetailSection title="Notes">
-          <p>{crewLog.notes || <EmptyValue />}</p>
-        </DetailSection>
-      </div>
+  return (
+    <AccordionSection title="Stash">
+      <CrewEquipmentList
+        items={inventory}
+        sourceCrewId={null}
+        crewMembers={members}
+        submitAction={submitAction}
+        emptyText="No stash equipment yet."
+      />
     </AccordionSection>
   );
 }
@@ -2338,7 +2234,9 @@ export default function FiveParsecsProcedureView({ gameState, submitAction, play
 
       <section className="fp-record-sheets">
         <CampaignSheet campaign={safeGameState.campaign} />
-        <CrewLogSheet crewLog={safeGameState.crewLog} />
+        <CrewSheet crewLog={safeGameState.crewLog} submitAction={submitAction} />
+        <ShipSheet crewLog={safeGameState.crewLog} />
+        <StashSheet crewLog={safeGameState.crewLog} submitAction={submitAction} />
         <EncounterLogSheet encounterLog={safeGameState.encounterLog} />
         <WorldLogSheet worldLog={safeGameState.worldLog} campaign={safeGameState.campaign} />
       </section>

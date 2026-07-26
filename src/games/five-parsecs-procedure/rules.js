@@ -358,6 +358,52 @@ function resolveActiveCommand(state, action = {}) {
   return removeUndefinedValues(nextState);
 }
 
+// Moves one equipment record between the shared Stash and a crew member's
+// carried equipment (or between two crew members), independent of the
+// command queue — the always-visible Crew record sheet isn't a turn step,
+// so it can't go through RESOLVE_ACTIVE_COMMAND. sourceCrewId/destinationCrewId
+// of null/undefined means the Stash.
+function moveEquipment(state, action = {}) {
+  const safeState = initializeMissingGameState(state);
+  const { sourceCrewId, index, destinationCrewId } = action;
+
+  if (sourceCrewId === destinationCrewId) {
+    return safeState;
+  }
+
+  const crewDetails = { ...(safeState.crewLog.crewDetails || {}) };
+  let inventory = Array.isArray(safeState.crewLog.inventory) ? [...safeState.crewLog.inventory] : [];
+
+  const sourceList = sourceCrewId
+    ? [...(crewDetails[sourceCrewId]?.equipment || [])]
+    : inventory;
+  const item = sourceList[index];
+
+  if (!item) {
+    return safeState;
+  }
+
+  sourceList.splice(index, 1);
+
+  if (sourceCrewId) {
+    crewDetails[sourceCrewId] = { ...crewDetails[sourceCrewId], equipment: sourceList };
+  } else {
+    inventory = sourceList;
+  }
+
+  if (destinationCrewId) {
+    const destList = [...(crewDetails[destinationCrewId]?.equipment || []), item];
+    crewDetails[destinationCrewId] = { ...crewDetails[destinationCrewId], equipment: destList };
+  } else {
+    inventory = [...inventory, item];
+  }
+
+  return removeUndefinedValues({
+    ...safeState,
+    crewLog: { ...safeState.crewLog, crewDetails, inventory },
+  });
+}
+
 export function submitAction(...args) {
   const action = normalizeAction(args);
   const state = normalizeState(args, action);
@@ -372,6 +418,9 @@ export function submitAction(...args) {
 
     case "RESOLVE_ACTIVE_COMMAND":
       return resolveActiveCommand(state, action);
+
+    case "MOVE_EQUIPMENT":
+      return moveEquipment(state, action);
 
     default:
       return state;
