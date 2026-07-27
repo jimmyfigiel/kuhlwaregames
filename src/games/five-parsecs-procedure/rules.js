@@ -404,6 +404,29 @@ function moveEquipment(state, action = {}) {
   });
 }
 
+// Directly edits one stat on one crew member's sheet, independent of the
+// command queue — same rationale as moveEquipment above: the always-visible
+// Crew record sheet isn't a turn step, so manual stat corrections made there
+// can't go through RESOLVE_ACTIVE_COMMAND.
+function updateCrewStat(state, action = {}) {
+  const safeState = initializeMissingGameState(state);
+  const { crewId, stat, value } = action;
+
+  if (!crewId || !stat) {
+    return safeState;
+  }
+
+  const crewDetails = { ...(safeState.crewLog.crewDetails || {}) };
+  const existingDetail = crewDetails[crewId] || {};
+  const stats = { ...(existingDetail.stats || {}), [stat]: value };
+  crewDetails[crewId] = { ...existingDetail, stats };
+
+  return removeUndefinedValues({
+    ...safeState,
+    crewLog: { ...safeState.crewLog, crewDetails },
+  });
+}
+
 export function submitAction(...args) {
   const action = normalizeAction(args);
   const state = normalizeState(args, action);
@@ -421,6 +444,9 @@ export function submitAction(...args) {
 
     case "MOVE_EQUIPMENT":
       return moveEquipment(state, action);
+
+    case "UPDATE_CREW_STAT":
+      return updateCrewStat(state, action);
 
     default:
       return state;
