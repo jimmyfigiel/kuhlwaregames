@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { CompoundNameGenerator, MarkovNameGenerator } from "../../procedure-core/name-generator";
 import {
   FIVE_PARSECS_WORLD_NAME_PARTS,
@@ -7,7 +7,31 @@ import {
   pulpyFiveParsecsNames,
   randomShipName,
 } from "./data/nameSets";
+import {
+  WEAPONS_TABLE,
+  PROTECTION_TABLE,
+  CONSUMABLES_TABLE,
+  IMPLANTS_TABLE,
+  UTILITY_DEVICES_TABLE,
+  ONBOARD_ITEMS_TABLE,
+  GUN_MODS_TABLE,
+  GUN_SIGHTS_TABLE,
+} from "./data/equipment/equipmentCatalog";
 import "./view.css";
+
+// Older/simpler equipment records (e.g. starting gear rolled at crew
+// creation) only ever stored a name + category, not stats — this looks
+// those up by name against the catalog so the crew table can still show
+// range/damage/traits/effect text without a data migration.
+const EQUIPMENT_CATALOG_BY_NAME = new Map();
+WEAPONS_TABLE.forEach((w) => EQUIPMENT_CATALOG_BY_NAME.set(w.name.toLowerCase(), { kind: "weapon", ...w }));
+PROTECTION_TABLE.forEach((p) => EQUIPMENT_CATALOG_BY_NAME.set(p.name.toLowerCase(), { kind: "protection", ...p }));
+[...CONSUMABLES_TABLE, ...IMPLANTS_TABLE, ...UTILITY_DEVICES_TABLE, ...ONBOARD_ITEMS_TABLE, ...GUN_MODS_TABLE, ...GUN_SIGHTS_TABLE].forEach((g) => {
+  const key = g.name.toLowerCase();
+  if (!EQUIPMENT_CATALOG_BY_NAME.has(key)) {
+    EQUIPMENT_CATALOG_BY_NAME.set(key, { kind: "gear", ...g });
+  }
+});
 
 const GAME_VERSION = "five-parsecs-procedure-v1-54";
 
@@ -1445,6 +1469,60 @@ function CampaignSheet({ campaign }) {
 
 const STASH_VALUE = "__stash__";
 
+function formatWeaponFields({ range, shots, damage, traits }) {
+  const parts = [
+    range || null,
+    shots ? `${shots} shot${shots === 1 ? "" : "s"}` : null,
+    damage !== undefined && damage !== "" ? `dmg ${damage}` : null,
+    ...(Array.isArray(traits) ? traits : []),
+  ].filter(Boolean);
+  return parts.join(" · ");
+}
+
+function formatProtectionFields({ save, effect, traits }) {
+  const parts = [
+    save ? `Save ${save}` : null,
+    effect || null,
+    ...(Array.isArray(traits) ? traits : []),
+  ].filter(Boolean);
+  return parts.join(" · ");
+}
+
+function formatGearFields({ effect, traits }) {
+  const parts = [effect || null, ...(Array.isArray(traits) ? traits : [])].filter(Boolean);
+  return parts.join(" · ");
+}
+
+// Boils an equipment record down to one display line — this is what lets
+// the crew table show "everything needed to play a battle" without opening
+// the item. Prefers stats embedded directly on the record (item.weapon/
+// .armor/.gear); falls back to a catalog lookup by name for older/simpler
+// records (e.g. starting gear) that only ever stored a name + category.
+function formatEquipmentSummary(item) {
+  if (item.category === "weapon" && item.weapon) {
+    return formatWeaponFields(item.weapon);
+  }
+  if (item.category === "protection" && item.armor) {
+    return formatProtectionFields({ ...item.armor, effect: item.gear?.effect });
+  }
+  if (item.gear?.effect || item.gear?.traits?.length) {
+    return formatGearFields(item.gear);
+  }
+
+  const catalogEntry = EQUIPMENT_CATALOG_BY_NAME.get((item.name || "").toLowerCase());
+  if (catalogEntry?.kind === "weapon") {
+    return formatWeaponFields(catalogEntry);
+  }
+  if (catalogEntry?.kind === "protection") {
+    return formatProtectionFields(catalogEntry);
+  }
+  if (catalogEntry?.kind === "gear") {
+    return formatGearFields(catalogEntry);
+  }
+
+  return item.category || "";
+}
+
 function EquipmentMoveSelect({ sourceCrewId, index, crewMembers, submitAction, gameState }) {
   const destinations = [
     { value: STASH_VALUE, label: "Stash" },
@@ -1500,9 +1578,58 @@ function CrewEquipmentList({ items, sourceCrewId, crewMembers, submitAction, emp
   );
 }
 
+function EditableStatCell({ crewId, stat, value, submitAction, gameState }) {
+  function handleChange(event) {
+    const raw = event.target.value;
+    const num = raw === "" ? 0 : Number(raw);
+    submitAction({
+      type: "UPDATE_CREW_STAT",
+      stateSnapshot: gameState,
+      crewId,
+      stat,
+      value: Number.isFinite(num) ? num : 0,
+    });
+  }
+
+  return (
+    <input
+      type="number"
+      className="fp-stat-input"
+      value={value ?? 0}
+      onChange={handleChange}
+    />
+  );
+}
+
+function CrewGearRow({ item, index, sourceCrewId, crewMembers, submitAction, gameState, editing, colSpan }) {
+  const summary = formatEquipmentSummary(item);
+  return (
+    <tr className="fp-gear-subrow">
+      <td colSpan={colSpan}>
+        <div className="fp-equip-row">
+          <div className="fp-equip-row-main">
+            <span className="fp-equip-row-name">{item.name}{item.damaged ? " (Damaged)" : ""}</span>
+            {summary && <span className="fp-equip-row-category">{summary}</span>}
+          </div>
+          {editing && (
+            <EquipmentMoveSelect
+              sourceCrewId={sourceCrewId}
+              index={index}
+              crewMembers={crewMembers}
+              submitAction={submitAction}
+              gameState={gameState}
+            />
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+}
+
 function CrewSheet({ crewLog, submitAction, gameState }) {
   const members = Array.isArray(crewLog.crewMembers) ? crewLog.crewMembers : [];
   const crewDetails = crewLog.crewDetails || {};
+  const [editingId, setEditingId] = useState(null);
 
   const statColumns = [
     ["reactions", "Rct"],
@@ -1512,6 +1639,7 @@ function CrewSheet({ crewLog, submitAction, gameState }) {
     ["savvy", "Sav"],
     ["luck", "Lck"],
   ];
+  const colSpan = 1 + statColumns.length;
 
   return (
     <AccordionSection title="Crew">
@@ -1523,6 +1651,8 @@ function CrewSheet({ crewLog, submitAction, gameState }) {
             <CardField label="Crew Size" value={members.length} />
           </div>
         </DetailCard>
+
+        <div className="fp-muted fp-crew-table-hint">Tap a crew member's name to edit their stats and move gear.</div>
 
         <div className="fp-table-wrap">
           <table className="fp-table fp-crew-stat-table">
@@ -1536,46 +1666,67 @@ function CrewSheet({ crewLog, submitAction, gameState }) {
               {members.map((member, index) => {
                 const detail = crewDetails[member.id] || {};
                 const stats = detail.stats || {};
+                const equipment = Array.isArray(detail.equipment) ? detail.equipment : [];
+                const isEditing = editingId === member.id;
                 return (
-                  <tr key={member.id || `${member.name}-${index}`}>
-                    <td className="fp-wrap-cell">
-                      <strong>{member.number || index + 1}. {member.name || "Unnamed"}</strong>
-                      <div className="fp-equip-row-category">
-                        {[detail.characterType, detail.class?.label, detail.background?.label].filter(Boolean).join(" · ") || "—"}
-                      </div>
-                    </td>
-                    {statColumns.map(([key]) => (
-                      <td key={key}>{stats[key] ?? "—"}</td>
-                    ))}
-                  </tr>
+                  <Fragment key={member.id || `${member.name}-${index}`}>
+                    <tr className={isEditing ? "fp-crew-row-editing" : undefined}>
+                      <td className="fp-wrap-cell">
+                        <button
+                          type="button"
+                          className="fp-crew-name-button"
+                          onClick={() => setEditingId(isEditing ? null : member.id)}
+                        >
+                          {member.number || index + 1}. {member.name || "Unnamed"}
+                        </button>
+                        <div className="fp-equip-row-category">
+                          {[detail.characterType, detail.class?.label, detail.background?.label].filter(Boolean).join(" · ") || "—"}
+                        </div>
+                      </td>
+                      {statColumns.map(([key]) => (
+                        <td key={key}>
+                          {isEditing ? (
+                            <EditableStatCell
+                              crewId={member.id}
+                              stat={key}
+                              value={stats[key]}
+                              submitAction={submitAction}
+                              gameState={gameState}
+                            />
+                          ) : (
+                            stats[key] ?? "—"
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                    {equipment.length === 0 ? (
+                      <tr className="fp-gear-subrow">
+                        <td colSpan={colSpan} className="fp-table-empty">No carried equipment.</td>
+                      </tr>
+                    ) : (
+                      equipment.map((item, itemIndex) => (
+                        <CrewGearRow
+                          key={item.equipmentId || item.id || `${item.name}-${itemIndex}`}
+                          item={item}
+                          index={itemIndex}
+                          sourceCrewId={member.id}
+                          crewMembers={members}
+                          submitAction={submitAction}
+                          gameState={gameState}
+                          editing={isEditing}
+                          colSpan={colSpan}
+                        />
+                      ))
+                    )}
+                  </Fragment>
                 );
               })}
               {members.length === 0 && (
-                <tr><td colSpan={1 + statColumns.length} className="fp-table-empty">No crew members yet.</td></tr>
+                <tr><td colSpan={colSpan} className="fp-table-empty">No crew members yet.</td></tr>
               )}
             </tbody>
           </table>
         </div>
-
-        {members.map((member, index) => {
-          const detail = crewDetails[member.id] || {};
-          const equipment = Array.isArray(detail.equipment) ? detail.equipment : [];
-          return (
-            <AccordionSection
-              key={member.id || `${member.name}-${index}`}
-              title={`${member.name || "Unnamed Crew Member"} — Weapons & Gear`}
-            >
-              <CrewEquipmentList
-                items={equipment}
-                sourceCrewId={member.id}
-                crewMembers={members}
-                submitAction={submitAction}
-                emptyText="No carried equipment."
-                gameState={gameState}
-              />
-            </AccordionSection>
-          );
-        })}
       </div>
     </AccordionSection>
   );

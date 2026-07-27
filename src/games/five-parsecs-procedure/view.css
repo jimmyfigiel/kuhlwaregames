@@ -1353,3 +1353,61 @@
   color: #111827;
   font-size: 0.85rem;
 }
+
+.fp-wrap-cell {
+  white-space: normal;
+}
+
+.fp-crew-table-hint {
+  font-size: 0.8rem;
+}
+
+.fp-crew-name-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-weight: 700;
+  color: #111827;
+  cursor: pointer;
+  text-align: left;
+}
+
+.fp-crew-name-button:hover,
+.fp-crew-name-button:focus-visible {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.fp-crew-row-editing > td {
+  background: #eff6ff;
+}
+
+.fp-gear-subrow td {
+  white-space: normal;
+  background: #f9fafb;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.fp-gear-subrow .fp-equip-row {
+  padding: 4px 0 4px 16px;
+  border-bottom: none;
+}
+
+.fp-gear-subrow .fp-equip-row-name {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.fp-stat-input {
+  width: 42px;
+  padding: 3px 4px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+  font-size: 0.85rem;
+  text-align: center;
+}
